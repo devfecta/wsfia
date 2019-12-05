@@ -1,5 +1,58 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+	div.row
+		div.col-lg-4.justify-content-center.align-items-center
+			img(src="images/WSFIA_Logo.png" alt="Wisconsin State Fire Inspectors Association").img-fluid
+
+		div.col-lg-8
+			p To provide the people of Wisconsin we serve with effective life safety strategies through comprehensive 
+				| inspection, public education, code management, and fire investigation training and awareness. We also 
+				| strive through diligent practice and enforcement to keep all persons, including members of the fire service safe.
+
+			p The Wisconsin State Fire Inspectors Association fosters the highest standards of fire prevention in the 
+				| state of Wisconsin through progressive Fire Inspections and Public Fire and Life Safety Education.
+
+			p If you have any questions or concerns related to fire inspections, public education, or the field of fire 
+				| prevention, please contact anyone from our association.
+				a(href="/executive-board-members" title="WSFIA Executive Board Members") 
+						| Click here for our board of directors and executive board members who will be happy to help.
+
+		div.card.text-white.bg-secondary.my-4.text-center
+			div.card-body.d-flex.justify-content-around.align-items-center
+				p.text-white.m-0 Become a member today to get the latest information reguarding fire inspection, 
+					| public education, and fire investigation.
+					a(href="registration").m-3.btn.btn-primary Membership Registration
+
+		div.row
+			div.col-md-4.mb-4
+				div.card.h-100
+					div.card-body
+						h2.card-title News / Announcements
+						p.card-text
+
+					div.card-footer
+						a(href="#").btn.btn-primary More Info
+
+			div.col-md-4.mb-4
+				div.card.h-100
+					div.card-body
+						h2.card-title Sponsors
+						p.card-text The WSFIA is support by some of the finest companies in the industry.
+
+					div.card-footer
+						a(href="#").btn.btn-primary View Sponsors
+
+			div.col-md-4.mb-4
+				div.card.h-100
+					div.card-body
+						h2.card-title Follow Us
+						p.card-text For instant updates from the WSFIA follow us on social media.
+
+					div.card-footer.d-flex.justify-content-around
+						a(href="https://www.facebook.com/WSFIA" target="_blank" rel="noopener noreferrer")
+							span(style="color:#3b5998").fab.fa-facebook-square.fa-w-14.fa-5x
+
+
+						a(href="https://twitter.com/wsfia" target="_blank" rel="noopener noreferrer")
+							span(style="color:#1da1f2").fab.fa-twitter-square.fa-5x
