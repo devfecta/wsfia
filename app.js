@@ -38,11 +38,4 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-let server = app.listen(3000);
-console.log('Listening on: ' + server.address().port);
-/*
-let server = app.listen(0, () => {
-  console.log('Listening', server.address().port)
-})
-*/
 module.exports = app;
