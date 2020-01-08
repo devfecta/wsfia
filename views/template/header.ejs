@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <!--
+          Notice the use of %PUBLIC_URL% in the tags above.
+          It will be replaced with the URL of the `public` folder during the build.
+          Only files inside the `public` folder can be referenced from the HTML.
+
+          Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+          work correctly both with client-side routing and a non-root public URL.
+          Learn how to configure a non-root public URL by running `npm run build`.
+        -->
+        <title>Wisconsin State Fire Inspectors Association</title>
+
+        <!-- Bootstrap Core CSS -->
+        <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
+        <!-- Font Awesome CSS for Icons -->
+        <!--
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+        -->
+        <link rel="stylesheet" href="./css/main.css">
+        
+    </head>
+    <!-- getView(document.cookie.split(';')) -->
+    <body>
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        
+        <header id="header">
+
+            <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+              <div class="container">
+              <a class="navbar-brand text-light" onclick="loadView('home');">
+                      <img src="./images/WSFIA_Logo.png" alt="Wisconsin State Fire Inspectors Association" /> <span class="d-none d-sm-none d-md-inline-block">Wisconsin State Fire Inspectors Association</span> <span class="d-sm-inline-block d-md-none">WSFIA</span>
+                      </a>
+                  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                  </button>
+                  <div class="collapse navbar-collapse" id="navbarResponsive">
+                      <ul class="navbar-nav ml-auto">
+                          <li class="nav-item dropdown">
+                              <a class="nav-link dropdown-toggle" id="infoDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Association Info</a>
+                              <div class="dropdown-menu" aria-labelledby="infoDropdown">
+                                  <a class="dropdown-item" onclick="loadView('executive-board-members');">WSFIA Executive Board Members</a>
+                                  <a class="dropdown-item" onclick="loadView('job-postings');">Job Postings</a>
+                                  <a class="dropdown-item" onclick="loadView('calendar');">WSFIA Calendar</a>
+                                  <a class="dropdown-item" href="https://www.thefirefightersdaughters.com/p/catalog/8da7d64f-c19a-49d3-9235-a081ad6fda83/wsfia-gear-store" target="_blank" rel="noopener noreferrer">WSFIA Clothing</a>
+                                  <a class="dropdown-item" onclick="loadView('area-map');">WSFIA Area Map</a>
+                              </div>
+                          </li>
+                          <li class="nav-item dropdown">
+                              <a class="nav-link dropdown-toggle" id="conferenceDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Conference</a>
+                              <div class="dropdown-menu" aria-labelledby="conferenceDropdown">
+                                  <a class="dropdown-item" onclick="loadView('awards');">Awards</a>
+                                  <a class="dropdown-item" onclick="loadView('scholarships');">Scholarships</a>
+                                  <a class="dropdown-item" onclick="loadView('conference-registration');">Registration</a>
+                                  <a class="dropdown-item" href="https://www.facebook.com/WSFIA/" target="_blank" rel="noopener noreferrer">Conference Photos</a>
+                              </div>
+                          </li>
+    <!-- Need Check for Login -->
+                          <li class="nav-item dropdown">
+                              <a class="nav-link dropdown-toggle" id="memberAreaDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Member Area</a>
+                              <div class="dropdown-menu" aria-labelledby="memberAreaDropdown">
+                                
+                                <!--
+                                    if ($_SESSION['loggedIn']) {
+                                        echo '<a class="dropdown-item" onclick="loadView(\'account\');">Account Info</a>';
+                                        echo '<a class="dropdown-item" onclick="loadView(\'documents\');">Documents</a>';
+                                    }
+                                    else {
+                                        echo '<a class="dropdown-item" onclick="loadView(\'login\');">Login</a>';
+                                        echo '<a class="dropdown-item" onclick="loadView(\'registration\');">Register</a>';
+                                    }
+                                -->
+                                  
+                              </div>
+                          </li>
+
+                          <li class="nav-item">
+                              <a class="nav-link" onclick="loadView('links');">Links</a>
+                          </li>
+                          <li class="nav-item">
+                              <a class="nav-link" onclick="loadView('executive-board-members');">Contact Us</a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </nav>
+        
+        </header>
+        <main role="main" id="main" class="container py-5 mb-4">
