@@ -66,18 +66,13 @@
                           <li class="nav-item dropdown">
                               <a class="nav-link dropdown-toggle" id="memberAreaDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Member Area</a>
                               <div class="dropdown-menu" aria-labelledby="memberAreaDropdown">
-                                
-                                <!--
-                                    if ($_SESSION['loggedIn']) {
-                                        echo '<a class="dropdown-item" onclick="loadView(\'account\');">Account Info</a>';
-                                        echo '<a class="dropdown-item" onclick="loadView(\'documents\');">Documents</a>';
-                                    }
-                                    else {
-                                        echo '<a class="dropdown-item" onclick="loadView(\'login\');">Login</a>';
-                                        echo '<a class="dropdown-item" onclick="loadView(\'registration\');">Register</a>';
-                                    }
-                                -->
-                                  
+                                <% if (session) { %>
+                                        <a class="dropdown-item" onclick="loadView(\'account\');">Account Info</a>
+                                        <a class="dropdown-item" onclick="loadView(\'documents\');">Documents</a>
+                                <% } else { %>
+                                        <a class="dropdown-item" onclick="loadView(\'login\');">Login</a>
+                                        <a class="dropdown-item" onclick="loadView(\'registration\');">Register</a>
+                                <%  } %>
                               </div>
                           </li>
 

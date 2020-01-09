@@ -17,6 +17,7 @@
 	},
 	"homepage": "https://github.com/devfecta/wsfia#readme",
 	"dependencies": {
+		"bcrypt": "^3.0.7",
 		"bootstrap": "^4.4.1",
 		"ejs": "^3.0.1",
 		"express": "^4.17.1",
