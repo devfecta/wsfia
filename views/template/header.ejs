@@ -25,6 +25,7 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
         -->
         <link rel="stylesheet" href="./css/main.css">
+        <script src="./javascript/utilities.js"></script>
         
     </head>
     <!-- getView(document.cookie.split(';')) -->
@@ -35,7 +36,7 @@
 
             <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
               <div class="container">
-              <a class="navbar-brand text-light" onclick="loadView('home');">
+              <a class="navbar-brand text-light" href="/">
                       <img src="./images/WSFIA_Logo.png" alt="Wisconsin State Fire Inspectors Association" /> <span class="d-none d-sm-none d-md-inline-block">Wisconsin State Fire Inspectors Association</span> <span class="d-sm-inline-block d-md-none">WSFIA</span>
                       </a>
                   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,12 +67,12 @@
                           <li class="nav-item dropdown">
                               <a class="nav-link dropdown-toggle" id="memberAreaDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Member Area</a>
                               <div class="dropdown-menu" aria-labelledby="memberAreaDropdown">
-                                <% if (session) { %>
-                                        <a class="dropdown-item" onclick="loadView(\'account\');">Account Info</a>
-                                        <a class="dropdown-item" onclick="loadView(\'documents\');">Documents</a>
+                                <% if (session.user) { %>
+                                        <a class="dropdown-item" href="/account">Account Info</a>
+                                        <a class="dropdown-item" href="/documents">Documents</a>
                                 <% } else { %>
-                                        <a class="dropdown-item" onclick="loadView(\'login\');">Login</a>
-                                        <a class="dropdown-item" onclick="loadView(\'registration\');">Register</a>
+                                        <a class="dropdown-item" href="/login">Login</a>
+                                        <a class="dropdown-item" href="/register">Register</a>
                                 <%  } %>
                               </div>
                           </li>

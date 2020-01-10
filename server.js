@@ -1,7 +1,11 @@
 const express = require('express');
+const session = require('express-session');
 const app = express();
 const bcrypt = require('bcrypt');
+const dotenv = require('dotenv');
+dotenv.config();
 
+app.use(session({secret: 'secretValue', saveUninitialized: false, resave: false}));
 app.use(express.static('public'));
 
 const Controllers = require('./controllers');
@@ -12,16 +16,20 @@ app.set('view-engine', 'ejs');
 app.use(express.urlencoded({extended: false}));
 
 app.get('/', (request, response) => {
-    response.render('index.ejs', { session: '' });
+    request.session.test = 'testing';
+    console.log(request.session);
+    response.render('index.ejs', { session: request.session });
 });
 
 app.get('/login', (request, response) => {
-    response.render('login.ejs', { session: '' });
+
+    console.log(request.session);
+    response.render('login.ejs', { session: request.session });
     // controllers.member.login();
 });
 
 app.get('/register', (request, response) => {
-    response.render('./registration/businessInfo.ejs');
+    response.render('./registration/businessInfo.ejs', { session: request.session });
 });
 
 app.post('/register', async (request, response) => {
@@ -30,12 +38,15 @@ app.post('/register', async (request, response) => {
         const hashedPassword = await bcrypt.hash(request.body.password, 10);
         request.body.email
 
-        response.render('./registration/memberInfo.ejs', { session: '' });
+        response.render('./registration/memberInfo.ejs', { session: request.session });
         
     }
     catch {}
 
-    response.render('register.ejs', { session: '', view: ''});
+    response.render('register.ejs', { session: request.session, view: ''});
+
 });
 
-app.listen(3000);
+app.listen(process.env.PORT, () => {
+    console.log(`App Started on Port ${process.env.PORT}`);
+});
