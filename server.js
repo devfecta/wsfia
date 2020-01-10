@@ -1,5 +1,6 @@
 const express = require('express');
 const session = require('express-session');
+const cookie = require('cookie');
 const app = express();
 const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
@@ -30,6 +31,11 @@ app.get('/login', (request, response) => {
 
 app.get('/register', (request, response) => {
     response.render('./registration/businessInfo.ejs', { session: request.session });
+});
+
+app.get('/register/members', (request, response) => {
+    //let cookies = cookie.parse(request.headers.cookie);
+    response.render('./registration/businessMembers.ejs', { session: request.session});
 });
 
 app.post('/register', async (request, response) => {
