@@ -7,7 +7,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 app.use(session({secret: 'secretValue', saveUninitialized: false, resave: false}));
-app.use(express.static('public'));
+// app.use(express.static('public'));
+app.use('/', express.static('public'));
 
 const Controllers = require('./controllers');
 const controllers = new Controllers();
@@ -30,12 +31,37 @@ app.get('/login', (request, response) => {
 });
 
 app.get('/register', (request, response) => {
-    response.render('./registration/businessInfo.ejs', { session: request.session });
+    //console.log(app.request.get('header'));
+    response.render('./registration/businessSearch.ejs', { session: request.session });
+});
+
+app.get('/register/business', (request, response) => {
+    //let cookies = cookie.parse(request.headers.cookie);
+    response.render('./registration/businessInfo.ejs', { session: request.session});
+});
+
+app.post('/register/business', async (request, response) => {
+
+    try {
+        
+        await fetch('http://localhost/wsfia-dev/configuration/api.php?class=Business&method=searchBusinessesByName&searchBusinesses='+searchString
+            , { method: 'POST'
+                , headers: {'Content-Type': 'text/json'}
+                , body: request.body
+            }
+        ).then(response => { return response.text() })
+        .then(res => console.log(res))
+        .catch(error => {console.log(new Error(error))});
+        
+    }
+    catch {}
+
+    //response.render('./registration/businessInfo.ejs', { session: request.session});
 });
 
 app.get('/register/members', (request, response) => {
     //let cookies = cookie.parse(request.headers.cookie);
-    response.render('./registration/businessMembers.ejs', { session: request.session});
+    response.render('./registration/memberInfo.ejs', { session: request.session});
 });
 
 app.post('/register', async (request, response) => {

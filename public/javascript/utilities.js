@@ -91,7 +91,7 @@ const getBusinesses = (data) => {
 	else {
 		
 		results.innerHTML = `
-			<p>No Results Found <button type="button" onclick="loadView('createBusiness');" class="btn btn-primary">Create Department/Business</button></p>
+			<p>No Results Found <a href="/register/business" class="btn btn-primary">Create Department/Business</a></p>
 		`;
 	}
 
@@ -189,15 +189,37 @@ const getMembers = async (businessId) => {
 
             currentForm.appendChild(registerRow);
 
-
-
-
-
         })
         .catch(error => displayError(error));
     /*
 	
     */
+}
+
+const buildStatesDropdown = async () => {
+
+    let parameters = 'class=Business';
+        parameters += '&method=getStates';
+
+    await fetch('http://localhost/wsfia-dev/configuration/api.php?' + parameters, {method: 'GET'})
+    .then(response => response.json())
+    .then(data => {
+        const statesDropdown = document.querySelector('#states');
+
+            data.forEach( state => {
+
+                let stateOption = document.createElement('option');
+                stateOption.setAttribute('value', state.stateId);
+                if(state.stateId == 49) {
+                    stateOption.setAttribute('selected', true);
+                }
+                stateOption.innerHTML = state.stateName;
+                statesDropdown.appendChild(stateOption);
+                
+            });
+    })
+    .catch(error => displayError(error));
+
 }
 
 /**
