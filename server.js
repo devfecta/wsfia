@@ -40,25 +40,6 @@ app.get('/register/business', (request, response) => {
     response.render('./registration/businessInfo.ejs', { session: request.session});
 });
 
-app.post('/register/business', async (request, response) => {
-
-    try {
-        
-        await fetch('http://localhost/wsfia-dev/configuration/api.php?class=Business&method=searchBusinessesByName&searchBusinesses='+searchString
-            , { method: 'POST'
-                , headers: {'Content-Type': 'text/json'}
-                , body: request.body
-            }
-        ).then(response => { return response.text() })
-        .then(res => console.log(res))
-        .catch(error => {console.log(new Error(error))});
-        
-    }
-    catch {}
-
-    //response.render('./registration/businessInfo.ejs', { session: request.session});
-});
-
 app.get('/register/members', (request, response) => {
     //let cookies = cookie.parse(request.headers.cookie);
     response.render('./registration/memberInfo.ejs', { session: request.session});

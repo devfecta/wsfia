@@ -3,7 +3,7 @@
 <section id="businessInfo">
     <h1>Add a Department/Business</h1>
 
-    <form name="businessForm" id="businessForm" action="/register/business" method="POST">
+    <form name="businessForm" id="businessForm">
         <fieldset>
             <legend>Department/Business Information</legend>
 
@@ -87,7 +87,7 @@
             
         <div class="form-group row">
             <div class="col-md-12 p-5 text-right">
-                <button type="submit" id="addButton" style="min-width: 150px; width:25%" class="btn btn-primary">Add Department / Business</button>
+                <button type="button" onclick="addBusiness()" id="addButton" style="min-width: 150px; width:25%" class="btn btn-primary">Add Department / Business</button>
                 <a href="/register" id="nextButton" style="min-width: 150px; width:25%" class="btn btn-secondary">Cancel</a>
             </div>
         </div>

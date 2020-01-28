@@ -99,6 +99,60 @@ const getBusinesses = (data) => {
 	
 }
 
+const addBusiness = async () => {
+
+// 'http://localhost/wsfia-dev/configuration/api.php?class=Business&method=searchBusinessesByName&searchBusinesses='+searchString
+
+    try {
+
+        let inputFields = document.querySelectorAll('input');
+        let selectFields = document.querySelectorAll('select');
+
+        let formData = {};
+
+        inputFields.forEach(input => {
+
+            if (input.checked) {
+                formData[input.name] = input.value;
+            } else if (input.type !== 'radio') {
+                formData[input.name] = input.value;
+            }
+            
+        });
+
+        selectFields.forEach(select => {
+
+            let option = {};
+
+            option.id = select.selectedOptions[0].value;
+            option.name = select.selectedOptions[0].text;
+
+            formData[select.name] = option;
+
+        });
+
+        console.log(formData);
+
+        await fetch('http://localhost/wsfia-dev/configuration/api.php'
+            , { method: 'POST'
+            , mode: 'cors'
+            //, headers: {'Accept': 'application/json', 'Content-Type': 'application/json'}
+            , body: JSON.stringify(formData)
+            }
+        )
+        .then(response => response.json())
+        .then(res => console.log(res))
+        .catch(error => displayError(error));
+        
+    }
+    catch {
+        console.error('catch error');
+    }
+
+    return false;
+    
+}
+
 /**
  * Displays members of a department/company.
  * @param {*} businessId 
