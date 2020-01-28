@@ -105,44 +105,24 @@ const addBusiness = async () => {
 
     try {
 
-        let inputFields = document.querySelectorAll('input');
-        let selectFields = document.querySelectorAll('select');
+        const formData = new FormData(document.querySelector("#businessForm"));
 
-        let formData = {};
+        formData.append('class', 'Business');
+        formData.append('method', 'createBusiness');
 
-        inputFields.forEach(input => {
-
-            if (input.checked) {
-                formData[input.name] = input.value;
-            } else if (input.type !== 'radio') {
-                formData[input.name] = input.value;
-            }
-            
+        formData.forEach(value => {
+            console.log(value);
         });
-
-        selectFields.forEach(select => {
-
-            let option = {};
-
-            option.id = select.selectedOptions[0].value;
-            option.name = select.selectedOptions[0].text;
-
-            formData[select.name] = option;
-
-        });
-
-        console.log(formData);
-
+        
         await fetch('http://localhost/wsfia-dev/configuration/api.php'
             , { method: 'POST'
-            , mode: 'cors'
-            //, headers: {'Accept': 'application/json', 'Content-Type': 'application/json'}
-            , body: JSON.stringify(formData)
+            , body: formData
             }
         )
         .then(response => response.json())
         .then(res => console.log(res))
         .catch(error => displayError(error));
+        
         
     }
     catch {
