@@ -101,8 +101,6 @@ const getBusinesses = (data) => {
 
 const addBusiness = async () => {
 
-// 'http://localhost/wsfia-dev/configuration/api.php?class=Business&method=searchBusinessesByName&searchBusinesses='+searchString
-
     try {
 
         const formData = new FormData(document.querySelector("#businessForm"));
@@ -120,7 +118,11 @@ const addBusiness = async () => {
             }
         )
         .then(response => response.json())
-        .then(res => console.log(res))
+        .then(json => {
+            if (json) {
+                window.location.replace("/register");
+            }
+        })
         .catch(error => displayError(error));
         
         
