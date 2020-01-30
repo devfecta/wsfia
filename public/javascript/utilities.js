@@ -31,107 +31,71 @@ const businessSearch = async (searchString) => {
  */
 const getBusinesses = (data) => {
 
-	const searchResults = document.getElementById('searchResultsId');
-	searchResults.innerHTML = `
-		<p class="text-danger">If you don't see your department/business, click on the "Create Department/Business" button 
-		to add your department/business to our system.</p>
-	`;
+    const searchResults = document.getElementById('searchResultsId');
+    searchResults.innerHTML = `
+        <p class="text-danger">If you don't see your department/business, click on the "Create Department/Business" button 
+        to add your department/business to our system.</p>
+    `;
 
-	let results = document.createElement("div");
-	//console.log(data);
-	if (data.length > 0) {
+    let results = document.createElement("div");
+    //console.log(data);
+    if (data.length > 0) {
 
-		searchResults.innerHTML += `
-			<p class="text-danger">Click on the "View Members" button to view all of the members of associated with the department/business.</p>
-		`;
+        searchResults.innerHTML += `
+            <p class="text-danger">Click on the "View Members" button to view all of the members of associated with the department/business.</p>
+        `;
 
-		data.forEach(business => {
+        data.forEach(business => {
 
             //document.cookie = 'businessId=' + business.id;
             //console.log(document.cookie);
 
-			let resultRow = document.createElement("div");
-			resultRow.className = 'row';
-			resultRow.id = 'departmentId' + business.id;
+            let resultRow = document.createElement("div");
+            resultRow.className = 'row';
+            resultRow.id = 'departmentId' + business.id;
 
-			let resultInfoColumn = document.createElement("div");
-			resultInfoColumn.className = 'col-md-8';
-	
-			resultInfoColumn.innerHTML = `
-				<p><strong>${business.name} (Station ${business.station})</strong><br/>
-				${business.streetAddress}<br/>
-				${business.city}, ${business.state.abbreviation} ${business.zipcode}</p>
-			`;
+            let resultInfoColumn = document.createElement("div");
+            resultInfoColumn.className = 'col-md-8';
+    
+            resultInfoColumn.innerHTML = `
+                <p><strong>${business.name} (Station ${business.station})</strong><br/>
+                ${business.streetAddress}<br/>
+                ${business.city}, ${business.state.abbreviation} ${business.zipcode}</p>
+            `;
 
-			let resultButtonColumn = document.createElement("div");
-			resultButtonColumn.className = 'col-md-4 d-flex justify-content-around align-items-center';
+            let resultButtonColumn = document.createElement("div");
+            resultButtonColumn.className = 'col-md-4 d-flex justify-content-around align-items-center';
 
-			let resultButton = document.createElement("button");
-			resultButton.className = 'btn btn-success m-1';
-			resultButton.style = 'cursor: pointer;';
-			resultButton.addEventListener('click', function(){ getMembers(business.id); });
-			resultButton.innerHTML = 'View Members';
-			resultButtonColumn.appendChild(resultButton);
+            let resultButton = document.createElement("button");
+            resultButton.className = 'btn btn-success m-1';
+            resultButton.style = 'cursor: pointer;';
+            resultButton.addEventListener('click', function(){ getMembers(business.id); });
+            resultButton.innerHTML = 'View Members';
+            resultButtonColumn.appendChild(resultButton);
             /*
-			let backButton = document.createElement("button");
-			backButton.className = 'btn btn-secondary';
-			backButton.style = 'cursor: pointer;';
-			backButton.addEventListener('click', goBack);
-			backButton.innerHTML = 'Go Back';
-			resultButtonColumn.appendChild(backButton);
+            let backButton = document.createElement("button");
+            backButton.className = 'btn btn-secondary';
+            backButton.style = 'cursor: pointer;';
+            backButton.addEventListener('click', goBack);
+            backButton.innerHTML = 'Go Back';
+            resultButtonColumn.appendChild(backButton);
             */
 
-			resultRow.appendChild(resultInfoColumn);
-			resultRow.appendChild(resultButtonColumn);
+            resultRow.appendChild(resultInfoColumn);
+            resultRow.appendChild(resultButtonColumn);
 
-			results.appendChild(resultRow);
+            results.appendChild(resultRow);
 
-		});
-	}
-	else {
-		
-		results.innerHTML = `
-			<p>No Results Found <a href="/register/business" class="btn btn-primary">Create Department/Business</a></p>
-		`;
-	}
-
-	searchResults.appendChild(results);
-	
-}
-
-const addBusiness = async () => {
-
-    try {
-
-        const formData = new FormData(document.querySelector("#businessForm"));
-
-        formData.append('class', 'Business');
-        formData.append('method', 'createBusiness');
-
-        formData.forEach(value => {
-            console.log(value);
         });
-        
-        await fetch('http://localhost/wsfia-dev/configuration/api.php'
-            , { method: 'POST'
-            , body: formData
-            }
-        )
-        .then(response => response.json())
-        .then(json => {
-            if (json) {
-                window.location.replace("/register");
-            }
-        })
-        .catch(error => displayError(error));
-        
-        
     }
-    catch {
-        console.error('catch error');
+    else {
+        
+        results.innerHTML = `
+            <p>No Results Found <a href="/register/business" class="btn btn-primary">Create Department/Business</a></p>
+        `;
     }
 
-    return false;
+    searchResults.appendChild(results);
     
 }
 
@@ -213,11 +177,9 @@ const getMembers = async (businessId) => {
             let registerButtonColumn = document.createElement("div");
             registerButtonColumn.className = 'col-md-12 text-center';
 
-            let registerButton = document.createElement("button");
+            let registerButton = document.createElement("a");
             registerButton.className = 'btn btn-primary';
-            registerButton.style = 'cursor: pointer;';
-
-            registerButton.addEventListener('click', function(){ loadView('register'); });
+            registerButton.href = '/register/member';
             registerButton.innerHTML = 'Create New Account';
 
             registerButtonColumn.appendChild(registerButton);
@@ -227,9 +189,6 @@ const getMembers = async (businessId) => {
 
         })
         .catch(error => displayError(error));
-    /*
-	
-    */
 }
 
 const buildStatesDropdown = async () => {
@@ -263,5 +222,5 @@ const buildStatesDropdown = async () => {
  * @param {*} error 
  */
 const displayError = (error) => {
-	document.getElementsByTagName('main')[0].innerHTML = error;
+    document.getElementsByTagName('main')[0].innerHTML = error;
 }

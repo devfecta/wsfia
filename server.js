@@ -5,10 +5,19 @@ const app = express();
 const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
 dotenv.config();
+const uuid = require('uuid/v4');
+const sessionId = uuid();
+
+const fetch = require("node-fetch");
+
+// const bodyParser = require("body-parser");
+// app.use(bodyParser.json());
 
 app.use(session({secret: 'secretValue', saveUninitialized: false, resave: false}));
 // app.use(express.static('public'));
 app.use('/', express.static('public'));
+
+//app.use(express.urlencoded());
 
 const Controllers = require('./controllers');
 const controllers = new Controllers();
@@ -40,11 +49,20 @@ app.get('/register/business', (request, response) => {
     response.render('./registration/businessInfo.ejs', { session: request.session});
 });
 
-app.get('/register/members', (request, response) => {
+app.post('/addBusiness', async (request, response) => {
+    //console.log(request.body);
+    controllers.business.addBusiness(JSON.stringify(request.body));
+    response.render('./registration/businessSearch.ejs', { session: request.session });
+    //response.send('./registration/businessSearch.ejs');
+    //response.end();
+});
+
+app.get('/register/member', (request, response) => {
+    request.session.test2 = 'testing2';
     //let cookies = cookie.parse(request.headers.cookie);
     response.render('./registration/memberInfo.ejs', { session: request.session});
 });
-
+/*
 app.post('/register', async (request, response) => {
 
     try {
@@ -59,7 +77,7 @@ app.post('/register', async (request, response) => {
     response.render('register.ejs', { session: request.session, view: ''});
 
 });
-
+*/
 app.listen(process.env.PORT, () => {
     console.log(`App Started on Port ${process.env.PORT}`);
 });

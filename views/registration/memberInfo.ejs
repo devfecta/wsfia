@@ -1,10 +1,12 @@
-<%- include ('template/header') -%>
+<%- include ('../template/header') -%>
 
-<section id="registrationInfo">
+<%= session %>
+
+<section id="membershipInfo">
     <h1>Membership Registration</h1>
     <p class="text-danger">Memberships run January 1 - December 31 of the current year.</p>
 
-    <form name="registrationForm" id="registrationForm" enctype="multipart/form-data" method="POST">
+    <form name="membershipForm" id="membershipForm" enctype="multipart/form-data">
         <fieldset>
             <legend>Member Information</legend>
 
@@ -117,4 +119,4 @@
     
 </section>
 
-<%- include ('template/footer') -%>
+<%- include ('../template/footer') -%>

@@ -17,13 +17,16 @@
 	},
 	"homepage": "https://github.com/devfecta/wsfia#readme",
 	"dependencies": {
+		"axios": "^0.19.2",
 		"bcrypt": "^3.0.7",
 		"bootstrap": "^4.4.1",
 		"ejs": "^3.0.1",
 		"express": "^4.17.1",
 		"express-session": "^1.17.0",
 		"jquery": "^3.4.1",
-		"popper.js": "^1.16.0"
+		"node-fetch": "^2.6.0",
+		"popper.js": "^1.16.0",
+		"uuid": "^3.4.0"
 	},
 	"devDependencies": {
 		"dotenv": "^8.2.0",
