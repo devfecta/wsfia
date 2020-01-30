@@ -43,24 +43,38 @@ app.get('/register', (request, response) => {
     //console.log(app.request.get('header'));
     response.render('./registration/businessSearch.ejs', { session: request.session });
 });
-
+/**
+ * Adding a business
+ */
 app.get('/register/business', (request, response) => {
     //let cookies = cookie.parse(request.headers.cookie);
-    response.render('./registration/businessInfo.ejs', { session: request.session});
+    response.render('./registration/businessInfo.ejs', { session: request.session, message: '' });
 });
 
 app.post('/addBusiness', async (request, response) => {
     //console.log(request.body);
-    controllers.business.addBusiness(JSON.stringify(request.body));
-    response.render('./registration/businessSearch.ejs', { session: request.session });
-    //response.send('./registration/businessSearch.ejs');
-    //response.end();
+    request.session.confirm = await controllers.business.addBusiness(JSON.stringify(request.body));
+    //console.log(response.statusCode);
+    if (request.session.confirm) {
+        response.redirect('/register');
+    }
+    else {
+        response.render('./registration/businessInfo.ejs', { session: request.session, message: '<div class="alert alert-danger m-1" role="alert">There was an error when trying to add the business.</div>' });
+    }
 });
-
+/**
+ * Adding a member
+ */
 app.get('/register/member', (request, response) => {
     request.session.test2 = 'testing2';
     //let cookies = cookie.parse(request.headers.cookie);
-    response.render('./registration/memberInfo.ejs', { session: request.session});
+    response.render('./registration/memberInfo.ejs', { session: request.session, message: '' });
+});
+
+app.post('/addRegistrant', async (request, response) => {
+    //console.log(request.body);
+    controllers.business.addBusiness(JSON.stringify(request.body));
+    response.render('./registration/businessSearch.ejs', { session: request.session, message: '' });
 });
 /*
 app.post('/register', async (request, response) => {
