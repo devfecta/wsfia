@@ -1,3 +1,5 @@
+const axios = require("axios").default;
+
 class Membership {
 
     constructor() {}
@@ -5,14 +7,14 @@ class Membership {
     //console.log(window.sessionStorage);
     //console.log(Math.random().toString(30).substring(2, 6));
 
-    addRegistrants = async (formData) => {
+    addMember = async (data) => {
 
         try {
 
             const formData = new FormData(document.querySelector("#membershipForm"));
 
-            formData.append('class', 'RegisterMembership');
-            formData.append('method', 'addRegistrants');
+            formData.append('class', 'Membership');
+            formData.append('method', 'addMember');
 
             formData.forEach(value => {
                 console.log(value);

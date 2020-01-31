@@ -6,7 +6,7 @@
 
     <%- message %>
 
-    <form name="membershipForm" id="membershipForm" enctype="multipart/form-data">
+    <form name="membershipForm" id="membershipForm" action="/register/addMember" method="POST">
         <fieldset>
             <legend>Member Information</legend>
 
@@ -103,16 +103,16 @@
             <div class="form-group">
                 <label for="searchTextBoxId">Department/Business:</label>
                 <input type="text" style="width:350px; height:2em" id="searchTextBoxId" name="searchTextBox" 
-                    onkeyup="businessRegistrationSearch(this.value);" placeholder="Search for your Department/Business by Name">
+                    onkeyup="memberBusinessSearch(this.value);" placeholder="Search for your Department/Business by Name">
             </div>
-            <div id="searchResultsId"></div>
+            <div id="searchResults"></div>
             <div id="businessList"></div>
         </fieldset>
             
         <div class="form-group row">
             <div class="col-md-12 p-5 text-right">
-                <button type="button" onclick="addRegistrants(document.querySelector('form'))" id="addRegistrantButton" style="min-width: 150px; width:25%" class="btn btn-primary" disabled>Add Registrant</button>
-                <button type="button" onclick="addRegistrants('')" id="nextButton" style="min-width: 150px; width:25%" class="btn btn-success">Next</button>
+                <button type="submit" id="addMemberButton" style="min-width: 150px; width:25%" class="btn btn-primary" disabled>Add Registrant</button>
+                <a href="/register/member/registrants" id="nextButton" style="min-width: 150px; width:25%" class="btn btn-success">Next</a>
             </div>
         </div>
     </form>

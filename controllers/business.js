@@ -4,8 +4,6 @@ class Business {
 
     constructor() {}
 
-    test = 'testing';
-
     addBusiness = async (data) => {
 
         let formData = JSON.parse(data);

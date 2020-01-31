@@ -71,10 +71,16 @@ app.get('/register/member', (request, response) => {
     response.render('./registration/memberInfo.ejs', { session: request.session, message: '' });
 });
 
-app.post('/addRegistrant', async (request, response) => {
+app.post('/register/addMember', async (request, response) => {
     //console.log(request.body);
-    controllers.business.addBusiness(JSON.stringify(request.body));
-    response.render('./registration/businessSearch.ejs', { session: request.session, message: '' });
+    request.session.confirm = await controllers.membership.addMember(JSON.stringify(request.body));
+
+    if (request.session.confirm) {
+        response.redirect('/register/member/registrants');
+    }
+    else {
+        response.render('./registration/memberInfo.ejs', { session: request.session, message: '<div class="alert alert-danger m-1" role="alert">There was an error when trying to add the member.</div>' });
+    }    
 });
 /*
 app.post('/register', async (request, response) => {

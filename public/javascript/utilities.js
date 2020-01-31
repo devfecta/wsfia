@@ -98,7 +98,6 @@ const getBusinesses = (data) => {
     searchResults.appendChild(results);
     
 }
-
 /**
  * Displays members of a department/company.
  * @param {*} businessId 
@@ -215,6 +214,121 @@ const buildStatesDropdown = async () => {
     })
     .catch(error => displayError(error));
 
+}
+/**
+ * Adds businesses to a member registrtion.
+ * @param {*} businessId 
+ */
+const memberBusinessSearch = async (searchString) => {
+
+    const businessList = document.querySelector('#businessList');
+    const searchResults = document.querySelector('#searchResults');
+
+    let parameters = 'class=Business';
+        parameters += '&method=searchBusinessesByName';
+        parameters += '&searchBusinesses=' + searchString;
+
+    await fetch('http://localhost/wsfia-dev/configuration/api.php?' + parameters, {method: 'GET'})
+    .then(response => response.json())
+    .then(data => {
+
+        const searchResults = document.getElementById('searchResults');
+        searchResults.innerHTML = '';
+
+        let results = document.createElement("div");
+
+        if (data.length > 0) {
+            data.forEach(business => {
+
+                let resultRow = document.createElement("div");
+                resultRow.className = 'row';
+                resultRow.id = 'departmentId' + business.id;
+
+                let resultInfoColumn = document.createElement("div");
+                resultInfoColumn.className = 'col-md-9';
+        
+                resultInfoColumn.innerHTML = `
+                    <p><strong>${business.name} (Station ${business.station})</strong><br/>
+                    ${business.streetAddress}<br/>
+                    ${business.city}, ${business.state.abbreviation} ${business.zipcode}</p>
+                `;
+
+                let resultButtonColumn = document.createElement("div");
+                resultButtonColumn.className = 'col-md-3';
+
+                let resultButton = document.createElement("button");
+                resultButton.setAttribute('type', 'button');
+                resultButton.setAttribute('class', 'btn btn-primary');
+                resultButton.setAttribute('style', 'cursor: pointer;');
+                //resultButton.addEventListener('click', function(){ addBusiness(business.id) });
+                resultButton.addEventListener('click', function(){ addMemberBusiness(business.id) });
+                resultButton.innerHTML = 'Add Department/Business';
+
+                resultButtonColumn.appendChild(resultButton);
+
+                resultRow.appendChild(resultInfoColumn);
+                resultRow.appendChild(resultButtonColumn);
+
+                results.appendChild(resultRow);
+
+            });
+        }
+        else {
+            
+            results.innerHTML = `
+                <p>No Results Found <a href="/register/business" class="btn btn-primary">Create Department/Business</a></p>
+            `;
+        }
+
+        searchResults.appendChild(results);
+        
+    })
+    .catch(error => displayError(error));
+}
+
+
+const addMemberBusiness = async (businessId) => {
+
+	const businessList = document.querySelector('#businessList');
+    const searchResults = document.querySelector('#searchResults');
+    
+    let parameters = 'class=Business';
+        parameters += '&method=Business';
+        parameters += '&businessId=' + businessId;
+
+    await fetch('http://localhost/wsfia-dev/configuration/api.php?' + parameters, {method: 'GET'})
+    .then(response => response.json())
+    .then(data => {
+
+        // console.log(data);
+
+        let businessRow = document.createElement("div");
+        businessRow.setAttribute('class', 'form-check');
+
+        let businessInput = document.createElement("input");
+        businessInput.setAttribute('type', 'checkbox');
+        businessInput.setAttribute('id', 'business['+data.id+']');
+        businessInput.setAttribute('data-value', `${data.name} (Station ${data.station})`);
+        businessInput.setAttribute('name', 'businesses');
+        businessInput.setAttribute('class', 'form-check-input');
+        businessInput.setAttribute('checked', true);
+        businessInput.setAttribute('value', data.id);
+
+        let businessInputLabel = document.createElement("label");
+        businessInputLabel.setAttribute('for', 'business['+data.id+']');
+        businessInputLabel.setAttribute('class', 'form-check-label ml-1 mr-3');
+        businessInputLabel.innerHTML = `${data.name} (Station ${data.station})`;
+
+        searchResults.innerHTML = '';
+
+        businessRow.appendChild(businessInput);
+        businessRow.appendChild(businessInputLabel);
+        businessList.appendChild(businessRow);
+
+        document.querySelector('#addMemberButton').removeAttribute('disabled');
+
+    })
+    .catch(error => displayError(error));
 }
 
 /**
