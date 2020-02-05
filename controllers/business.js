@@ -32,7 +32,6 @@ class Business {
             .then(response => {
                 confirmation = response.data;
             })
-            //.catch(error => displayError(error));
             .catch(error => console.log(error));
             
         }

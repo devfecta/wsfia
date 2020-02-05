@@ -6,14 +6,12 @@ const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
 dotenv.config();
 const uuid = require('uuid/v4');
-const sessionId = uuid();
-
 const fetch = require("node-fetch");
 
 // const bodyParser = require("body-parser");
 // app.use(bodyParser.json());
 
-app.use(session({secret: 'secretValue', saveUninitialized: false, resave: false}));
+app.use(session({secret: uuid(), saveUninitialized: true, resave: true}));
 // app.use(express.static('public'));
 app.use('/', express.static('public'));
 
@@ -40,6 +38,12 @@ app.get('/login', (request, response) => {
 });
 
 app.get('/register', (request, response) => {
+
+    if(request.session.sessionId === undefined){
+        request.session.sessionId = uuid();
+    }
+    
+    console.log(request.session.sessionId);
     //console.log(app.request.get('header'));
     response.render('./registration/businessSearch.ejs', { session: request.session });
 });

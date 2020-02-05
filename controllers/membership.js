@@ -3,43 +3,51 @@ const axios = require("axios").default;
 class Membership {
 
     constructor() {}
-
     //console.log(window.sessionStorage);
     //console.log(Math.random().toString(30).substring(2, 6));
-
     addMember = async (data) => {
+
+        let formData = JSON.parse(data);
+        //console.log(formData);
+        let confirmation = false;
+        
 
         try {
 
-            const formData = new FormData(document.querySelector("#membershipForm"));
+            let params = new URLSearchParams();
 
-            formData.append('class', 'Membership');
-            formData.append('method', 'addMember');
+            params.append('emailAddress', formData.emailAddress);
+            params.append('firstName', formData.firstName);
+            params.append('lastName', formData.lastName);
+            params.append('jobTitle', formData.jobTitle);
+            params.append('studentId', formData.studentId);
+            params.append('areas', formData.areas);
+            params.append('businesses', formData.businesses);
+            params.append('class', 'Membership');
+            params.append('method', 'addMember');
 
-            formData.forEach(value => {
+            params.forEach(value => {
                 console.log(value);
             });
-            
-            await fetch('http://localhost/wsfia-dev/configuration/api.php'
-                , { method: 'POST'
-                , body: formData
-                }
+
+            await axios.post('http://localhost/wsfia-dev/configuration/api.php'
+                , params
             )
-            .then(response => response.json())
-            .then(json => {
-                if (json) {
-                    window.location.replace("/register/member/confirmation");
-                }
+            .then(response => {
+                console.log(response.data);
+                return false;
+                confirmation = response.data;
             })
-            .catch(error => displayError(error));
-            
+            .catch(error => console.log(error));
+
+            return false;
             
         }
-        catch {
-            console.error('catch error');
+        catch (e) {
+            console.error(e);
         }
 
-        return false;
+        
 
         let formDataSerialized = {};
         let formLength = formData.length;
