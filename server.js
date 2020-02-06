@@ -38,12 +38,6 @@ app.get('/login', (request, response) => {
 });
 
 app.get('/register', (request, response) => {
-
-    if(request.session.sessionId === undefined){
-        request.session.sessionId = uuid();
-    }
-    
-    console.log(request.session.sessionId);
     //console.log(app.request.get('header'));
     response.render('./registration/businessSearch.ejs', { session: request.session });
 });
@@ -70,6 +64,13 @@ app.post('/addBusiness', async (request, response) => {
  * Adding a member
  */
 app.get('/register/member', (request, response) => {
+
+    if(request.session.sessionId === undefined){
+        request.session.sessionId = uuid();
+    }
+
+    console.log(request.session.sessionId);
+
     request.session.test2 = 'testing2';
     //let cookies = cookie.parse(request.headers.cookie);
     response.render('./registration/memberInfo.ejs', { session: request.session, message: '' });
@@ -77,6 +78,7 @@ app.get('/register/member', (request, response) => {
 
 app.post('/register/addMember', async (request, response) => {
     //console.log(request.body);
+    request.body.sessionId = request.session.sessionId;
     request.session.confirm = await controllers.membership.addMember(JSON.stringify(request.body));
 
     if (request.session.confirm) {

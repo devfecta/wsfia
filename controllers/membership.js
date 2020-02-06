@@ -16,6 +16,7 @@ class Membership {
 
             let params = new URLSearchParams();
 
+            params.append('sessionId', formData.sessionId);
             params.append('emailAddress', formData.emailAddress);
             params.append('firstName', formData.firstName);
             params.append('lastName', formData.lastName);
@@ -25,17 +26,20 @@ class Membership {
             params.append('businesses', formData.businesses);
             params.append('class', 'Membership');
             params.append('method', 'addMember');
-
+            
+            //console.log(params);
+            /*
             params.forEach(value => {
                 console.log(value);
             });
+            */
 
             await axios.post('http://localhost/wsfia-dev/configuration/api.php'
                 , params
             )
             .then(response => {
-                console.log(response.data);
-                return false;
+                //console.log(response.data);
+                //return false;
                 confirmation = response.data;
             })
             .catch(error => console.log(error));
