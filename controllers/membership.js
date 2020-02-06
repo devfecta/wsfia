@@ -11,7 +11,6 @@ class Membership {
         //console.log(formData);
         let confirmation = false;
         
-
         try {
 
             let params = new URLSearchParams();
@@ -28,11 +27,6 @@ class Membership {
             params.append('method', 'addMember');
             
             //console.log(params);
-            /*
-            params.forEach(value => {
-                console.log(value);
-            });
-            */
 
             await axios.post('http://localhost/wsfia-dev/configuration/api.php'
                 , params
@@ -44,15 +38,13 @@ class Membership {
             })
             .catch(error => console.log(error));
 
-            return false;
+            return confirmation;
             
         }
         catch (e) {
             console.error(e);
         }
-
-        
-
+/*
         let formDataSerialized = {};
         let formLength = formData.length;
 
@@ -144,7 +136,39 @@ class Membership {
         formView.appendChild(messageRow);
         
         getRegistrants(formDataSerialized.PHPSESSID);
+*/
+    }
 
+    getRegistrants = async (data) => {
+        //let registrants = JSON.parse(data);
+
+        let response = '';
+
+        try {
+
+            console.log(data);
+            
+
+            let params = new URLSearchParams();
+
+            params.append('sessionId', data);
+            params.append('class', 'Membership');
+            params.append('method', 'getRegistrants');
+            
+            //console.log(params);
+            
+            return await axios.post('http://localhost/wsfia-dev/configuration/api.php'
+                , params
+            )
+            .then(response => response.data)
+            .catch(error => console.log(error));
+
+            return response;
+            
+        }
+        catch (e) {
+            console.error(e);
+        }
     }
 
 }

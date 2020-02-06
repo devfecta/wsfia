@@ -25,14 +25,13 @@ app.set('view-engine', 'ejs');
 app.use(express.urlencoded({extended: false}));
 
 app.get('/', (request, response) => {
-    request.session.test = 'testing';
-    console.log(request.session);
+    //request.session.test = 'testing';
+    //console.log(request.session);
     response.render('index.ejs', { session: request.session });
 });
 
 app.get('/login', (request, response) => {
-
-    console.log(request.session);
+    //console.log(request.session);
     response.render('login.ejs', { session: request.session });
     // controllers.member.login();
 });
@@ -68,10 +67,7 @@ app.get('/register/member', (request, response) => {
     if(request.session.sessionId === undefined){
         request.session.sessionId = uuid();
     }
-
-    console.log(request.session.sessionId);
-
-    request.session.test2 = 'testing2';
+    // console.log(request.session.sessionId);
     //let cookies = cookie.parse(request.headers.cookie);
     response.render('./registration/memberInfo.ejs', { session: request.session, message: '' });
 });
@@ -79,14 +75,24 @@ app.get('/register/member', (request, response) => {
 app.post('/register/addMember', async (request, response) => {
     //console.log(request.body);
     request.body.sessionId = request.session.sessionId;
-    request.session.confirm = await controllers.membership.addMember(JSON.stringify(request.body));
+    let confirm = await controllers.membership.addMember(JSON.stringify(request.body));
 
-    if (request.session.confirm) {
+    //console.log(request.session.confirm);
+
+    if (confirm) {
+        request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
+        //console.log(request.session.registrants);
         response.redirect('/register/member/registrants');
     }
     else {
         response.render('./registration/memberInfo.ejs', { session: request.session, message: '<div class="alert alert-danger m-1" role="alert">There was an error when trying to add the member.</div>' });
     }    
+});
+
+app.get('/register/member/registrants', (request, response) => {
+    // console.log(request.session.sessionId);
+    //let cookies = cookie.parse(request.headers.cookie);
+    response.render('./registration/registrantsInfo.ejs', { session: request.session, message: '' });
 });
 /*
 app.post('/register', async (request, response) => {

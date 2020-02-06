@@ -1,0 +1,48 @@
+<%- include ('../template/header') -%>
+
+<section id="membershipInfo">
+    <h1>Membership Registration</h1>
+    <p class="text-danger">If you would like to register multiple people click on the 
+        "Add Another Person" button to fill out the registration for again. Otherwise, click on the "Register" button 
+        to finish the registration process.</p>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Registrant</th>
+                <th scope="col">Department/Business</th>
+                <th scope="col">Areas</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% session.registrants.forEach(function(registrant, index) { %>
+                <tr>
+                    <th scope="row"><%= index + 1 %></th>
+                    <td>
+                        <strong>Name:</strong> <%= registrant.firstName + ' ' + registrant.lastName %><br />
+                        <strong>Job Title:</strong> <%= registrant.jobTitle %><br />
+                        <strong>e-Mail Address:</strong> <%= registrant.emailAddress %><br />
+                        <strong>Student ID:</strong> <%= (registrant.studentId) ? registrant.studentId : 'NA' %>
+                    </td>
+                    <td>
+                        <% registrant.businesses.forEach(function(business) { %>
+                            <%= business %><br/>
+                        <% }) %>
+                    </td>
+                    <td>
+                        <% registrant.areas.forEach(function(area) { %>
+                            <%= area %><br/>
+                        <% }) %>
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+    
+
+
+</section>
+
+<%- include ('../template/footer') -%>
