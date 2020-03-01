@@ -81,7 +81,7 @@ app.post('/register/addMember', async (request, response) => {
 
     if (confirm) {
         request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
-        console.log(request.session.registrants);
+        //console.log(request.session.registrants);
         response.redirect('/register/member/registrants');
     }
     else {

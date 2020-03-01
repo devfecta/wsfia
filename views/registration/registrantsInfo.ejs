@@ -5,7 +5,7 @@
 <section id="membershipInfo">
     <h1>Membership Registration</h1>
     
-<% if (session.registrants.length > 0) {  %>
+<% if ((session.registrants) && session.registrants.length > 0) {  %>
 
     <p class="text-danger">If you would like to register multiple people click on the 
         "Add Another Person" button to fill out the registration for again. Otherwise, click on the "Register" button 
@@ -21,7 +21,8 @@
             </tr>
         </thead>
         <tbody>
-            <% session.registrants.forEach(function(registrant, index) { %>
+            <% 
+            session.registrants.forEach(function(registrant, index) { %>
                 <tr>
                     <th scope="row"><%= index + 1 %></th>
                     <td>
@@ -31,17 +32,12 @@
                         <strong>Student ID:</strong> <%= (registrant.studentId) ? registrant.studentId : 'NA' %>
                     </td>
                     <td>
-                        <% registrant.businesses.forEach(function(business, index) { %>
+                        <% registrant.businesses.forEach(function(business, index) { 
+                            businesses = [...businesses, business];
+                            %>
+                            
                             <%= business.id + business.name %> <%= (business.station) ? '(Station '+ business.station +')' : '' %><br/>
-                        <% }) %>
-
-                        <% businesses = session.registrants[index].businesses.filter((b, i) => {
-                            if(b.id == 1){
-                                console.log(b.id);
-                                return b;
-                            }
-                        }) %>
-                        
+                        <% }); %>                        
                     </td>
                     <td>
                         <% registrant.areas.forEach(function(area) { %>
@@ -49,13 +45,42 @@
                         <% }) %>
                     </td>
                 </tr>
-            <% }) %>
+            <% });
+
+            let businessIds = [];
+            let businessesFiltered = [];
+
+            businessIds = businesses
+            .map((business, index) => business.id)
+
+            businessId = businessIds
+            .filter((id, index) => {
+                return businessIds.indexOf(id) === index;
+            })
+            .forEach((id, index) => {
+
+                businesses.forEach(business => {
+
+                    if (business.id === id) {
+                        businessesFiltered[index] = business;
+                    }
+
+                })
+
+            })
+
+            businesses = businessesFiltered;
+            
+            %>
         </tbody>
     </table>
 <% } else { %>
     <p class="text-danger">There are no registrants. Please add them 
         by clicking on the "Add Another Person" button.</p>
+        <a href="/register/member" id="backButton" style="min-width: 150px; width:25%" class="btn btn-success">Go Back</a>
 <% } %>
+
+<% if (session.registrants) {  %>
     
 <form name="membershipForm" id="membershipForm" action="/register/process" method="POST">
     <fieldset>
@@ -66,9 +91,11 @@
         <% }) %>
 
         <p>Select a billing address:</p>
+        
         <% businesses.forEach(function(business) { %>
             <%= business.id + '-' + business.name %><br/>
         <% }) %>
+
     </fieldset>
             
     <div class="form-group row">
@@ -78,6 +105,8 @@
         </div>
     </div>
 </form>
+
+<% } %>
 
 </section>
 
