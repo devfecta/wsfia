@@ -1,0 +1,60 @@
+<%- include ('../template/header') -%>
+
+<% 
+    let totalPrice = 0;
+%>
+
+<section id="membershipInfo">
+    <h1>Membership Confirmation</h1>
+    
+<% if ((session.registration) && session.registration.length > 0) {  %>
+
+    <p class="text-danger">Thank you for registering with the WSFIA. A PayPal invoice has been sent to the selected billing e-mail address.</p>
+        
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Registrant</th>
+                <th scope="col">Quantity</th>
+                <th scope="col">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% session.registration.lineItems.forEach(function(registrant, index) { 
+                totalPrice += registrant.price;
+            %>
+                <tr>
+                    <th scope="row"><%= index + 1 %></th>
+                    <td>
+                        <strong>Item Name:</strong> <%= registrant.itemName %><br />
+                        <strong>Description:</strong> <%= registrant.itemDescription %><br />
+                        <strong>e-Mail Address:</strong> <%= registrant.emailAddress %>
+                    </td>
+                    <td>
+                        <%= registrant.quantity %>                     
+                    </td>
+                    <td>
+                        $<%= registrant.price %>
+                    </td>
+                </tr>
+            <% }); %>
+
+            <tr class="text-align-right">
+                <td colspan="2">
+                    Total Price:                    
+                </td>
+                <td>
+                    $<%= totalPrice %>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+<% } else { %>
+    <p class="text-danger">There are no registrants. Please add them by going back to the registration form.</p>
+    <a href="/register/member" id="backButton" style="min-width: 150px; width:25%" class="btn btn-success">Go Back</a>
+<% } %>
+
+</section>
+
+<%- include ('../template/footer') -%>

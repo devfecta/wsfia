@@ -90,9 +90,38 @@ app.post('/register/addMember', async (request, response) => {
 });
 
 app.get('/register/member/registrants', (request, response) => {
-    // console.log(request.session.sessionId);
-    //let cookies = cookie.parse(request.headers.cookie);
     response.render('./registration/registrantsInfo.ejs', { session: request.session, message: '' });
+});
+
+app.post('/register/process', async (request, response) => {
+    //request.body.billing.emailAddress = request.body.emailAddress;
+    //request.body.billing.business = request.body.business;
+    request.body.sessionId = request.session.sessionId;
+    //request.body.registrants = request.session.registrants;
+    //console.log(request.session.sessionId);
+    //console.log(request.session.registrants);
+    request.session.registration = await controllers.membership.registerMember(JSON.stringify(request.body));
+    console.log(request.session.registration);
+
+    response.redirect('/register/confirm');
+
+    /*
+    request.body.sessionId = request.session.sessionId;
+    let confirm = await controllers.membership.addMember(JSON.stringify(request.body));
+    //console.log(request.session.confirm);
+    if (confirm) {
+        request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
+        //console.log(request.session.registrants);
+        response.redirect('/register/member/registrants');
+    }
+    else {
+        response.render('./registration/memberInfo.ejs', { session: request.session, message: '<div class="alert alert-danger m-1" role="alert">There was an error when trying to add the member.</div>' });
+    }
+    */
+});
+
+app.get('/register/confirm', (request, response) => {
+    response.render('./registration/confirm.ejs', { session: request.session, message: '' });
 });
 /*
 app.post('/register', async (request, response) => {

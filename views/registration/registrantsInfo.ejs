@@ -44,7 +44,7 @@
                             businesses = [...businesses, business];
                         %>
                             
-                            <%= business.id + business.name %> <%= (business.station) ? '(Station '+ business.station +')' : '' %><br/>
+                            <%= business.name %> <%= (business.station) ? '(Station '+ business.station +')' : '' %><br/>
                         <% }); %>                        
                     </td>
                     <td>
@@ -99,17 +99,28 @@
 <% if (session.registrants) {  %>
     
 <form name="membershipForm" id="membershipForm" action="/register/process" method="POST">
-    <fieldset>
+    <fieldset class="px-4">
         <legend>Billing Information</legend>
-        <p>Select a billing e-mail address:</p>
+        <p class="mb-2">Select a billing e-mail address:</p>
+
         <% emailAddresses.forEach(function(emailAddress, index) { %>
-            <%= emailAddress %><br/>
+
+        <div class="form-check mb-1">
+            <input type="radio" onclick="validateRegistrationForm(this.form)" class="form-check-input" name="emailAddress" id="emailAddress<%= index %>" value="<%= emailAddress %>">
+            <label class="form-check-label" for="emailAddress<%= index %>"><%= emailAddress %></label>
+        </div>
+        
         <% }) %>
 
-        <p class="mt-2">Select a billing address:</p>
+        <p class="mt-4 mb-2">Select a billing address:</p>
         
-        <% businesses.forEach(function(business) { %>
-            <%= business.id + '-' + business.name %><br/>
+        <% businesses.forEach(function(business, index) { %>
+
+            <div class="form-check mb-1">
+                <input type="radio" onclick="validateRegistrationForm(this.form)" class="form-check-input" name="business" id="business<%= index %>" value="<%= business.id %>">
+                <label class="form-check-label" for="business<%= index %>"><%= business.name %></label>
+            </div>
+
         <% }) %>
 
     </fieldset>

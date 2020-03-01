@@ -14,11 +14,13 @@ const businessSearch = async (searchString) => {
         let parameters = 'class=Business';
         parameters += '&method=searchBusinessesByName';
         parameters += '&searchBusinesses=' + searchString;
+
+        console.log(parameters);
         
         await fetch('http://localhost/wsfia-dev/configuration/api.php?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(json => {
-            console.log(json)
+            console.log("" + json)
             getBusinesses(json)
         })
         .catch(error => displayError(error));
@@ -329,6 +331,21 @@ const addMemberBusiness = async (businessId) => {
 
     })
     .catch(error => displayError(error));
+}
+
+const validateRegistrationForm = (form) => {
+    let radioButtons = form.querySelectorAll('input[type="radio"]');
+
+    let count = 0;
+    radioButtons.forEach(radio => {
+        if (radio.checked) {
+            count++;
+        }
+    });
+    
+    if (count > 1) {
+        document.querySelector('#registerButton').removeAttribute('disabled');
+    }
 }
 
 /**

@@ -146,9 +146,8 @@ class Membership {
 
         try {
 
-            console.log(data);
+            //console.log(data);
             
-
             let params = new URLSearchParams();
 
             params.append('sessionId', data);
@@ -164,6 +163,54 @@ class Membership {
             .catch(error => console.log(error));
 
             return response;
+            
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
+
+    registerMember = async (data) => {
+
+        let formData = JSON.parse(data);
+        //console.log(formData);
+        let confirmation = false;
+
+        //let registrants = await this.getRegistrants(sessionId);
+        
+        try {
+            
+            let params = new URLSearchParams();
+
+            params.append('sessionId', formData.sessionId);
+            params.append('emailAddress', formData.emailAddress);
+            params.append('businessId', formData.business);
+            params.append('class', 'Membership');
+            params.append('method', 'register');
+            
+            //console.log(params);
+
+            return await axios.post('http://localhost/wsfia-dev/configuration/api.php'
+                , params
+            )
+            .then(response => {
+                const lineItems = response.data;
+                params = new URLSearchParams();
+                params.append('lineItems', JSON.stringify(response.data));
+                //console.log("Parameters");
+                //console.log(params);
+                
+                return axios.post('http://localhost/wsfia-dev/configuration/PayPal-PHP-SDK/SendInvoice.php'
+                    , params
+                )
+                .then(response => lineItems)
+                .catch(error => console.log(error));
+                //return false;
+                //confirmation = response.data;
+            })
+            .catch(error => console.log(error));
+            
+            return confirmation;
             
         }
         catch (e) {
