@@ -1,6 +1,10 @@
 <%- include ('../template/header') -%>
 
-<% let businesses = []; %>
+<% 
+    let businesses = []; 
+    let businessIds = [];
+    let emailAddresses = [];
+%>
 
 <section id="membershipInfo">
     <h1>Membership Registration</h1>
@@ -21,8 +25,11 @@
             </tr>
         </thead>
         <tbody>
-            <% 
-            session.registrants.forEach(function(registrant, index) { %>
+            <% session.registrants.forEach(function(registrant, index) { 
+
+                emailAddresses = [...emailAddresses, registrant.emailAddress];
+                
+            %>
                 <tr>
                     <th scope="row"><%= index + 1 %></th>
                     <td>
@@ -33,8 +40,9 @@
                     </td>
                     <td>
                         <% registrant.businesses.forEach(function(business, index) { 
+                            businessIds = [...businessIds, business.id];
                             businesses = [...businesses, business];
-                            %>
+                        %>
                             
                             <%= business.id + business.name %> <%= (business.station) ? '(Station '+ business.station +')' : '' %><br/>
                         <% }); %>                        
@@ -47,26 +55,34 @@
                 </tr>
             <% });
 
-            let businessIds = [];
+            
             let businessesFiltered = [];
+            let emailsFiltered = [];
 
-            businessIds = businesses
-            .map((business, index) => business.id)
+            emailAddresses = emailAddresses
+            .filter((email, index) => {
+                return emailAddresses.indexOf(email) === index;
+            })
+            .forEach((email, index) => {
+                emailAddresses.forEach(emailAddress => {
+                    if (emailAddress === email) {
+                        emailsFiltered[index] = emailAddress;
+                    }
+                })
+            })
+
+            emailAddresses = emailsFiltered;
 
             businessId = businessIds
             .filter((id, index) => {
                 return businessIds.indexOf(id) === index;
             })
             .forEach((id, index) => {
-
                 businesses.forEach(business => {
-
                     if (business.id === id) {
                         businessesFiltered[index] = business;
                     }
-
                 })
-
             })
 
             businesses = businessesFiltered;
@@ -86,11 +102,11 @@
     <fieldset>
         <legend>Billing Information</legend>
         <p>Select a billing e-mail address:</p>
-        <% session.registrants.forEach(function(registrant, index) { %>
-            <%= registrant.emailAddress %>
+        <% emailAddresses.forEach(function(emailAddress, index) { %>
+            <%= emailAddress %><br/>
         <% }) %>
 
-        <p>Select a billing address:</p>
+        <p class="mt-2">Select a billing address:</p>
         
         <% businesses.forEach(function(business) { %>
             <%= business.id + '-' + business.name %><br/>
