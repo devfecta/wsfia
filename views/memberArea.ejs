@@ -1,0 +1,34 @@
+<%- include ('template/header') -%>
+
+<div class="row">
+    
+    <div class="text-light col-lg-4 p-4" style="border-radius: 1em; background-color: rgba(206,32,41, 0.8);">
+        Hello, <%= session.userInfo.firstName %><br />
+        WSFIA Member ID: <%= session.userInfo.wsfiaId %>
+    </div>
+
+    <div class="col-lg-8 p-4 justify-content-center align-self-center" style="border-radius: 1em;">
+        
+    </div>
+
+    <div class="card text-dark my-4 w-100 h-100" style="border-radius: 1em; border-radius: 1em; background-color: rgba(255,255,255, 0.8);">
+        <div class="card-header">
+            Announcements
+          </div>
+        <div class="card-body justify-content-around align-items-center">
+            
+        </div>
+    </div>
+
+    <div class="card text-dark my-4 w-100 h-100" style="border-radius: 1em; border-radius: 1em; background-color: rgba(255,255,255, 0.8);">
+        <div class="card-header">
+            News
+          </div>
+        <div class="card-body justify-content-around align-items-center">
+            
+        </div>
+    </div>
+
+</div>
+
+<%- include ('template/footer') -%>

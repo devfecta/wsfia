@@ -194,28 +194,23 @@ const getMembers = async (businessId) => {
 
 const buildStatesDropdown = async () => {
 
+    let states = document.querySelector("#states");
+
     let parameters = 'class=Business';
         parameters += '&method=getStates';
 
     await fetch('http://localhost/wsfia-dev/configuration/api.php?' + parameters, {method: 'GET'})
     .then(response => response.json())
     .then(data => {
-        const statesDropdown = document.querySelector('#states');
-
-            data.forEach( state => {
-
-                let stateOption = document.createElement('option');
-                stateOption.setAttribute('value', state.stateId);
-                if(state.stateId == 49) {
-                    stateOption.setAttribute('selected', true);
-                }
-                stateOption.innerHTML = state.stateName;
-                statesDropdown.appendChild(stateOption);
-                
-            });
+        data.forEach(state => {
+            let stateOption = document.createElement("option");
+            stateOption.setAttribute('value', state.stateId);
+            stateOption.text = state.stateName;
+            if (state.stateId == 49) { stateOption.selected = true }
+            states.appendChild(stateOption);
+        })
     })
     .catch(error => displayError(error));
-
 }
 /**
  * Adds businesses to a member registrtion.

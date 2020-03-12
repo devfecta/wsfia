@@ -31,9 +31,10 @@
 
             <div class="form-group row">
                 <label class="col-md-3 col-form-label" for="city">State</label>
-                <select name="states" id="states" class="col-sm-9 form-control" onfocus="buildStatesDropdown()">
-                    <option value="49">Wisconsin</option>
-                </select>
+                <select name="states" id="states" class="col-sm-9 form-control"></select>
+                <script>
+                    buildStatesDropdown();
+                </script>
             </div>
 
             <div class="form-group row">

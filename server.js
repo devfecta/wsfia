@@ -39,14 +39,7 @@ app.use(express.urlencoded({extended: false}));
 app.get('/', (request, response) => {
     response.render('index.ejs', { session: request.session });
 });
-/**
- * Renders the login page.
- */
-app.get('/login', (request, response) => {
-    //console.log(request.session);
-    response.render('login.ejs', { session: request.session });
-    // controllers.member.login();
-});
+
 /**
  * Renders the first registration page.
  */
@@ -108,117 +101,65 @@ app.get('/register/member/registrants', (request, response) => {
 app.post('/register/process', async (request, response) => {
     request.body.sessionId = request.session.sessionId;
     request.session.registration = await controllers.membership.registerMember(JSON.stringify(request.body));
-    //console.log("Processed");
     //console.log(request.session.registration);
     response.redirect('/register/confirm');
-
-    /*
-    request.body.sessionId = request.session.sessionId;
-    let confirm = await controllers.membership.addMember(JSON.stringify(request.body));
-    //console.log(request.session.confirm);
-    if (confirm) {
-        request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
-        //console.log(request.session.registrants);
-        response.redirect('/register/member/registrants');
-    }
-    else {
-        response.render('./registration/memberInfo.ejs', { session: request.session, message: '<div class="alert alert-danger m-1" role="alert">There was an error when trying to add the member.</div>' });
-    }
-    */
 });
-
+/**
+ * Renders the confirmation of registrants, after the registration(s) have been processed.
+ */
 app.get('/register/confirm', (request, response) => {
     //request.session.test = 'testing';
-    console.log("Confirmation");
     //console.log(request.session.registration);
     response.render('./registration/confirm.ejs', { session: request.session, message: '' });
 });
-
-
-
-/*
-{
-  lineItems: [
-    {
-      emailAddress: 'testing@wsfia.org',
-      userId: '105',
-      quantity: 1,
-      itemId: '1',
-      itemName: 'WSFIA Membership',
-      itemDescription: 'Member Name: FirstName LastName\nMember ID: WSFIA-10520311',
-      price: '40.00'
+/**
+ * Renders the login page.
+ */
+app.get('/login', (request, response) => {
+    response.render('login.ejs', { session: request.session });
+});
+/**
+ * Handles the login process and then redirects to the members area page.
+ */
+app.post('/login', async (request, response) => {
+    let userInfo = await controllers.membership.login(JSON.stringify(request.body));
+    request.session.userInfo = userInfo;
+    response.redirect('/member-area');
+});
+/**
+ * Checks to see if the user has benn authenticated, if not redirected to the login page.
+ */
+function authenticateUser (request, response, next) {
+    if ((request.session.userInfo) && request.session.userInfo.authenticated) {
+        return next();
     }
-  ],
-  billing: {
-    billingEmailAddress: 'testing@wsfia.org',
-    billingBusiness: {
-      id: '2',
-      name: 'Verona Fire',
-      station: '4',
-      streetAddress: '456 Test Circle',
-      city: 'Verona',
-      state: '49',
-      zipcode: '53700',
-      phone: '(608) 456-4567',
-      url: null,
-      services: null,
-      type: 'Volunteer',
-      stateId: '49',
-      stateAbbreviation: 'WI',
-      stateName: 'Wisconsin'
-    }
-  }
+    response.redirect('/login');
 }
-
-
-{
-  lineItems: [
-    {
-      emailAddress: 'testing@wsfia.org',
-      userId: '106',
-      quantity: 1,
-      itemId: '1',
-      itemName: 'WSFIA Membership',
-      itemDescription: 'Member Name: FirstName LastName\nMember ID: WSFIA-10620311',
-      price: '40.00'
-    },
-    {
-      emailAddress: 'testing1@wsfia.org',
-      userId: '107',
-      quantity: 1,
-      itemId: '1',
-      itemName: 'WSFIA Membership',
-      itemDescription: 'Member Name: FirstName1 LastName1\nMember ID: WSFIA-10720311',
-      price: '40.00'
-    }
-  ],
-  billing: {
-    billingEmailAddress: 'testing@wsfia.org',
-    billingBusiness: {
-      id: '1',
-      name: 'Fitchburg Fire',
-      station: '2',
-      streetAddress: '123 Test Road',
-      city: 'Fitchburg',
-      state: '49',
-      zipcode: '53719',
-      phone: '(608) 123-4567',
-      url: null,
-      services: null,
-      type: 'Combination',
-      stateId: '49',
-      stateAbbreviation: 'WI',
-      stateName: 'Wisconsin'
-    }
-  }
-}
-
-
-*/
-
-
-
-
+/**
+ * If the user is authenticated then the members area page is rendered.
+ */
+app.get('/member-area', authenticateUser, (request, response) => {
+    response.render('./memberArea.ejs', { session: request.session, message: '' });
+});
+/**
+ * Logs out the user by removing the userInfo property from the session, then redirects to the login page.
+ */
+app.get('/logout', (request, response) => {
+    delete request.session.userInfo
+    response.redirect('/login');
+});
+/**
+ * If the user is authenticated then renders the user account information form.
+ */
+app.get('/account', authenticateUser, (request, response) => {
+    response.render('./account.ejs', { session: request.session, message: '' });
+});
+/**
+ * If the user is authenticated then renders the documents page.
+ */
+app.get('/documents', authenticateUser, (request, response) => {
+    response.render('./documents.ejs', { session: request.session, message: '' });
+});
 /*
 app.post('/register', async (request, response) => {
 
