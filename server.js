@@ -160,6 +160,53 @@ app.get('/account', authenticateUser, (request, response) => {
 app.get('/documents', authenticateUser, (request, response) => {
     response.render('./documents.ejs', { session: request.session, message: '' });
 });
+/**
+ * Static Pages
+ */
+/**
+ * Renders the area map page.
+ */
+app.get('/area-map', (request, response) => {
+    response.render('./areaMap.ejs', { session: request.session, message: '' });
+});
+/**
+ * Renders the awards page.
+ */
+app.get('/awards', (request, response) => {
+    response.render('./awards.ejs', { session: request.session, message: '' });
+});
+/**
+ * Renders the WSFIA calendar page.
+ */
+app.get('/calendar', (request, response) => {
+    response.render('./calendar.ejs', { session: request.session, message: '' });
+});
+/**
+ * Renders the contact page with the executive board members.
+ */
+app.get('/contact', (request, response) => {
+    response.render('./contact.ejs', { session: request.session, message: '' });
+});
+/**
+ * Renders the job postings page.
+ */
+app.get('/job-postings', (request, response) => {
+    response.render('./jobPostings.ejs', { session: request.session, message: '' });
+});
+/**
+ * Renders the link page.
+ */
+app.get('/links', (request, response) => {
+    response.render('./links.ejs', { session: request.session, message: '' });
+});
+/**
+ * Renders the scholarships page.
+ */
+app.get('/scholarships', (request, response) => {
+    response.render('./scholarships.ejs', { session: request.session, message: '' });
+});
+
+
 /*
 app.post('/register', async (request, response) => {
 
