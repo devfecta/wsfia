@@ -1,5 +1,7 @@
 const axios = require("axios").default;
 
+const url = '';
+
 class Membership {
 
     constructor() {}
@@ -28,7 +30,7 @@ class Membership {
             
             //console.log(params);
 
-            await axios.post('http://localhost/wsfia-dev/configuration/api.php'
+            await axios.post(process.env.HOST + '/configuration/api.php'
                 , params
             )
             .then(response => {
@@ -156,7 +158,7 @@ class Membership {
             
             //console.log(params);
             
-            return await axios.post('http://localhost/wsfia-dev/configuration/api.php'
+            return await axios.post(process.env.HOST + '/configuration/api.php'
                 , params
             )
             .then(response => response.data)
@@ -190,7 +192,7 @@ class Membership {
             
             //console.log(params);
 
-            return await axios.post('http://localhost/wsfia-dev/configuration/api.php'
+            return await axios.post(process.env.HOST + '/configuration/api.php'
                 , params
             )
             .then(response => {
@@ -200,7 +202,7 @@ class Membership {
                 //console.log("Parameters");
                 //console.log(params);
                 
-                return axios.post('http://localhost/wsfia-dev/configuration/PayPal-PHP-SDK/SendInvoice.php'
+                return axios.post(url + '/configuration/PayPal-PHP-SDK/SendInvoice.php'
                     , params
                 )
                 .then(response => lineItems)
@@ -238,7 +240,7 @@ class Membership {
             console.log("Params");
             console.log(params);
 
-            return await axios.post('http://localhost/wsfia-dev/configuration/api.php'
+            return await axios.post(process.env.HOST + '/configuration/api.php'
                 , params
             )
             .then(response => response.data)

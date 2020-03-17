@@ -2,7 +2,7 @@ const axios = require("axios").default;
 
 class Business {
 
-    constructor() {}
+    constructor() { }
 
     addBusiness = async (data) => {
 
@@ -26,7 +26,7 @@ class Business {
             params.append('class', 'Business');
             params.append('method', 'createBusiness');
 
-            await axios.post('http://localhost/wsfia-dev/configuration/api.php'
+            await axios.post(process.env.HOST + '/configuration/api.php'
                 , params
             )
             .then(response => {

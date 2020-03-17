@@ -3,6 +3,9 @@
  * function to process the results. 
  * @param {string} searchString Represents the name of the department or business.
  */
+
+const url = location.protocol + '//' + location.hostname + ':8000';
+
 const businessSearch = async (searchString) => {
 
     if(searchString.length <= 2) 
@@ -10,14 +13,12 @@ const businessSearch = async (searchString) => {
     else 
     {
         //console.log(searchString);
-        // await fetch('http://localhost/wsfia-dev/configuration/api.php?class=Business&method=searchBusinessesByName&searchBusinesses='+searchString, {method: 'POST', headers: {'Content-Type': 'text/json'}});
+        // await fetch(url + '/wsfia-dev/configuration/api.php?class=Business&method=searchBusinessesByName&searchBusinesses='+searchString, {method: 'POST', headers: {'Content-Type': 'text/json'}});
         let parameters = 'class=Business';
         parameters += '&method=searchBusinessesByName';
         parameters += '&searchBusinesses=' + searchString;
-
-        console.log(parameters);
         
-        await fetch('http://localhost/wsfia-dev/configuration/api.php?' + parameters, {method: 'GET'})
+        await fetch(url+ '/configuration/api.php?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(json => {
             console.log("" + json)
@@ -110,7 +111,7 @@ const getMembers = async (businessId) => {
         parameters += '&method=getMembersByBusiness';
         parameters += '&businessId=' + businessId;
         
-        await fetch('http://localhost/wsfia-dev/configuration/api.php?' + parameters, {method: 'GET'})
+        await fetch(url + '/configuration/api.php?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(data => {
             console.log(data)
@@ -199,7 +200,7 @@ const buildStatesDropdown = async () => {
     let parameters = 'class=Business';
         parameters += '&method=getStates';
 
-    await fetch('http://localhost/wsfia-dev/configuration/api.php?' + parameters, {method: 'GET'})
+    await fetch(url + '/configuration/api.php?' + parameters, {method: 'GET'})
     .then(response => response.json())
     .then(data => {
         data.forEach(state => {
@@ -225,7 +226,7 @@ const memberBusinessSearch = async (searchString) => {
         parameters += '&method=searchBusinessesByName';
         parameters += '&searchBusinesses=' + searchString;
 
-    await fetch('http://localhost/wsfia-dev/configuration/api.php?' + parameters, {method: 'GET'})
+    await fetch(url + '/configuration/api.php?' + parameters, {method: 'GET'})
     .then(response => response.json())
     .then(data => {
 
@@ -293,7 +294,7 @@ const addMemberBusiness = async (businessId) => {
         parameters += '&method=Business';
         parameters += '&businessId=' + businessId;
 
-    await fetch('http://localhost/wsfia-dev/configuration/api.php?' + parameters, {method: 'GET'})
+    await fetch(url + '/configuration/api.php?' + parameters, {method: 'GET'})
     .then(response => response.json())
     .then(data => {
 

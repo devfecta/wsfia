@@ -1,12 +1,13 @@
 const express = require('express');
 const session = require('express-session');
-const cookie = require('cookie');
+//const cookie = require('cookie');
 const app = express();
-const bcrypt = require('bcrypt');
+app.set('trust proxy', true);
+//const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
 dotenv.config();
 const uuid = require('uuid/v4');
-const fetch = require("node-fetch");
+//const fetch = require("node-fetch");
 
 // const bodyParser = require("body-parser");
 // app.use(bodyParser.json());
@@ -223,6 +224,7 @@ app.post('/register', async (request, response) => {
 
 });
 */
-app.listen(process.env.PORT, () => {
-    console.log(`App Started on Port ${process.env.PORT}`);
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}...`);
 });
