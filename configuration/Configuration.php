@@ -1,6 +1,6 @@
 <?php
 require_once("config.php");
-require_once(__WEBROOT__ . "/configuration/vendor/autoload.php");
+//require_once(__WEBROOT__ . "/configuration/vendor/autoload.php");
 
 class Configuration extends PDO {
 

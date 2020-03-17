@@ -18,7 +18,7 @@ const businessSearch = async (searchString) => {
         parameters += '&method=searchBusinessesByName';
         parameters += '&searchBusinesses=' + searchString;
         
-        await fetch(url+ '/configuration/api.php?' + parameters, {method: 'GET'})
+        await fetch(url + '/configuration/api.php?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(json => {
             console.log("" + json)

@@ -10,6 +10,9 @@ class Business {
         //console.log(formData);
         let confirmation = false;
 
+
+        console.log("Host: " + process.env.HOST);
+
         try {
 
             let params = new URLSearchParams();

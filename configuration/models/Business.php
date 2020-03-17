@@ -291,14 +291,17 @@ class Business {
          * Returns information on all businesses in JSON
          */
         $businesses = array();
+
+        
         
         try {
+
             $statement = Configuration::openConnection()->prepare("SELECT * FROM businesses AS b JOIN states AS s ON b.state=s.stateId WHERE b.name LIKE :businessName");
             $statement->bindValue(":businessName", '%'.$businessName.'%');
             $statement->execute();
 
             $results = $statement->fetchAll(PDO::FETCH_COLUMN);
-            
+
             foreach ($results as $index => $id) {
 
                 $business = new Business($id);
