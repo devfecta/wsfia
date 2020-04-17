@@ -19,3 +19,6 @@ public/
 views/
 *.json
 *.js
+
+.gcloudignore
+app.yaml
