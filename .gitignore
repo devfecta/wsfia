@@ -10,12 +10,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-interfaces/
-models/
 PayPal-PHP-SDK/
-*.php
-*.sql
-
-.gcloudignore
-app.yaml
-README.md 
+config.php
