@@ -15,7 +15,23 @@ $encodedJSON = null;
 
 //$wsfia = new WSFIA();
 
-Configuration::loadModels();
+// Original Configuration::loadModels();
+require_once("models/Business.php");
+//require_once("./models/Company.php");
+//require_once("./models/Confirmation.php");
+//require_once("./models/LineItem.php");
+require_once("models/Member.php");
+require_once("models/Membership.php");
+//require_once("./models/Order.php");
+require_once("models/ProcessOrder.php");
+require_once("models/RegisterConferenceMember.php");
+//require_once("./models/RegisterConferenceSpeaker.php");
+//require_once("./models/RegisterConferenceVendor.php");
+//require_once("./models/School.php");
+//require_once("./models/Speaker.php");
+//require_once("./models/User.php");
+//require_once("./models/Vendor.php");
+
 /*
 $connection = Configuration::openConnection();
 
@@ -203,6 +219,8 @@ switch ($requestMethod) {
                     }
                     break;
                 case 'Business':
+
+                    
                     $business = new Business(null);
                     switch ($_GET['method']) {
                         case "Business":

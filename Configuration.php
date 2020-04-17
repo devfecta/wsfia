@@ -26,12 +26,33 @@ class Configuration extends PDO {
         /**
          * Loads all of the class files in the models directory.
          */
+        /* Original
         foreach(new DirectoryIterator(__WEBROOT__ . '/configuration/models') as $classFile) {
             // Check to see if the file is a PHP file.
             if (strpos($classFile, '.php') != false) {
                 require_once(__WEBROOT__ . '/configuration/models/'. $classFile);
             }
         }
+        */
+
+        $directory = __WEBROOT__.'/html/models';
+
+        $all_files  = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($directory));
+        $php_files = new RegexIterator($all_files, '/\.php$/');
+
+        foreach($php_files as $classFile) {
+            // Check to see if the file is a PHP file.
+            if (strpos($classFile, '.php') != false) {
+                if(file_exists(__WEBROOT__.'/html/models/'.$classFile)) {
+                        //echo $classFile;
+                        require_once(__WEBROOT__.'/html/models/'. $classFile);
+                        //echo 'test2';
+                }
+//echo ("$classFile");
+            }
+        }
+
+        
     }
 
     public static function loadControllers() {

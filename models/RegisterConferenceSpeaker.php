@@ -1,6 +1,6 @@
 <?php
 require_once('Speaker.php');
-require_once(__WEBROOT__ . '/configuration/interfaces/iRegistration.php');
+require_once('./interfaces/iRegistration.php');
 /**
  * Handles the conference registration for WSFIA speakers.
  * Extends Speaker which extends User.
