@@ -197,12 +197,13 @@ class Membership {
             )
             .then(response => {
                 const lineItems = response.data;
+
                 params = new URLSearchParams();
                 params.append('lineItems', JSON.stringify(response.data));
                 //console.log("Parameters");
                 //console.log(params);
                 
-                return axios.post(url + '/configuration/PayPal-PHP-SDK/SendInvoice.php'
+                return axios.post(process.env.API + '/PayPal-PHP-SDK/SendInvoice.php'
                     , params
                 )
                 .then(response => lineItems)

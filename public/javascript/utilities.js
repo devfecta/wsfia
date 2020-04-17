@@ -5,7 +5,8 @@
  */
 
 //const url = location.protocol + '//' + location.hostname + ':8000';
-const url = '.';
+//const url = 'http://35.22.155.9';
+const url = 'http://localhost';
 
 const businessSearch = async (searchString) => {
 
@@ -19,10 +20,10 @@ const businessSearch = async (searchString) => {
         parameters += '&method=searchBusinessesByName';
         parameters += '&searchBusinesses=' + searchString;
         
-        await fetch(process.env.API + '/api.php?' + parameters, {method: 'GET'})
+        await fetch(url + '/api.php?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(json => {
-            console.log("" + json)
+            console.log("test" + JSON.stringify(json))
             getBusinesses(json)
         })
         .catch(error => displayError(error));
@@ -112,7 +113,7 @@ const getMembers = async (businessId) => {
         parameters += '&method=getMembersByBusiness';
         parameters += '&businessId=' + businessId;
         
-        await fetch(process.env.API + '/api.php?' + parameters, {method: 'GET'})
+        await fetch(url + '/api.php?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(data => {
             console.log(data)
@@ -201,7 +202,7 @@ const buildStatesDropdown = async () => {
     let parameters = 'class=Business';
         parameters += '&method=getStates';
 
-    await fetch(process.env.API + '/api.php?' + parameters, {method: 'GET'})
+    await fetch(url + '/api.php?' + parameters, {method: 'GET'})
     .then(response => response.json())
     .then(data => {
         data.forEach(state => {
@@ -227,7 +228,7 @@ const memberBusinessSearch = async (searchString) => {
         parameters += '&method=searchBusinessesByName';
         parameters += '&searchBusinesses=' + searchString;
 
-    await fetch(process.env.API + '/api.php?' + parameters, {method: 'GET'})
+    await fetch(url + '/api.php?' + parameters, {method: 'GET'})
     .then(response => response.json())
     .then(data => {
 
@@ -295,7 +296,7 @@ const addMemberBusiness = async (businessId) => {
         parameters += '&method=Business';
         parameters += '&businessId=' + businessId;
 
-    await fetch(process.env.API + '/api.php?' + parameters, {method: 'GET'})
+    await fetch(url + '/api.php?' + parameters, {method: 'GET'})
     .then(response => response.json())
     .then(data => {
 
