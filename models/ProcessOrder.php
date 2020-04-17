@@ -1,8 +1,8 @@
 <?php
 //require_once('../WSFIA.php');
 require_once('Order.php');
-require_once(__WEBROOT__ . '/configuration/interfaces/iOrder.php');
-require_once(__WEBROOT__ . '/configuration/interfaces/iLineItem.php');
+require_once('./interfaces/iOrder.php');
+require_once('./interfaces/iLineItem.php');
 /**
  * Handles the processing of order information from registrations.
  */

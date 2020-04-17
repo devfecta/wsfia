@@ -1,6 +1,6 @@
 <?php
 require_once('Member.php');
-require_once(__WEBROOT__ . '/configuration/interfaces/iRegistration.php');
+require_once('./interfaces/iRegistration.php');
 /**
  * Handles the membership registration for WSFIA members.
  * Extends Member which extends User.
