@@ -1,0 +1,103 @@
+<%- include ('../template/header') -%>
+
+<section id="businessInfo">
+    <h1>Add a Department/Business</h1>
+
+    <%- message %>
+
+    <form name="businessForm" id="businessForm" action="/addBusiness" method="POST">
+        <fieldset>
+            <legend>Department/Business Information</legend>
+
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="businessName">Department/Business Name</label>
+                <input type="text" class="col-md-9 form-control" name="businessName" id="businessName" size="36" maxlength="32" required value="Test Department" />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="station">Station</label>
+                <input type="text" class="col-md-9 form-control" name="station" id="station" size="20" maxlength="24" required value="Station 1" />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="streetAddress">Street Address</label>
+                <input type="text" class="col-md-9 form-control" name="streetAddress" id="streetAddress" size="20" maxlength="64" required value="123 Test Road" />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="city">City</label>
+                <input type="text" class="col-sm-9 form-control" name="city" id="city" size="36" maxlength="24" value="Fitchburg" />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="city">State</label>
+                <select name="states" id="states" class="col-sm-9 form-control"></select>
+                <script>
+                    buildStatesDropdown();
+                </script>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="zipcode">Zipcode</label>
+                <input type="text" class="col-md-9 form-control" name="zipcode" id="zipcode" size="12" maxlength="10" value="12345-6789" />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="phone">Phone</label>
+                <input type="text" class="col-md-9 form-control" name="phone" id="phone" size="12" maxlength="14" value="(123) 456-7890" />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="url">Website URL</label>
+                <input type="text" class="col-md-9 form-control" name="url" id="url" size="12" maxlength="256" value="http://www.test.com" />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="services">Services</label>
+                <textarea class="col-md-9 form-control" name="services" id="services" rows="5">Form Test Services</textarea>
+            </div>
+        
+        </fieldset>
+
+        <fieldset>
+            <legend>Department/Business Type</legend>
+            <div class="form-check">
+                <input type="radio" class="form-check-input" name="departmentType" id="departmentTypeNone" value="None" checked />
+                <label class="form-check-label ml-1 mr-3" for="departmentTypeNone">None</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" class="form-check-input" name="departmentType" id="departmentTypeVolunteer" value="Volunteer" />
+                <label class="form-check-label ml-1 mr-3" for="departmentTypeVolunteer">Volunteer</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" class="form-check-input" name="departmentType" id="departmentTypeCombination" value="Combination" />
+                <label class="form-check-label ml-1 mr-3" for="departmentTypeCombination">Combination</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" class="form-check-input" name="departmentType" id="departmentTypeCareer" value="Career" />
+                <label class="form-check-label ml-1 mr-3" for="departmentTypeCareer">Career</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" class="form-check-input" name="departmentType" id="departmentTypeCompany" value="Company" />
+                <label class="form-check-label ml-1 mr-3" for="departmentTypeCompany">Company</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" class="form-check-input" name="departmentType" id="departmentTypeSchool" value="School" />
+                <label class="form-check-label ml-1 mr-3" for="departmentTypeSchool">School</label>
+            </div>
+
+        </fieldset>
+            
+        <div class="form-group row">
+            <div class="col-md-12 p-5 text-right">
+
+                <button type="submit" id="addButton" style="min-width: 150px; width:25%" class="btn btn-primary">Add Department / Business</button>
+
+                <a href="/register" id="nextButton" style="min-width: 150px; width:25%" class="btn btn-secondary">Cancel</a>
+            </div>
+        </div>
+    </form>
+    
+</section>
+
+<%- include ('../template/footer') -%>

@@ -1,0 +1,95 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+a {
+  cursor: pointer;
+}
+
+.bg-wsfia-red {
+  background-color: #ce2029;
+}
+
+body {
+  margin: 0;
+  padding-top: 54px;
+  
+}
+
+body::after {
+  content: "";
+  background-image: url('/images/sprinkler-system-inspection.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: blur(3px);
+  -webkit-filter: blur(3px);
+  opacity: 0.3;
+  top: -6em;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: -1; 
+}
+
+nav {
+  background-color: #ce2029;
+}
+
+.navbar {
+  padding: unset;
+}
+
+.navbar-brand > img {
+  width: auto;
+  height: auto;
+  max-height: 60px;
+}
+
+section {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 1em;
+  padding: 3em;
+  margin-bottom: 3em;
+}
+
+.checkboxFieldset {
+  display: flex;
+}
+
+
+.btn-primary {
+  color: #fff;
+  background-color: #ce2029;
+  border-color: #ce2029;
+}
+
+.btn-primary:hover {
+  color: #fff;
+  background-color: #a41920;
+  border-color: #a41920;
+  text-decoration: none;
+}
+
+.dropdown-menu {
+  border: none;
+  border-radius: 0;
+}
+
+.card-img-top {
+  border-radius: unset;
+}
+
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+@media (min-width: 992px) {
+body {
+  padding-top: 56px;
+}
+}
