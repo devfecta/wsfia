@@ -1,3 +1,4 @@
+.gitignore
 # dotenv environment variables file
 .env
 # Dependency directories
