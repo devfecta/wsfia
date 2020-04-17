@@ -30,7 +30,7 @@ class Membership {
             
             //console.log(params);
 
-            await axios.post(process.env.HOST + '/configuration/api.php'
+            await axios.post(process.env.API + '/api.php'
                 , params
             )
             .then(response => {
@@ -158,7 +158,7 @@ class Membership {
             
             //console.log(params);
             
-            return await axios.post(process.env.HOST + '/configuration/api.php'
+            return await axios.post(process.env.API + '/api.php'
                 , params
             )
             .then(response => response.data)
@@ -192,7 +192,7 @@ class Membership {
             
             //console.log(params);
 
-            return await axios.post(process.env.HOST + '/configuration/api.php'
+            return await axios.post(process.env.API + '/api.php'
                 , params
             )
             .then(response => {
@@ -240,7 +240,7 @@ class Membership {
             console.log("Params");
             console.log(params);
 
-            return await axios.post(process.env.HOST + '/configuration/api.php'
+            return await axios.post(process.env.API + '/api.php'
                 , params
             )
             .then(response => response.data)

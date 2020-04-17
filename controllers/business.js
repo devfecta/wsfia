@@ -29,7 +29,7 @@ class Business {
             params.append('class', 'Business');
             params.append('method', 'createBusiness');
 
-            await axios.post(process.env.HOST + '/configuration/api.php'
+            await axios.post(process.env.API + '/api.php'
                 , params
             )
             .then(response => {
