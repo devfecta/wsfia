@@ -6,7 +6,8 @@ app.set('trust proxy', true);
 //const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
 dotenv.config();
-const uuid = require('uuid/v4');
+//const uuid = require('uuid/v4');
+const { v4: uuidv4 } = require('uuid');
 //const fetch = require("node-fetch");
 
 // const bodyParser = require("body-parser");
@@ -14,7 +15,7 @@ const uuid = require('uuid/v4');
 /**
  * Creates a new session ID.
  */
-app.use(session({secret: uuid(), saveUninitialized: true, resave: true}));
+app.use(session({secret: uuidv4(), saveUninitialized: true, resave: true}));
 /**
  * Allows for the serving of static files in the public directory.
  */
@@ -70,7 +71,7 @@ app.post('/addBusiness', async (request, response) => {
  */
 app.get('/register/member', (request, response) => {
     if(request.session.sessionId === undefined){
-        request.session.sessionId = uuid();
+        request.session.sessionId = uuidv4();
     }
     response.render('./registration/memberInfo.ejs', { session: request.session, message: '' });
 });
@@ -82,6 +83,7 @@ app.post('/register/addMember', async (request, response) => {
     let confirm = await controllers.membership.addMember(JSON.stringify(request.body));
     if (confirm) {
         request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
+        //console.log(request.session.registrants);
         response.redirect('/register/member/registrants');
     }
     else {
@@ -102,8 +104,31 @@ app.get('/register/member/registrants', (request, response) => {
 app.post('/register/process', async (request, response) => {
     request.body.sessionId = request.session.sessionId;
     request.session.registration = await controllers.membership.registerMember(JSON.stringify(request.body));
-    //console.log(request.session.registration);
     response.redirect('/register/confirm');
+});
+/**
+ * Renders the page for listing all of the members for renewal.
+ */
+app.get('/renewal/member', async (request, response) => {
+    //console.log(request.query.businessId);
+    request.session.members = await controllers.membership.getRenewals(JSON.stringify(request.query));
+    console.log(request.session.members);
+    response.render('./registration/renewal.ejs', { session: request.session, message: '' });
+});
+/**
+ * Calls the registerMember method to add registrants to the database, calls to the PayPal API to create and send an invoice, then redirect to the confirmation page.
+ */
+app.post('/renewal/process', async (request, response) => {
+    console.log(request.session);
+    console.log(request.body);
+    //request.body.sessionId = request.session.sessionId;
+    /*
+    request.session.registration = await controllers.membership.renewMember(JSON.stringify(request.body));
+    
+    console.log(request.session.registration);
+    
+    response.redirect('/register/confirm');
+    */
 });
 /**
  * Renders the confirmation of registrants, after the registration(s) have been processed.

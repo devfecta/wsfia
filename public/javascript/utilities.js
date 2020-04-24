@@ -140,17 +140,17 @@ const getMembers = async (businessId) => {
                 let resultButton = document.createElement("a");
                 resultButton.className = 'btn btn-success';
                 //resultButton.style = 'cursor: pointer;';
-                resultButton.href = '/login';
+                
 
                 let currentDate = new Date();
                 var expirationDate = new Date(member.expirationDate);
 
                 if(currentDate > expirationDate) {
-                    //resultButton.addEventListener('click', function(){ loadView('login'); });
+                    resultButton.href = '/renewal/member?businessId=' + businessId;
                     resultButton.innerHTML = 'Renew Membership';
                 }
                 else {
-                    //resultButton.addEventListener('click', function(){ loadView('login'); });
+                    resultButton.href = '/login';
                     resultButton.innerHTML = 'Login';
                 }
 

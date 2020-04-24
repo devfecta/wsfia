@@ -254,6 +254,69 @@ class Membership {
         
     }
 
+    getRenewals = async (data) => {
+
+        let formData = JSON.parse(data);
+
+        let parameters = 'class=Membership';
+            parameters += '&method=getRenewals';
+            parameters += '&businessId=' + formData.businessId;
+
+        return await axios.get(process.env.API + '/api.php?' + parameters)
+        .then(response => response.data)
+        .then(json => json)
+        .catch(error => error);
+    }
+
+    renewMember = async (data) => {
+
+        let formData = JSON.parse(data);
+        //console.log(formData);
+        let confirmation = false;
+
+        //let registrants = await this.getRegistrants(sessionId);
+        
+        try {
+            
+            let params = new URLSearchParams();
+
+            params.append('sessionId', formData.sessionId);
+            params.append('emailAddress', formData.emailAddress);
+            params.append('businessId', formData.business);
+            params.append('class', 'Membership');
+            params.append('method', 'register');
+            
+            //console.log(params);
+
+            return await axios.post(process.env.API + '/api.php'
+                , params
+            )
+            .then(response => {
+                const lineItems = response.data;
+
+                params = new URLSearchParams();
+                params.append('lineItems', JSON.stringify(response.data));
+                //console.log("Parameters");
+                //console.log(params);
+                
+                return axios.post(process.env.API + '/PayPal-PHP-SDK/SendInvoice.php'
+                    , params
+                )
+                .then(response => lineItems)
+                .catch(error => console.log(error));
+                //return false;
+                //confirmation = response.data;
+            })
+            .catch(error => console.log(error));
+            
+            return confirmation;
+            
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
+
 }
 
 module.exports = Membership;
