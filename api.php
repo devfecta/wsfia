@@ -202,6 +202,12 @@ switch ($requestMethod) {
                             //echo $_GET['formData'];
                             echo $Membership->getRegistrants($_GET['formData']);
                             break;
+                        case "getRenewals":
+                            $member = new Member(null);
+                            echo $member->getMembersByBusiness($_GET['businessId']);
+
+                            ////echo $Membership->getRegistrants($_GET['formData']);
+                            break;
                         default:
                             echo json_encode(array("error" => 'GET METHOD ERROR: The '.$_GET['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);
                             break;
