@@ -252,7 +252,7 @@ switch ($requestMethod) {
 
 
 
-        
+        /*
         if (isset($_GET['formType'])) {
             switch ($_GET['formType']) {
 
@@ -306,7 +306,7 @@ switch ($requestMethod) {
         } else {
            // echo json_encode(array("error" => 'GET ERROR: Form type not set.\n'), JSON_PRETTY_PRINT);
         }
-        
+        */
         break;
         
     case "PUT":

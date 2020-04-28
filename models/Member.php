@@ -120,6 +120,8 @@ class Member extends User {
         
         $departmentsArray = json_decode($departmentsJSON, true);
 
+        $this->departments = $departmentsArray[0];
+        /*
         foreach ($departmentsArray as $id) {
             
             $department = new Business($id);
@@ -139,6 +141,7 @@ class Member extends User {
             );
             
         }
+        */
         
     }
 
