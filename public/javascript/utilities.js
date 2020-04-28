@@ -23,7 +23,7 @@ const businessSearch = async (searchString) => {
         await fetch(url + '/api.php?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(json => {
-            console.log("test" + JSON.stringify(json))
+            //console.log("test" + JSON.stringify(json))
             getBusinesses(json)
         })
         .catch(error => displayError(error));
@@ -116,7 +116,7 @@ const getMembers = async (businessId) => {
         await fetch(url + '/api.php?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(data => {
-            console.log(data)
+            //console.log(data)
             // Clears the search textbox
             const searchTextBox = document.querySelector('#searchTextBoxId');
             searchTextBox.value = '';
@@ -141,12 +141,11 @@ const getMembers = async (businessId) => {
                 resultButton.className = 'btn btn-success';
                 //resultButton.style = 'cursor: pointer;';
                 
-
                 let currentDate = new Date();
                 var expirationDate = new Date(member.expirationDate);
 
                 if(currentDate > expirationDate) {
-                    resultButton.href = '/renewal/member?businessId=' + businessId;
+                    resultButton.href = '/renewal/member?businessId=' + member.departments.id;
                     resultButton.innerHTML = 'Renew Membership';
                 }
                 else {
@@ -344,6 +343,14 @@ const validateRegistrationForm = (form) => {
     if (count > 1) {
         document.querySelector('#registerButton').removeAttribute('disabled');
     }
+}
+
+const removeRenewal = (id) => {
+    let lineItem = document.querySelector("#userRow" + id);
+    lineItem.remove();
+    lineItem = document.querySelector("#emailAddressRow" + id);
+    lineItem.remove();
+    
 }
 
 /**

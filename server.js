@@ -112,7 +112,8 @@ app.post('/register/process', async (request, response) => {
 app.get('/renewal/member', async (request, response) => {
     //console.log(request.query.businessId);
     request.session.members = await controllers.membership.getRenewals(JSON.stringify(request.query));
-    console.log(request.session.members);
+    //console.log(JSON.stringify(request.session.members.departments));
+    //console.log(request.session.members);
     response.render('./registration/renewal.ejs', { session: request.session, message: '' });
 });
 /**
