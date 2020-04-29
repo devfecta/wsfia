@@ -233,69 +233,66 @@ class Membership extends Member implements iRegistration {
     }
 
 
-    public function renew($sessionData) {
+    public function renew($renewData) {
 
-        $data = json_decode(json_encode($sessionData), FALSE);
+        $data = json_decode(json_encode($renewData), FALSE);
+
         /**
          * Returns the new User ID in JSON
          */
         try {
-            $registrants = json_decode($this->getRegistrants($data->sessionId));
+            $members = json_decode($data->members);
+            //$registrants = json_decode($this->getRegistrants($data->sessionId));
             // $connection is lets you use the same connection for multiple statements.
             $connection = Configuration::openConnection();
 
             $lineItem = array();
-            $characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%&";
 
-            foreach($registrants as $registrant) {
+            // Gets new expiration date
+            $statement = $connection->prepare("SELECT DATE_FORMAT(CURDATE(), '%Y-%m-%d')");
+            $statement->execute();
+            $dateCurrent = $statement->fetch(PDO::FETCH_COLUMN);
+            if (strtotime($dateCurrent) < strtotime(date('Y-11-1'))) {
+                $expirationDate = date('Y-12-31', strtotime($dateCurrent));
+            } else {
+                $expirationDate = date('Y-12-31', strtotime($dateCurrent . '+1 year'));
+            }
 
-                //$password = $characters[mt_rand(0, strlen($Characters))];
-                $password = '123abc';
-                // User Information
-                $statement = $connection->prepare("INSERT INTO users (`type`, `password`, `firstName`, `lastName`, `emailAddress`) VALUES (:type, :password, :firstName, :lastName, :emailAddress)");
-                $statement->bindParam(":type", json_encode(array(2=>"Member")));
-                $statement->bindParam(":password", password_hash($password, PASSWORD_BCRYPT));
-                $statement->bindParam(":firstName", $registrant->firstName);
-                $statement->bindParam(":lastName", $registrant->lastName);
-                $statement->bindParam(":emailAddress", $registrant->emailAddress);
+            foreach($members as $member) {
+                // Update the expiration date
+                $statement = $connection->prepare("UPDATE members SET expirationDate=:expirationDate WHERE id=:memberId");
+                $statement->bindParam(":expirationDate", $expirationDate);
+                $statement->bindParam(":memberId", $member);
                 $statement->execute();
 
-                $newUserId = $connection->lastInsertId();
+                if ($statement->rowCount() > 0) {
+                    // Get member information
+                    $statement = $connection->prepare("SELECT `members`.`id` AS wsfiaId, `users`.*, `members`.* FROM `members` INNER JOIN `users` ON `users`.`id`=`members`.`userId` WHERE `members`.`id`=:memberId");
+                    $statement->bindParam(":memberId", $member);
+                    $statement->execute();
 
-                // Create member ID
-                $statement = $connection->prepare("SELECT DATE_FORMAT(CURDATE(), '%Y-%m-%d')");
-                $statement->execute();
-                $dateCurrent = $statement->fetch(PDO::FETCH_COLUMN);
-                $memberId = 'WSFIA-' . $newUserId . date('ynj', strtotime($dateCurrent));
+                    if ($statement->rowCount() > 0) {
+                        $result = $statement->fetch(PDO::FETCH_ASSOC);
 
-                // Member Information
-                $statement = $connection->prepare("INSERT INTO members (`id`, `userId`, `jobTitle`, `departments`, `areas`, `expirationDate`, `studentId`) VALUES (:id, :userId, :jobTitle, :departments, :areas, :expirationDate, :studentId)");
-                $statement->bindParam(":id", $memberId);
-                $statement->bindParam(":userId", $newUserId);
-                $statement->bindParam(":jobTitle", $registrant->jobTitle);
-                $statement->bindParam(":departments", json_encode($registrant->businesses));
-                $statement->bindParam(":areas", json_encode($registrant->areas));
-                // After October the expiration date is increased to the following year.
-                if (strtotime($dateCurrent) < strtotime(date('Y-11-1'))) {
-                    $statement->bindParam(":expirationDate", date('Y-12-31', strtotime($dateCurrent)));
-                } else {
-                    $statement->bindParam(":expirationDate", date('Y-12-31', strtotime($dateCurrent . '+1 year')));
+                        $userInfo['id'] = $result['id'];
+                        $userInfo['wsfiaId'] = $result['wsfiaId'];
+                        $userInfo['firstName'] = $result['firstName'];
+                        //$userInfo['authenticated'] = password_verify($data->password, $result['password']);
+
+                        // Create an order and line item for new member.
+                        $orderOption = 1;
+                        $statement = $connection->prepare("SELECT * FROM orderOptions WHERE id=:id");
+                        $statement->bindParam(":id", $orderOption);
+                        $statement->execute();
+                        $results = $statement->fetch(PDO::FETCH_ASSOC);
+                        $itemId = $results['id'];
+                        $itemDescription = "Member Name: " . $result['firstName'] . " " . $result['lastName'] . "\nMember ID: " . $result['wsfiaId'];
+                        $price = $results['price'];
+
+                        array_push($lineItem, array("emailAddress" => $result['emailAddress'], "userId" => $result['userId'], "quantity" => 1, "itemId" => $itemId, "itemName" => $results['description'], "itemDescription" => $itemDescription, "price" => $price));
+
+                    }
                 }
-                $statement->bindParam(":studentId", $registrant->studentId);
-                $statement->execute();
-
-                // Create an order and line item for new member.
-                $orderOption = 1;
-                $statement = $connection->prepare("SELECT * FROM orderOptions WHERE id=:id");
-                $statement->bindParam(":id", $orderOption);
-                $statement->execute();
-                $results = $statement->fetch(PDO::FETCH_ASSOC);
-                $itemId = $results['id'];
-                $itemDescription = "Member Name: " . $registrant->firstName . " " . $registrant->lastName . "\nMember ID: " . $memberId;
-                $price = $results['price'];
-
-                array_push($lineItem, array("emailAddress" => $registrant->emailAddress, "userId" => $newUserId, "quantity" => 1, "itemId" => $itemId, "itemName" => $results['description'], "itemDescription" => $itemDescription, "price" => $price));
-                
             }
 
             $lineItems['lineItems'] = $lineItem;
@@ -309,11 +306,6 @@ class Membership extends Member implements iRegistration {
             $lineItems['billing'] = array("billingEmailAddress" => $data->emailAddress, "billingBusiness" => $billingBusiness);
 
             $lineItems = json_encode($lineItems, JSON_PRETTY_PRINT);
-
-            // Remove session data
-            $statement = Configuration::openConnection()->prepare("DELETE FROM `userSessions` WHERE `sessionId`=:sessionId");
-            $statement->bindParam(":sessionId", $data->sessionId);
-            $statement->execute();
             
             Configuration::closeConnection();
             

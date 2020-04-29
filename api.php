@@ -83,6 +83,11 @@ switch ($requestMethod) {
                             // Return JSON of the registrants
                             echo $Membership->login($_POST);
                             break;
+                        case "renew":
+                            // Return JSON of the renewed members
+                            //echo json_encode(array("type" => "API POST", "method" => $requestMethod, "data" => $_POST));
+                            echo $Membership->renew($_POST);
+                            break;
                         default:
                             echo json_encode(array("error" => 'METHOD ERROR: The '.$_POST['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);
                             break;
@@ -106,7 +111,7 @@ switch ($requestMethod) {
                     break;
             }
         }
-
+        /*
         if (isset($_REQUEST['formType'])) {
 
             switch ($_REQUEST['formType']) {
@@ -121,10 +126,9 @@ switch ($requestMethod) {
                         $_SESSION['order']['id'] = $processOrder->createOrder(session_id());
                     //}
 
-                    /**
-                     * Creates a member but with the status of 0 (unregistered)
-                     */
-
+                    
+                    //Creates a member but with the status of 0 (unregistered)
+                    
                     $data = json_decode(file_get_contents('php://input'), true);
 
                     for ($index = 0; $index < sizeof($data); $index++) {
@@ -144,9 +148,8 @@ switch ($requestMethod) {
                     //$_SESSION['order']['member'][] = json_decode($response);
 
                     //$processOrder->addLineItem($_SESSION['order']['id'], $response);
-                    /**
-                     * Adds the new member ID and item ID to the session for later use
-                     */
+                    
+                    // Adds the new member ID and item ID to the session for later use
 
                     break;
                 case "CreateBusiness":
@@ -188,7 +191,7 @@ switch ($requestMethod) {
             //echo json_encode(array("error" => 'POST ERROR: Form type not set.\n'), JSON_PRETTY_PRINT);
         
         }
-
+        */
         break;
     case "GET":
     //echo "REQUEST_METHOD Get";
