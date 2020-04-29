@@ -120,16 +120,16 @@ app.get('/renewal/member', async (request, response) => {
  * Calls the registerMember method to add registrants to the database, calls to the PayPal API to create and send an invoice, then redirect to the confirmation page.
  */
 app.post('/renewal/process', async (request, response) => {
-    console.log(request.session);
-    console.log(request.body);
+    //console.log(request.session);
+    //console.log(request.body);
     //request.body.sessionId = request.session.sessionId;
-    /*
+    
     request.session.registration = await controllers.membership.renewMember(JSON.stringify(request.body));
     
     console.log(request.session.registration);
     
     response.redirect('/register/confirm');
-    */
+    
 });
 /**
  * Renders the confirmation of registrants, after the registration(s) have been processed.

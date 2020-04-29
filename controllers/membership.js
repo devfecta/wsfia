@@ -280,11 +280,11 @@ class Membership {
             
             let params = new URLSearchParams();
 
-            params.append('sessionId', formData.sessionId);
+            params.append('members', JSON.stringify(formData.members));
             params.append('emailAddress', formData.emailAddress);
             params.append('businessId', formData.business);
             params.append('class', 'Membership');
-            params.append('method', 'register');
+            params.append('method', 'renew');
             
             //console.log(params);
 
