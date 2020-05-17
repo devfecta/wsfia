@@ -139,6 +139,35 @@ class Membership extends Member implements iRegistration {
         return json_encode($userInfo, JSON_PRETTY_PRINT);
     }
 
+    public function resetPassword($formData) {
+        $data = json_decode(json_encode($formData), FALSE);
+        $passwordUpdated["updatedPassword"] = false;
+        /**
+         * Returns the JSON with a boolean if the password was updated or not.
+         */
+        try {
+
+            $connection = Configuration::openConnection();
+
+            $statement = $connection->prepare("UPDATE `users` SET `password`=:password WHERE `emailAddress`=:emailAddress");
+            $statement->bindParam(":emailAddress", $data->emailAddress);
+            $statement->bindParam(":password", password_hash($data->password, PASSWORD_BCRYPT));
+            $statement->execute();
+
+            if ($statement->rowCount() > 0) {
+                $passwordUpdated["updatedPassword"] = true;
+            }
+            
+            Configuration::closeConnection();
+
+        }
+        catch (PDOException $e) {
+            return $passwordUpdated["updatedPassword"] = $e->getMessage();
+        }
+
+        return json_encode($passwordUpdated, JSON_PRETTY_PRINT);
+    }
+
     public function register($sessionData) {
 
         $data = json_decode(json_encode($sessionData), FALSE);
@@ -151,7 +180,7 @@ class Membership extends Member implements iRegistration {
             $connection = Configuration::openConnection();
 
             $lineItem = array();
-            $characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%&";
+            //$characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%&";
 
             foreach($registrants as $registrant) {
 

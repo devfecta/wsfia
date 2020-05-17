@@ -83,6 +83,10 @@ switch ($requestMethod) {
                             // Return JSON of the registrants
                             echo $Membership->login($_POST);
                             break;
+                        case "resetPassword":
+                            // Return JSON of the password boolean
+                            echo $Membership->resetPassword($_POST);
+                            break;
                         case "renew":
                             // Return JSON of the renewed members
                             //echo json_encode(array("type" => "API POST", "method" => $requestMethod, "data" => $_POST));
