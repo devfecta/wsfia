@@ -254,6 +254,34 @@ class Membership {
         
     }
 
+    resetPassword = async (data) => {
+
+        let formData = JSON.parse(data);
+        
+        try {
+
+            //console.log(data);
+            
+            let params = new URLSearchParams();
+
+            params.append('emailAddress', formData.inputEmail);
+            params.append('password', formData.inputPassword);
+            params.append('class', 'Membership');
+            params.append('method', 'resetPassword');
+
+            return await axios.post(process.env.API + '/api.php'
+                , params
+            )
+            .then(response => response.data)
+            .catch(error => console.log(error));
+            
+        }
+        catch (e) {
+            console.error(e);
+        }
+        
+    }
+
     getRenewals = async (data) => {
 
         let formData = JSON.parse(data);

@@ -163,6 +163,19 @@ function authenticateUser (request, response, next) {
     response.redirect('/login');
 }
 /**
+ * Renders the Forgot Password page.
+ */
+app.get('/resetPassword', (request, response) => {
+    response.render('./resetPassword.ejs', { session: request.session, message: null });
+});
+/**
+ * Renders the Forgot Password page with password update confirmation.
+ */
+app.post('/resetPassword', async (request, response) => {
+    let resultJSON = await controllers.membership.resetPassword(JSON.stringify(request.body));    
+    response.render('./resetPassword.ejs', { session: request.session, message: resultJSON.updatedPassword });
+});
+/**
  * If the user is authenticated then the members area page is rendered.
  */
 app.get('/member-area', authenticateUser, (request, response) => {
