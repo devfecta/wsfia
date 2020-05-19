@@ -42,6 +42,8 @@ const getBusinesses = (data) => {
         to add your department/business to our system.</p>
     `;
 
+    
+
     let results = document.createElement("div");
     //console.log(data);
     if (data.length > 0) {
@@ -116,6 +118,8 @@ const getMembers = async (businessId) => {
         await fetch(url + '/api.php?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(data => {
+
+            console.log(data);
             //console.log(data)
             // Clears the search textbox
             const searchTextBox = document.querySelector('#searchTextBoxId');
@@ -126,6 +130,8 @@ const getMembers = async (businessId) => {
                 If you don't see your account listed, click on the "Create New Account" button to register.</p>`;
 
             data.forEach( member => {
+
+                
 
                 let resultRow = document.createElement("div");
                 resultRow.className = 'row';

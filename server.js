@@ -126,7 +126,7 @@ app.post('/renewal/process', async (request, response) => {
     
     request.session.registration = await controllers.membership.renewMember(JSON.stringify(request.body));
     
-    console.log(request.session.registration);
+    //console.log(request.session.registration);
     
     response.redirect('/register/confirm');
     
@@ -150,6 +150,7 @@ app.get('/login', (request, response) => {
  */
 app.post('/login', async (request, response) => {
     let userInfo = await controllers.membership.login(JSON.stringify(request.body));
+    //console.log(userInfo);
     request.session.userInfo = userInfo;
     response.redirect('/member-area');
 });
