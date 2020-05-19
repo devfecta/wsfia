@@ -133,7 +133,8 @@ class Membership extends Member implements iRegistration {
 
         }
         catch (PDOException $e) {
-            return "Error: " . $e->getMessage();
+            //return "Error: " . $e->getMessage();
+            return json_encode(array("error" => $e->getMessage()), JSON_PRETTY_PRINT);
         }
 
         return json_encode($userInfo, JSON_PRETTY_PRINT);
