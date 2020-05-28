@@ -1,13 +1,12 @@
+//const url = location.protocol + '//' + location.hostname + ':8000';
+const url = 'http://34.71.62.246';
+//const url = 'http://localhost';
+
 /**
  * Searches for departments or businesses in the database, and calls the getBusinesses 
  * function to process the results. 
  * @param {string} searchString Represents the name of the department or business.
  */
-
-//const url = location.protocol + '//' + location.hostname + ':8000';
-//const url = 'http://35.22.155.9';
-const url = 'http://localhost';
-
 const businessSearch = async (searchString) => {
 
     if(searchString.length <= 2) 
@@ -30,6 +29,33 @@ const businessSearch = async (searchString) => {
     }
 }
 
+const checkEmailAddress = async (searchString) => {
+
+    if(searchString.length <= 2) 
+    { $('#searchResults').fadeOut(); } 
+    else 
+    {
+        let parameters = 'class=Membership';
+        parameters += '&method=checkEmailAddress';
+        parameters += '&searchEmailAddress=' + searchString;
+        
+        await fetch(url + '/api.php?' + parameters, {method: 'GET'})
+        .then(response => response.json())
+        .then(json => {
+            //console.log(json.result);
+            if (json.result > 0) {
+                document.querySelector('#checkResult').textContent = "e-Mall Address Already Exists";
+                validateMembershipForm(document.querySelector('#membershipForm'));
+            }
+            else {
+                document.querySelector('#checkResult').textContent = "";
+                validateMembershipForm(document.querySelector('#membershipForm'));
+            }
+        })
+        .catch(error => displayError(error));
+    }
+}
+
 /**
  * Displays the departments/companies found in a search.
  * @param {*} data 
@@ -42,8 +68,6 @@ const getBusinesses = (data) => {
         to add your department/business to our system.</p>
     `;
 
-    
-
     let results = document.createElement("div");
     //console.log(data);
     if (data.length > 0) {
@@ -53,10 +77,8 @@ const getBusinesses = (data) => {
         `;
 
         data.forEach(business => {
-
             //document.cookie = 'businessId=' + business.id;
             //console.log(document.cookie);
-
             let resultRow = document.createElement("div");
             resultRow.className = 'row';
             resultRow.id = 'departmentId' + business.id;
@@ -119,7 +141,7 @@ const getMembers = async (businessId) => {
         .then(response => response.json())
         .then(data => {
 
-            console.log(data);
+            //console.log(data);
             //console.log(data)
             // Clears the search textbox
             const searchTextBox = document.querySelector('#searchTextBoxId');
@@ -130,8 +152,6 @@ const getMembers = async (businessId) => {
                 If you don't see your account listed, click on the "Create New Account" button to register.</p>`;
 
             data.forEach( member => {
-
-                
 
                 let resultRow = document.createElement("div");
                 resultRow.className = 'row';
@@ -199,7 +219,9 @@ const getMembers = async (businessId) => {
         })
         .catch(error => displayError(error));
 }
-
+/**
+ * Gets a list of HTML options for the states.
+ */
 const buildStatesDropdown = async () => {
 
     let states = document.querySelector("#states");
@@ -221,7 +243,7 @@ const buildStatesDropdown = async () => {
     .catch(error => displayError(error));
 }
 /**
- * Adds businesses to a member registrtion.
+ * Gets a list of businesses to add to a member registration.
  * @param {*} businessId 
  */
 const memberBusinessSearch = async (searchString) => {
@@ -290,8 +312,10 @@ const memberBusinessSearch = async (searchString) => {
     })
     .catch(error => displayError(error));
 }
-
-
+/**
+ * Adds business(s) to a member registration.
+ * @param {*} businessId 
+ */
 const addMemberBusiness = async (businessId) => {
 
 	const businessList = document.querySelector('#businessList');
@@ -316,8 +340,9 @@ const addMemberBusiness = async (businessId) => {
         businessInput.setAttribute('data-value', `${data.name} (Station ${data.station})`);
         businessInput.setAttribute('name', 'businesses');
         businessInput.setAttribute('class', 'form-check-input');
-        businessInput.setAttribute('checked', true);
+        //businessInput.setAttribute('checked', false);
         businessInput.setAttribute('value', data.id);
+        businessInput.addEventListener('click', function(){ validateMembershipForm(this.form) });
 
         let businessInputLabel = document.createElement("label");
         businessInputLabel.setAttribute('for', 'business['+data.id+']');
@@ -330,12 +355,13 @@ const addMemberBusiness = async (businessId) => {
         businessRow.appendChild(businessInputLabel);
         businessList.appendChild(businessRow);
 
-        document.querySelector('#addMemberButton').removeAttribute('disabled');
-
     })
     .catch(error => displayError(error));
 }
-
+/**
+ * Checks to make sure the radio buttons on the pre-registration confirmation page have been selected for billing.
+ * @param {*} form 
+ */
 const validateRegistrationForm = (form) => {
     let radioButtons = form.querySelectorAll('input[type="radio"]');
 
@@ -350,7 +376,53 @@ const validateRegistrationForm = (form) => {
         document.querySelector('#registerButton').removeAttribute('disabled');
     }
 }
+/**
+ * Checks to make sure there is an area and department/company selected on the Membership Registration page.
+ * @param {*} form 
+ */
+const validateMembershipForm = (form) => {
 
+    let areaCheckboxes = form.querySelectorAll('input[name="areas"]');
+
+    let businessCheckboxes = form.querySelectorAll('input[name="businesses"]');
+    
+    let BreakException = {areas : false, businesses : false};
+
+    try {
+        areaCheckboxes.forEach(area => {
+            if (area.checked) {
+                throw BreakException;
+            }
+        });
+    }
+    catch(e) {
+        BreakException.areas = true;
+    }
+
+    try {
+        businessCheckboxes.forEach(business => {
+            if (business.checked) {
+                throw BreakException;
+            }
+        });
+    }
+    catch(e) {
+        BreakException.businesses = true;
+        
+    }
+
+    if (BreakException.areas && BreakException.businesses && document.querySelector('#checkResult').textContent.length < 1) {
+        document.querySelector('#addMemberButton').removeAttribute('disabled');
+    }
+    else {
+        document.querySelector('#addMemberButton').disabled = true;
+    }
+
+}
+/**
+ * Remove a member from the membership renewal form.
+ * @param {*} id 
+ */
 const removeRenewal = (id) => {
     let lineItem = document.querySelector("#userRow" + id);
     lineItem.remove();
