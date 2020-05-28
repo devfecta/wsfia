@@ -115,87 +115,6 @@ switch ($requestMethod) {
                     break;
             }
         }
-        /*
-        if (isset($_REQUEST['formType'])) {
-
-            switch ($_REQUEST['formType']) {
-
-                case "Membership":
-
-                    $processOrder = new ProcessOrder();
-                    $registration = new Membership();
-
-                    //if (!isset($_SESSION['order']['id'])) {
-                        
-                        $_SESSION['order']['id'] = $processOrder->createOrder(session_id());
-                    //}
-
-                    
-                    //Creates a member but with the status of 0 (unregistered)
-                    
-                    $data = json_decode(file_get_contents('php://input'), true);
-
-                    for ($index = 0; $index < sizeof($data); $index++) {
-                        foreach ($data[$index] as $key => $value) {
-                            $_POST[$key] = $value;
-                        }
-                        $lineItemInfo = json_decode($registration->register($_POST));
-                        $processOrder->addLineItem($_SESSION['order']['id'], $lineItemInfo);
-                        $response[] = $lineItemInfo;
-
-                    }
-
-                    //echo json_encode($_POST['firstName']);
-                    //echo json_encode($_SESSION['order']['id']);
-                    echo json_encode($response);
-
-                    //$_SESSION['order']['member'][] = json_decode($response);
-
-                    //$processOrder->addLineItem($_SESSION['order']['id'], $response);
-                    
-                    // Adds the new member ID and item ID to the session for later use
-
-                    break;
-                case "CreateBusiness":
-                    $registration = new Membership();
-                    echo $registration->createBusiness($_POST);
-                    break;
-                case "CreateVendor":
-                    break;
-                case "CreateSpeaker":
-                    break;
-                case "CreateConferenceRegistrations":
-                    if (isset($_POST['registrantType'])) {
-
-                        switch ($_POST['registrantType']) {
-                            case "Member":
-                            echo "Conference Member";
-                                $registration = new RegisterConferenceMember();
-                                echo $registration->register($_POST);
-                                break;
-                            case "Vendor":
-                                break;
-                            case "Speaker":
-                                break;
-                            default:
-                                break;
-                        }
-
-                    } else {
-                        echo json_encode(array("error" => 'POST ERROR: Registrant type not set.\n'), JSON_PRETTY_PRINT);
-                    }
-                    
-                    break;
-                default:
-                    break;
-
-            }
-        } else {
-
-            //echo json_encode(array("error" => 'POST ERROR: Form type not set.\n'), JSON_PRETTY_PRINT);
-        
-        }
-        */
         break;
     case "GET":
     //echo "REQUEST_METHOD Get";
@@ -206,14 +125,14 @@ switch ($requestMethod) {
                     $Membership = new Membership();
                     switch ($_GET['method']) {
                         case "getRegistrants":
-                            //echo $_GET['formData'];
                             echo $Membership->getRegistrants($_GET['formData']);
                             break;
                         case "getRenewals":
                             $member = new Member(null);
                             echo $member->getMembersByBusiness($_GET['businessId']);
-
-                            ////echo $Membership->getRegistrants($_GET['formData']);
+                            break;
+                        case "checkEmailAddress":
+                            echo $Membership->checkEmailAddress($_GET['searchEmailAddress']);
                             break;
                         default:
                             echo json_encode(array("error" => 'GET METHOD ERROR: The '.$_GET['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);
@@ -232,8 +151,6 @@ switch ($requestMethod) {
                     }
                     break;
                 case 'Business':
-
-                    
                     $business = new Business(null);
                     switch ($_GET['method']) {
                         case "Business":
@@ -256,66 +173,7 @@ switch ($requestMethod) {
                     break;
             }
         }
-
-
-
-        /*
-        if (isset($_GET['formType'])) {
-            switch ($_GET['formType']) {
-
-                case "ReadMembers":
-                    $registration = new Membership();
-                    if (isset($_GET['id']) && $_GET['id'].length > 0) {
-                        echo $registration->reportRegistration($_GET['id']);
-                    } else {
-                        echo $registration->reportRegistrations();
-                    }
-                    break;
-                case "ReadVendors":
-                    break;
-                case "ReadSpeakers":
-                    break;
-                case "ReadBusinesses":
-                    $business = new Business('');
-                    echo $business->getBusinesses();
-                    break;
-                case "ReadConferenceRegistrations":
-                    break;
-                default:
-                    break;
-
-            }
-        } elseif(isset($_GET['view'])) {
-
-            $_SESSION['view'] = $_GET['view'];
-
-            echo file_get_contents('../views/'.$_GET['view'].'.php');
-
-            //Configuration::setView($_GET['view']);
-
-        } elseif(isset($_GET['methodOLD'])) {
-
-            switch ($_GET['method']) {
-                case 'searchBusinesses':
-                    //$business = new Business(null);
-                    //echo $business->searchBusinessesByName($_GET['searchBusinesses']);
-                    break;
-                case 'getMembers':
-                    $member = new Member(null);
-                    echo $member->getMembersByBusiness($_GET['businessId']);
-                    break;
-                default:
-                    break;
-            }
-
-            
-
-        } else {
-           // echo json_encode(array("error" => 'GET ERROR: Form type not set.\n'), JSON_PRETTY_PRINT);
-        }
-        */
         break;
-        
     case "PUT":
     //echo "REQUEST_METHOD Put";
         // Updates
@@ -342,7 +200,6 @@ switch ($requestMethod) {
             echo json_encode(array("error" => 'PUT ERROR: Form type not set.\n'), JSON_PRETTY_PRINT);
         }
         break;
-        
     case "DELETE":
     //echo "REQUEST_METHOD Delete";
         // Deletes

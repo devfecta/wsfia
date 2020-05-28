@@ -169,6 +169,30 @@ class Membership extends Member implements iRegistration {
         return json_encode($passwordUpdated, JSON_PRETTY_PRINT);
     }
 
+    
+    public function checkEmailAddress($emailAddress) {
+        /**
+         * Returns information on all businesses in JSON
+         */
+        try {
+
+            $statement = Configuration::openConnection()->prepare("SELECT emailAddress FROM users WHERE emailAddress=:emailAddress");
+            $statement->bindValue(":emailAddress", $emailAddress, PDO::PARAM_STR);
+            $statement->execute();
+
+            //$result = json_encode('{"result" : ' . $statement->rowCount() . '}', JSON_PRETTY_PRINT);
+            $result = '{"result" : ' . $statement->rowCount() . '}';
+
+            Configuration::closeConnection();
+        }
+        catch (PDOException $e) {
+            //return "Error: " . $e->getMessage();
+            $result = '{"result" : ' . $e->getMessage() . '}';
+        }
+
+        return $result;
+    }
+
     public function register($sessionData) {
 
         $data = json_decode(json_encode($sessionData), FALSE);
