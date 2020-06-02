@@ -113,7 +113,7 @@ class Membership extends Member implements iRegistration {
             $connection = Configuration::openConnection();
 
             // Get Billing Business Information
-            $statement = $connection->prepare("SELECT `users`.`id` AS `id`, `users`.`emailAddress` AS email, `users`.`password` AS `password`, `users`.`firstName` AS `firstName`, `members`.`id` AS `wsfiaId` FROM `users` INNER JOIN `members` ON `members`.`userId`=`users`.`id` WHERE `users`.`emailAddress`=:emailAddress");
+            $statement = $connection->prepare("SELECT `users`.`id` AS `id`, `users`.`emailAddress` AS email, `users`.`password` AS `password`, `users`.`firstName` AS `firstName`, `members`.`id` AS `wsfiaId`, `members`.`expirationDate` AS `expirationDate`, `members`.`status` AS `status`, `members`.`studentId` AS `studentId` FROM `users` INNER JOIN `members` ON `members`.`userId`=`users`.`id` WHERE `users`.`emailAddress`=:emailAddress");
             $statement->bindParam(":emailAddress", $data->emailAddress);
             $statement->execute();
 
@@ -124,7 +124,22 @@ class Membership extends Member implements iRegistration {
                 $userInfo['wsfiaId'] = $result['wsfiaId'];
                 $userInfo['firstName'] = $result['firstName'];
                 $userInfo['authenticated'] = password_verify($data->password, $result['password']);
+                $userInfo['expirationDate'] = date("Y-m-d", strtotime($result['expirationDate']));
+                
+                switch($result['status']) {
+                    case 1:
+                        $status = "Active";
+                        break;
+                    case 2:
+                        $status = "Suspended";
+                        break;
+                    default:
+                        $status = "Inactive";
+                        break;
+                }
+                $userInfo['status'] = $status;
 
+                $userInfo['studentId'] = $result['studentId'];
             }
             
             Configuration::closeConnection();
@@ -176,7 +191,7 @@ class Membership extends Member implements iRegistration {
          */
         try {
 
-            $statement = Configuration::openConnection()->prepare("SELECT emailAddress FROM users WHERE emailAddress=:emailAddress");
+            $statement = Configuration::openConnection()->prepare("SELECT `emailAddress` FROM `users` WHERE `emailAddress`=:emailAddress");
             $statement->bindValue(":emailAddress", $emailAddress, PDO::PARAM_STR);
             $statement->execute();
 
@@ -286,6 +301,28 @@ class Membership extends Member implements iRegistration {
 
     }
 
+    public function getAccountInfo($wsfiaId) {
+
+        try {
+
+            $connection = Configuration::openConnection();
+
+            $statement = $connection->prepare("SELECT `m`.`userId`, `m`.`jobTitle`, `m`.`departments`, `m`.`areas`, `m`.`expirationDate`, `m`.`status`, `m`.`sinceDate`, `m`.`studentId`, `u`.`firstName`, `u`.`lastName` FROM `members` as `m` INNER JOIN `users` as `u` ON `u`.`id`=`m`.`userId` WHERE `m`.`id`=:wsfiaId");
+            $statement->bindParam(":wsfiaId", $wsfiaId, PDO::PARAM_STR);
+            $statement->execute();
+
+            $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+            $result = json_encode($result, JSON_PRETTY_PRINT);
+            
+            Configuration::closeConnection();
+        }
+        catch(PDOException $e) {
+            
+            $result = '{"result" : ' . $e->getMessage() . '}';
+        }
+        return $result;
+    }
 
     public function renew($renewData) {
 
