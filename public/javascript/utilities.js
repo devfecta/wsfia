@@ -408,14 +408,23 @@ const validateMembershipForm = (form) => {
     }
     catch(e) {
         BreakException.businesses = true;
-        
     }
 
-    if (BreakException.areas && BreakException.businesses && document.querySelector('#checkResult').textContent.length < 1) {
-        document.querySelector('#addMemberButton').removeAttribute('disabled');
+    if (document.querySelector('#addMemberButton')) {
+        if (BreakException.areas && BreakException.businesses && document.querySelector('#checkResult').textContent.length < 1) {
+            document.querySelector('#addMemberButton').removeAttribute('disabled');
+        }
+        else {
+            document.querySelector('#addMemberButton').disabled = true;
+        }
     }
     else {
-        document.querySelector('#addMemberButton').disabled = true;
+        if (BreakException.areas && BreakException.businesses) {
+            document.querySelector('#updateButton').removeAttribute('disabled');
+        }
+        else {
+            document.querySelector('#updateButton').disabled = true;
+        }
     }
 
 }

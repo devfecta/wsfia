@@ -27,7 +27,6 @@ class Membership {
             params.append('businesses', formData.businesses);
             params.append('class', 'Membership');
             params.append('method', 'addMember');
-            
             //console.log(params);
 
             await axios.post(process.env.API + '/api.php'
@@ -147,15 +146,12 @@ class Membership {
         let response = '';
 
         try {
-
             //console.log(data);
-            
             let params = new URLSearchParams();
 
             params.append('sessionId', data);
             params.append('class', 'Membership');
             params.append('method', 'getRegistrants');
-            
             //console.log(params);
             
             return await axios.post(process.env.API + '/api.php'
@@ -189,7 +185,6 @@ class Membership {
             params.append('businessId', formData.business);
             params.append('class', 'Membership');
             params.append('method', 'register');
-            
             //console.log(params);
 
             return await axios.post(process.env.API + '/api.php'
@@ -222,24 +217,20 @@ class Membership {
     }
 
     login = async (data) => {
-        //let registrants = JSON.parse(data);
+
         let formData = JSON.parse(data);
-        
-        
         let response = '';
 
         try {
-
             //console.log(data);
-            
             let params = new URLSearchParams();
 
             params.append('emailAddress', formData.inputEmail);
             params.append('password', formData.inputPassword);
             params.append('class', 'Membership');
             params.append('method', 'login');
-            console.log("Params");
-            console.log(params);
+            //console.log("Params");
+            //console.log(params);
 
             return await axios.post(process.env.API + '/api.php'
                 , params
@@ -251,7 +242,22 @@ class Membership {
         catch (e) {
             console.error(e);
         }
-        
+    }
+    
+    getAccountInfo = async (wsfiaId) => {
+        try {
+            let parameters = 'class=Membership';
+            parameters += '&method=getAccountInfo';
+            parameters += '&wsfiaId=' + wsfiaId;
+
+            return await axios.get(process.env.API + '/api.php?' + parameters)
+            .then(response => response.data)
+            .then(json => json)
+            .catch(error => error);
+        }
+        catch (e) {
+            console.error(e);
+        }
     }
 
     resetPassword = async (data) => {
@@ -259,9 +265,7 @@ class Membership {
         let formData = JSON.parse(data);
         
         try {
-
             //console.log(data);
-            
             let params = new URLSearchParams();
 
             params.append('emailAddress', formData.inputEmail);
@@ -301,9 +305,7 @@ class Membership {
         let formData = JSON.parse(data);
         //console.log(formData);
         let confirmation = false;
-
         //let registrants = await this.getRegistrants(sessionId);
-        
         try {
             
             let params = new URLSearchParams();
@@ -313,7 +315,6 @@ class Membership {
             params.append('businessId', formData.business);
             params.append('class', 'Membership');
             params.append('method', 'renew');
-            
             //console.log(params);
 
             return await axios.post(process.env.API + '/api.php'
@@ -343,6 +344,63 @@ class Membership {
         catch (e) {
             console.error(e);
         }
+    }
+
+    updateAccountInfo = async (data) => {
+
+        let formData = JSON.parse(data);
+        /*
+        {
+            firstName: 'Kevin',
+            lastName: 'Kelm',
+            jobTitle: 'Fire Inspector',
+            studentId: '',
+            areas: [ '2', '3', '10' ],
+            searchTextBox: 'test ',
+            businesses: [ '232', '270' ]
+        }
+        */
+        console.log(formData);
+        return formData;
+
+        /*
+        try {
+            
+            let params = new URLSearchParams();
+
+            params.append('sessionId', formData.sessionId);
+            params.append('emailAddress', formData.emailAddress);
+            params.append('businessId', formData.business);
+            params.append('class', 'Membership');
+            params.append('method', 'register');
+            //console.log(params);
+
+            return await axios.post(process.env.API + '/api.php'
+                , params
+            )
+            .then(response => {
+                const lineItems = response.data;
+
+                params = new URLSearchParams();
+                params.append('lineItems', JSON.stringify(response.data));
+                //console.log("Parameters");
+                //console.log(params);
+                
+                return axios.post(process.env.API + '/PayPal-PHP-SDK/SendInvoice.php'
+                    , params
+                )
+                .then(response => lineItems)
+                .catch(error => console.log(error));
+            })
+            .catch(error => console.log(error));
+            
+            return confirmation;
+            
+        }
+        catch (e) {
+            console.error(e);
+        }
+        */
     }
 
 }

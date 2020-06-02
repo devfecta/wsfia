@@ -143,6 +143,7 @@ app.get('/register/confirm', (request, response) => {
  * Renders the login page.
  */
 app.get('/login', (request, response) => {
+    request.session.message = "";
     response.render('login.ejs', { session: request.session });
 });
 /**
@@ -151,8 +152,14 @@ app.get('/login', (request, response) => {
 app.post('/login', async (request, response) => {
     let userInfo = await controllers.membership.login(JSON.stringify(request.body));
     //console.log(userInfo);
-    request.session.userInfo = userInfo;
-    response.redirect('/member-area');
+    if (userInfo.authenticated) {
+        request.session.userInfo = userInfo;
+        response.redirect('/member-area');
+    }
+    else {
+        request.session.message = "Invalid Username/Password<br/>If you know you're a member try looking up your account via the <a href=\"/register\">registration page</a>.";
+        response.render('login.ejs', { session: request.session });
+    }
 });
 /**
  * Checks to see if the user has benn authenticated, if not redirected to the login page.
@@ -173,7 +180,8 @@ app.get('/resetPassword', (request, response) => {
  * Renders the Forgot Password page with password update confirmation.
  */
 app.post('/resetPassword', async (request, response) => {
-    let resultJSON = await controllers.membership.resetPassword(JSON.stringify(request.body));    
+    let resultJSON = await controllers.membership.resetPassword(JSON.stringify(request.body));
+    //console.log(resultJSON);
     response.render('./resetPassword.ejs', { session: request.session, message: resultJSON.updatedPassword });
 });
 /**
@@ -192,8 +200,19 @@ app.get('/logout', (request, response) => {
 /**
  * If the user is authenticated then renders the user account information form.
  */
-app.get('/account', authenticateUser, (request, response) => {
+app.get('/account', authenticateUser, async (request, response) => {
+    let accountInfo = await controllers.membership.getAccountInfo(request.session.userInfo.wsfiaId);
+    request.session.accountInfo = accountInfo;
+    //console.log(accountInfo);
     response.render('./account.ejs', { session: request.session, message: '' });
+});
+/**
+ * If the user is authenticated then processes the update of the account information.
+ */
+app.post('/account', authenticateUser, async (request, response) => {
+    let resultJSON = await controllers.membership.updateAccountInfo(JSON.stringify(request.body));
+    //console.log(resultJSON);
+    response.render('./account.ejs', { session: request.session, message: resultJSON.updatedAccount });
 });
 /**
  * If the user is authenticated then renders the documents page.

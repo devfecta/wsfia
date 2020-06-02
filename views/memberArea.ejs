@@ -2,9 +2,12 @@
 
 <div class="row">
     
-    <div class="text-light col-lg-4 p-4" style="border-radius: 1em; background-color: rgba(206,32,41, 0.8);">
+    <div class="text-light col-lg-5 p-4" style="border-radius: 1em; background-color: rgba(206,32,41, 0.8);">
         Hello, <%= session.userInfo.firstName %><br />
-        WSFIA Member ID: <%= session.userInfo.wsfiaId %>
+        <b>WSFIA Member ID</b>: <%= session.userInfo.wsfiaId %><br />
+        <b>Expiration Date</b>: <%= session.userInfo.expirationDate %> &nbsp; 
+        <b>Status</b>: <%= session.userInfo.status %><br />
+        <b>Student ID</b>: <%= session.userInfo.studentId %>
     </div>
 
     <div class="col-lg-8 p-4 justify-content-center align-self-center" style="border-radius: 1em;">
