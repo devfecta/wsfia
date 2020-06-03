@@ -49,7 +49,7 @@ class Membership extends Member implements iRegistration {
             $result = json_encode($statement->execute(), JSON_PRETTY_PRINT);
         } catch (Exception $e) {
             
-            $result = json_encode($e, JSON_PRETTY_PRINT);    
+            $result = json_encode($e, JSON_PRETTY_PRINT); 
 
         }
 
@@ -322,6 +322,72 @@ class Membership extends Member implements iRegistration {
             $result = '{"result" : ' . $e->getMessage() . '}';
         }
         return $result;
+    }
+
+    public function updateAccountInfo($accountData) {
+        //return json_encode($accountData, JSON_PRETTY_PRINT);
+        $data = json_decode(json_encode($accountData), FALSE);
+
+        $updatedAccount["updatedAccount"] = false;
+
+        try {
+
+            $connection = Configuration::openConnection();
+
+            
+
+            $statement = $connection->prepare("UPDATE `users` SET `firstName`=:firstName, `lastName`=:lastName WHERE `id`=:userId");
+            $statement->bindParam(":userId", $data->userId);
+            $statement->bindParam(":firstName", $data->firstName);
+            $statement->bindParam(":lastName", $data->lastName);
+            $statement->execute();
+
+            $businesses = array();
+
+            $data->businesses = explode(",", $data->businesses);
+
+            foreach($data->businesses as $business) {
+                $statement = $connection->prepare("SELECT `b`.* FROM `businesses` AS `b` JOIN `states` AS `s` ON `b`.`state`=`s`.`stateId` WHERE `b`.`id`=:id");
+                $statement->bindParam(":id", $business);
+                $statement->execute();
+                //$results = $statement->fetch(PDO::FETCH_ASSOC);
+                array_push($businesses, $statement->fetch(PDO::FETCH_ASSOC));
+            }
+
+            //return json_encode($businesses);
+
+            $areas = array();
+
+            $data->areas = explode(",", $data->areas);
+            
+            foreach($data->areas as $area) {
+                array_push($areas, "Area " . $area);
+            }
+
+            //return json_encode($areas);
+
+            $statement = $connection->prepare("UPDATE `members` SET `jobTitle`=:jobTitle, `departments`=:departments, `areas`=:areas, `studentId`=:studentId WHERE `userId`=:userId");
+            $statement->bindParam(":userId", $data->userId);
+            $statement->bindParam(":jobTitle", $data->jobTitle);
+            $statement->bindParam(":departments", json_encode($businesses));
+            $statement->bindParam(":areas", json_encode($areas));
+            $statement->bindParam(":studentId", $data->studentId);
+            $statement->execute();
+
+            
+
+            $updatedAccount["updatedAccount"] = true;
+
+            
+
+            Configuration::closeConnection();
+
+        }
+        catch (PDOException $e) {
+            return '{"updatedAccount" : "' . $e->getMessage() . '"';
+        }
+
+        return json_encode($updatedAccount, JSON_PRETTY_PRINT);
     }
 
     public function renew($renewData) {

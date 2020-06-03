@@ -256,7 +256,7 @@ class Member extends User {
     public function getMembersByBusiness($businessId) {
 
         $members = array();
-        
+
         try {
             
             $statement = Configuration::openConnection()->prepare("SELECT * FROM `members` WHERE JSON_CONTAINS(`departments`, :businessId)");
@@ -268,7 +268,6 @@ class Member extends User {
             foreach ($results as $result) {
 
                 $member = new Member($result['userId']);
-
                 array_push($members, json_decode($member));
                 
             }
@@ -276,7 +275,8 @@ class Member extends User {
             Configuration::closeConnection();
         }
         catch (PDOException $e) {
-            return "Error: " . $e->getMessage();
+            //return "Error: " . $e->getMessage();
+            return json_encode(array("Error" => $e->getMessage()), JSON_PRETTY_PRINT);
         }
         //$members = json_encode($members, JSON_PRETTY_PRINT);
         //stripslashes(json_decode($results));

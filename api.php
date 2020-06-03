@@ -92,6 +92,9 @@ switch ($requestMethod) {
                             //echo json_encode(array("type" => "API POST", "method" => $requestMethod, "data" => $_POST));
                             echo $Membership->renew($_POST);
                             break;
+                        case "updateAccountInfo":
+                            echo $Membership->updateAccountInfo($_POST);
+                            break;
                         default:
                             echo json_encode(array("error" => 'METHOD ERROR: The '.$_POST['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);
                             break;
