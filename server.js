@@ -203,8 +203,6 @@ app.get('/logout', (request, response) => {
 app.get('/account', authenticateUser, async (request, response) => {
     let accountInfo = await controllers.membership.getAccountInfo(request.session.userInfo.wsfiaId);
     request.session.accountInfo = accountInfo;
-    console.log(request.session);
-    //console.log(request.session);
     response.render('./account.ejs', { session: request.session, message: request.session.message });
 });
 /**
@@ -213,11 +211,8 @@ app.get('/account', authenticateUser, async (request, response) => {
 app.post('/account', authenticateUser, async (request, response) => {
     request.body.userId = request.session.accountInfo.userId;
     let resultJSON = await controllers.membership.updateAccountInfo(JSON.stringify(request.body));
-    //request.session.accountInfo
-    //console.log(resultJSON);
     request.session.message = resultJSON.updatedAccount;
     response.redirect('/account');
-    // response.render('./account.ejs', { session: request.session, message: resultJSON.updatedAccount });
 });
 /**
  * If the user is authenticated then renders the documents page.

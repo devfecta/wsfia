@@ -1,6 +1,6 @@
 //const url = location.protocol + '//' + location.hostname + ':8000';
-//const url = 'http://34.71.62.246';
-const url = 'http://localhost';
+const url = 'http://34.71.62.246';
+//const url = 'http://localhost';
 
 /**
  * Searches for departments or businesses in the database, and calls the getBusinesses 
