@@ -2,6 +2,15 @@
 
 <section id="membershipInfo">
     <h1>Account Information</h1>
+
+    <% if (session.message != null) {  %>
+        <% if (session.message) {  %>
+            <div class="alert alert-success" role="alert">Account Updated</div>
+        <% } else { %>
+            <div class="alert alert-danger" role="alert">Account NOT Updated</div>
+        <% } session.message = null; %>
+    <% } %>
+
     <p class="text-danger">Memberships run January 1 - December 31 of the current year.</p>
 
     <div class="text-light col-lg-5 p-4" style="border-radius: 1em; background-color: rgba(206,32,41, 0.8);">
@@ -11,14 +20,6 @@
         <b>Status</b>: <%= session.userInfo.status %><br />
         <b>Student ID</b>: <%= session.userInfo.studentId %>
     </div>
-
-    <% if (message != null) {  %>
-        <% if (message) {  %>
-            <div class="alert alert-success" role="alert">Password Updated - <a href="/login">Login</a></div>
-        <% } else { %>
-            <div class="alert alert-danger" role="alert">Password NOT Updated</div>
-        <% } %>
-    <% } %>
 
     <form name="membershipForm" id="membershipForm" action="/account" method="POST" class="needs-validation" novalidate>
         <fieldset>
@@ -55,50 +56,53 @@
                 this will be the area number you will use when filling in your membership application.<br />
                 <em>Example: Your department is in Brown County, so your area number would be 7.</em></p>
 
+            <%
+                let areas = JSON.parse(session.accountInfo.areas);
+                let mapAreas = areas.map(area => ({"area" : area, checked : "true"}));
+            %>
             
-
             <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[1]" value="1" data-value="Area 1" <%= session.accountInfo.areas.includes("Area 1") ? "checked" : ""; %> />
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[1]" value="1" data-value="Area 1" <%= mapAreas.find(({area}) => area == 'Area 1') !== undefined ? "checked" : ""; %> />
                 <label class="form-check-label ml-1 mr-3" for="area[1]">(Area 1) Kenosha, Walworth, Racine, Jefferson, Milwaukee, Waukesha</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[2]" value="2" data-value="Area 2" <%= session.accountInfo.areas.includes("Area 2") ? "checked" : ""; %> />
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[2]" value="2" data-value="Area 2" <%= mapAreas.find(({area}) => area == 'Area 2') !== undefined ? "checked" : ""; %> />
                 <label class="form-check-label ml-1 mr-3" for="area[2]">(Area 2) Dane, Green, Rock, Sauk, Columbia</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[3]" value="3" data-value="Area 3" <%= session.accountInfo.areas.includes("Area 3") ? "checked" : ""; %> />
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[3]" value="3" data-value="Area 3" <%= mapAreas.find(({area}) => area == 'Area 3') !== undefined ? "checked" : ""; %> />
                 <label class="form-check-label ml-1 mr-3" for="area[3]">(Area 3) LaCrosse, Vernon, Richland, Crawford, Iowa, Grant, Lafayette</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[4]" value="4" data-value="Area 4" <%= session.accountInfo.areas.includes("Area 4") ? "checked" : ""; %> />
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[4]" value="4" data-value="Area 4" <%= mapAreas.find(({area}) => area == 'Area 4') !== undefined ? "checked" : ""; %> />
                 <label class="form-check-label ml-1 mr-3" for="area[4]">(Area 4) Rusk, Taylor, Chippewa, Clark, Eau Claire, Jackson, Trempealeau</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[5]" value="5" data-value="Area 5" <%= session.accountInfo.areas.includes("Area 5") ? "checked" : ""; %> />
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[5]" value="5" data-value="Area 5" <%= mapAreas.find(({area}) => area == 'Area 5') !== undefined ? "checked" : ""; %> />
                 <label class="form-check-label ml-1 mr-3" for="area[5]">(Area 5) Barron, Polk, St Croix, Dunn, Pierce, Pepin, Buffalo</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[6]" value="6" data-value="Area 6" <%= session.accountInfo.areas.includes("Area 6") ? "checked" : ""; %> />
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[6]" value="6" data-value="Area 6" <%= mapAreas.find(({area}) => area == 'Area 6') !== undefined ? "checked" : ""; %> />
                 <label class="form-check-label ml-1 mr-3" for="area[6]">(Area 6) Green Lake, Washington, Ozaukee, Sheboygan, Fond Du Lac, Dodge, Marquette</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[7]" value="7" data-value="Area 7" <%= session.accountInfo.areas.includes("Area 7") ? "checked" : ""; %> />
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[7]" value="7" data-value="Area 7" <%= mapAreas.find(({area}) => area == 'Area 7') !== undefined ? "checked" : ""; %> />
                 <label class="form-check-label ml-1 mr-3" for="area[7]">(Area 7) Brown, Calumet, Door, Kewaunee, Manitowoc, Outagamie, Waushara, Winnebago</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[8]" value="8" data-value="Area 8" <%= session.accountInfo.areas.includes("Area 8") ? "checked" : ""; %> />
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[8]" value="8" data-value="Area 8" <%= mapAreas.find(({area}) => area == 'Area 8') !== undefined ? "checked" : ""; %> />
                 <label class="form-check-label ml-1 mr-3" for="area[8]">(Area 8) Florence, Marinette, Oconto, Menomonee</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[9]" value="9" data-value="Area 9" <%= session.accountInfo.areas.includes("Area 9") ? "checked" : ""; %> />
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[9]" value="9" data-value="Area 9" <%= mapAreas.find(({area}) => area == 'Area 9') !== undefined ? "checked" : ""; %> />
                 <label class="form-check-label ml-1 mr-3" for="area[9]">(Area 9) Adams, Wood, Portage, Waupaca, Marathon, Shawano, Juneau, Monroe</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[10]" value="10" data-value="Area 10" <%= session.accountInfo.areas.includes("Area 10") ? "checked" : ""; %> />
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[10]" value="10" data-value="Area 10" <%= mapAreas.find(({area}) => area == 'Area 10') !== undefined ? "checked" : ""; %> />
                 <label class="form-check-label ml-1 mr-3" for="area[10]">(Area 10) Vilas, Oneida, Lincoln, Langlade, Price, Forrest</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[11]" value="11" data-value="Area 11" <%= session.accountInfo.areas.includes("Area 11") ? "checked" : ""; %> />
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[11]" value="11" data-value="Area 11" <%= mapAreas.find(({area}) => area == 'Area 11') !== undefined ? "checked" : ""; %> />
                 <label class="form-check-label ml-1 mr-3" for="area[11]">(Area 11) Douglas, Bayfield, Iron, Ashland, Sawyer, Burnett, Washburn</label>
             </div>
 

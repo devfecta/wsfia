@@ -360,47 +360,32 @@ class Membership {
             businesses: [ '232', '270' ]
         }
         */
-        console.log(formData);
-        return formData;
-
-        /*
         try {
             
             let params = new URLSearchParams();
 
-            params.append('sessionId', formData.sessionId);
-            params.append('emailAddress', formData.emailAddress);
-            params.append('businessId', formData.business);
             params.append('class', 'Membership');
-            params.append('method', 'register');
+            params.append('method', 'updateAccountInfo');
+            params.append('userId', formData.userId);
+            params.append('firstName', formData.firstName);
+            params.append('lastName', formData.lastName);
+            params.append('jobTitle', formData.jobTitle);
+            params.append('studentId', formData.studentId);
+            params.append('areas', formData.areas);
+            params.append('businesses', formData.businesses);
+            //console.log("Parameters");
             //console.log(params);
 
             return await axios.post(process.env.API + '/api.php'
                 , params
             )
-            .then(response => {
-                const lineItems = response.data;
-
-                params = new URLSearchParams();
-                params.append('lineItems', JSON.stringify(response.data));
-                //console.log("Parameters");
-                //console.log(params);
-                
-                return axios.post(process.env.API + '/PayPal-PHP-SDK/SendInvoice.php'
-                    , params
-                )
-                .then(response => lineItems)
-                .catch(error => console.log(error));
-            })
-            .catch(error => console.log(error));
-            
-            return confirmation;
-            
+            .then(response => response.data)
+            .catch(error => console.log(error));            
         }
         catch (e) {
             console.error(e);
         }
-        */
+        
     }
 
 }
