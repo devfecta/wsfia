@@ -1,6 +1,7 @@
 //const url = location.protocol + '//' + location.hostname + ':8000';
-const url = 'http://34.71.62.246';
-//const url = 'http://localhost';
+// wsfia-php
+//const url = 'http://34.71.62.246';
+const url = 'http://localhost';
 
 /**
  * Searches for departments or businesses in the database, and calls the getBusinesses 
@@ -250,66 +251,75 @@ const memberBusinessSearch = async (searchString) => {
     const businessList = document.querySelector('#businessList');
     const searchResults = document.querySelector('#searchResults');
 
-    let parameters = 'class=Business';
-        parameters += '&method=searchBusinessesByName';
-        parameters += '&searchBusinesses=' + searchString;
+    if (searchString.length > 0) {
 
-    await fetch(url + '/api.php?' + parameters, {method: 'GET'})
-    .then(response => response.json())
-    .then(data => {
+        let parameters = 'class=Business';
+            parameters += '&method=searchBusinessesByName';
+            parameters += '&searchBusinesses=' + searchString;
 
-        const searchResults = document.getElementById('searchResults');
-        searchResults.innerHTML = '';
+        await fetch(url + '/api.php?' + parameters, {method: 'GET'})
+        .then(response => response.json())
+        .then(data => {
 
-        let results = document.createElement("div");
+            const searchResults = document.getElementById('searchResults');
+            searchResults.innerHTML = '';
+            searchResults.style.display = 'block';
 
-        if (data.length > 0) {
-            data.forEach(business => {
+            let results = document.createElement("div");
 
-                let resultRow = document.createElement("div");
-                resultRow.className = 'row';
-                resultRow.id = 'departmentId' + business.id;
+            if (data.length > 0) {
+                data.forEach(business => {
 
-                let resultInfoColumn = document.createElement("div");
-                resultInfoColumn.className = 'col-md-9';
-        
-                resultInfoColumn.innerHTML = `
-                    <p><strong>${business.name} (Station ${business.station})</strong><br/>
-                    ${business.streetAddress}<br/>
-                    ${business.city}, ${business.state.abbreviation} ${business.zipcode}</p>
-                `;
+                    
 
-                let resultButtonColumn = document.createElement("div");
-                resultButtonColumn.className = 'col-md-3';
+                    let resultRow = document.createElement("div");
+                    resultRow.className = 'row';
+                    resultRow.id = 'departmentId' + business.id;
 
-                let resultButton = document.createElement("button");
-                resultButton.setAttribute('type', 'button');
-                resultButton.setAttribute('class', 'btn btn-primary');
-                resultButton.setAttribute('style', 'cursor: pointer;');
-                //resultButton.addEventListener('click', function(){ addBusiness(business.id) });
-                resultButton.addEventListener('click', function(){ addMemberBusiness(business.id) });
-                resultButton.innerHTML = 'Add Department/Business';
-
-                resultButtonColumn.appendChild(resultButton);
-
-                resultRow.appendChild(resultInfoColumn);
-                resultRow.appendChild(resultButtonColumn);
-
-                results.appendChild(resultRow);
-
-            });
-        }
-        else {
+                    let resultInfoColumn = document.createElement("div");
+                    resultInfoColumn.className = 'col-md-9';
             
-            results.innerHTML = `
-                <p>No Results Found <a href="/register/business" class="btn btn-primary">Create Department/Business</a></p>
-            `;
-        }
+                    resultInfoColumn.innerHTML = `
+                        <p><strong>${business.name} (Station ${business.station})</strong><br/>
+                        ${business.streetAddress}<br/>
+                        ${business.city}, ${business.state.abbreviation} ${business.zipcode}</p>
+                    `;
 
-        searchResults.appendChild(results);
-        
-    })
-    .catch(error => displayError(error));
+                    let resultButtonColumn = document.createElement("div");
+                    resultButtonColumn.className = 'col-md-3';
+
+                    let resultButton = document.createElement("button");
+                    resultButton.setAttribute('type', 'button');
+                    resultButton.setAttribute('class', 'btn btn-primary');
+                    resultButton.setAttribute('style', 'cursor: pointer;');
+                    //resultButton.addEventListener('click', function(){ addBusiness(business.id) });
+                    resultButton.addEventListener('click', function(){ addMemberBusiness(business.id) });
+                    resultButton.innerHTML = 'Add Department/Business';
+
+                    resultButtonColumn.appendChild(resultButton);
+
+                    resultRow.appendChild(resultInfoColumn);
+                    resultRow.appendChild(resultButtonColumn);
+
+                    results.appendChild(resultRow);
+
+                });
+            }
+            else {
+                
+                results.innerHTML = `
+                    <p>No Results Found <a href="/register/business" class="btn btn-primary">Create Department/Business</a></p>
+                `;
+            }
+
+            searchResults.appendChild(results);
+            
+        })
+        .catch(error => displayError(error));
+    }
+    else {
+        searchResults.innerHTML = '';
+    }
 }
 /**
  * Adds business(s) to a member registration.
@@ -409,7 +419,10 @@ const validateMembershipForm = (form) => {
         BreakException.businesses = true;
     }
 
+    
+
     if (document.querySelector('#addMemberButton')) {
+        
         if (BreakException.areas && BreakException.businesses && document.querySelector('#checkResult').textContent.length < 1) {
             document.querySelector('#addMemberButton').removeAttribute('disabled');
         }
