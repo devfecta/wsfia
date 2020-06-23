@@ -1,31 +1,10 @@
-const axios = require("axios").default;
-
 class Utilities {
+
     /**
      * Searches for departments or businesses in the database, and calls the getBusinesses 
      * function to process the results. 
      * @param {string} searchString Represents the name of the department or business.
      */
-    businessSearch = async (searchString) => {
-
-        try {
-            //console.log(searchString);
-            // await fetch(url + '/wsfia-dev/configuration/api.php?class=Business&method=searchBusinessesByName&searchBusinesses='+searchString, {method: 'POST', headers: {'Content-Type': 'text/json'}});
-            //let parameters = 'class=Business';
-            //parameters += '&method=searchBusinessesByName';
-            //parameters += '&searchBusinesses=' + searchString;
-            
-            return await axios.get(process.env.API + '/api.php?' + searchString)
-            .then(response => response.data)
-            //.then(json => {return json})
-            .catch(error => error);
-        }
-        catch (e) {
-            console.error(e);
-        }
-    }
-
-/*
     businessSearch = async (searchString) => {
 
         if(searchString.length <= 2) 
@@ -47,8 +26,11 @@ class Utilities {
             .catch(error => displayError(error));
         }
     }
-*/
-/*
+
+    /**
+     * Displays the departments/companies found in a search.
+     * @param {*} data 
+     */
     getBusinesses = (data) => {
 
         const searchResults = document.getElementById('searchResultsId');
@@ -92,6 +74,14 @@ class Utilities {
                 resultButton.addEventListener('click', function(){ getMembers(business.id); });
                 resultButton.innerHTML = 'View Members';
                 resultButtonColumn.appendChild(resultButton);
+                /*
+                let backButton = document.createElement("button");
+                backButton.className = 'btn btn-secondary';
+                backButton.style = 'cursor: pointer;';
+                backButton.addEventListener('click', goBack);
+                backButton.innerHTML = 'Go Back';
+                resultButtonColumn.appendChild(backButton);
+                */
 
                 resultRow.appendChild(resultInfoColumn);
                 resultRow.appendChild(resultButtonColumn);
@@ -110,7 +100,7 @@ class Utilities {
         searchResults.appendChild(results);
         
     }
-*/
+
     /**
      * Displays members of a department/company.
      * @param {*} businessId 

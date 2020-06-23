@@ -1,7 +1,7 @@
 //const url = location.protocol + '//' + location.hostname + ':8000';
 // wsfia-php
-//const url = 'http://34.71.62.246';
-const url = 'http://localhost';
+const url = 'http://34.71.62.246';
+//const url = 'http://localhost';
 
 /**
  * Searches for departments or businesses in the database, and calls the getBusinesses 
@@ -14,12 +14,21 @@ const businessSearch = async (searchString) => {
     { $('#searchResults').fadeOut(); } 
     else 
     {
-        //console.log(searchString);
-        // await fetch(url + '/wsfia-dev/configuration/api.php?class=Business&method=searchBusinessesByName&searchBusinesses='+searchString, {method: 'POST', headers: {'Content-Type': 'text/json'}});
         let parameters = 'class=Business';
         parameters += '&method=searchBusinessesByName';
         parameters += '&searchBusinesses=' + searchString;
-        
+
+
+        await fetch('/searchBusinesses?' + parameters, {method: 'GET'})
+        .then(response => response.json())
+        .then(json => {
+            //console.log(JSON.stringify(json));
+            getBusinesses(json)
+        })
+        .catch(error => displayError(error));
+
+
+        /*
         await fetch(url + '/api.php?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(json => {
@@ -27,6 +36,7 @@ const businessSearch = async (searchString) => {
             getBusinesses(json)
         })
         .catch(error => displayError(error));
+        */
     }
 }
 

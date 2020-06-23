@@ -1,3 +1,5 @@
+const https = require("https");
+const fs = require("fs");
 const express = require('express');
 const session = require('express-session');
 //const cookie = require('cookie');
@@ -41,6 +43,17 @@ app.use(express.urlencoded({extended: false}));
 app.get('/', (request, response) => {
     response.render('index.ejs', { session: request.session });
 });
+
+
+
+app.get('/searchBusinesses', async (request, response) => {
+    //console.log(request._parsedOriginalUrl.query);
+    let confirm = await controllers.utilities.businessSearch(request._parsedOriginalUrl.query);
+    response.json(confirm);
+});
+
+
+
 
 /**
  * Renders the first registration page.
