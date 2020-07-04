@@ -1,6 +1,6 @@
 //const url = location.protocol + '//' + location.hostname + ':8000';
 // wsfia-php
-const url = 'http://34.71.62.246';
+//const url = 'http://34.71.62.246';
 //const url = 'http://localhost';
 
 /**
@@ -14,29 +14,17 @@ const businessSearch = async (searchString) => {
     { $('#searchResults').fadeOut(); } 
     else 
     {
+        // Create the GET query string
         let parameters = 'class=Business';
         parameters += '&method=searchBusinessesByName';
         parameters += '&searchBusinesses=' + searchString;
 
-
-        await fetch('/searchBusinesses?' + parameters, {method: 'GET'})
+        await fetch('/businessSearch?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(json => {
-            //console.log(JSON.stringify(json));
             getBusinesses(json)
         })
         .catch(error => displayError(error));
-
-
-        /*
-        await fetch(url + '/api.php?' + parameters, {method: 'GET'})
-        .then(response => response.json())
-        .then(json => {
-            //console.log("test" + JSON.stringify(json))
-            getBusinesses(json)
-        })
-        .catch(error => displayError(error));
-        */
     }
 }
 
@@ -50,10 +38,9 @@ const checkEmailAddress = async (searchString) => {
         parameters += '&method=checkEmailAddress';
         parameters += '&searchEmailAddress=' + searchString;
         
-        await fetch(url + '/api.php?' + parameters, {method: 'GET'})
+        await fetch('/checkEmailAddress?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(json => {
-            //console.log(json.result);
             if (json.result > 0) {
                 document.querySelector('#checkResult').textContent = "e-Mall Address Already Exists";
                 validateMembershipForm(document.querySelector('#membershipForm'));
@@ -148,7 +135,7 @@ const getMembers = async (businessId) => {
         parameters += '&method=getMembersByBusiness';
         parameters += '&businessId=' + businessId;
         
-        await fetch(url + '/api.php?' + parameters, {method: 'GET'})
+        await fetch('/getMembers?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(data => {
             //console.log(data);
@@ -239,9 +226,10 @@ const buildStatesDropdown = async () => {
     let parameters = 'class=Business';
         parameters += '&method=getStates';
 
-    await fetch(url + '/api.php?' + parameters, {method: 'GET'})
+    await fetch('/buildStatesDropdown?' + parameters, {method: 'GET'})
     .then(response => response.json())
     .then(data => {
+        
         data.forEach(state => {
             let stateOption = document.createElement("option");
             stateOption.setAttribute('value', state.stateId);
@@ -267,7 +255,7 @@ const memberBusinessSearch = async (searchString) => {
             parameters += '&method=searchBusinessesByName';
             parameters += '&searchBusinesses=' + searchString;
 
-        await fetch(url + '/api.php?' + parameters, {method: 'GET'})
+        await fetch('/memberBusinessSearch?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(data => {
 
@@ -279,9 +267,6 @@ const memberBusinessSearch = async (searchString) => {
 
             if (data.length > 0) {
                 data.forEach(business => {
-
-                    
-
                     let resultRow = document.createElement("div");
                     resultRow.className = 'row';
                     resultRow.id = 'departmentId' + business.id;
@@ -344,7 +329,7 @@ const addMemberBusiness = async (businessId) => {
         parameters += '&method=Business';
         parameters += '&businessId=' + businessId;
 
-    await fetch(url + '/api.php?' + parameters, {method: 'GET'})
+    await fetch('/addMemberBusiness?' + parameters, {method: 'GET'})
     .then(response => response.json())
     .then(data => {
 

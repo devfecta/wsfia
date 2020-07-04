@@ -1,19 +1,17 @@
 const https = require("https");
 const fs = require("fs");
+const helmet = require("helmet");
 const express = require('express');
 const session = require('express-session');
 //const cookie = require('cookie');
 const app = express();
+app.use(helmet());
 app.set('trust proxy', true);
 //const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
 dotenv.config();
 //const uuid = require('uuid/v4');
 const { v4: uuidv4 } = require('uuid');
-//const fetch = require("node-fetch");
-
-// const bodyParser = require("body-parser");
-// app.use(bodyParser.json());
 /**
  * Creates a new session ID.
  */
@@ -44,16 +42,44 @@ app.get('/', (request, response) => {
     response.render('index.ejs', { session: request.session });
 });
 
+/**
+ * Utilities START
+ */
 
-
-app.get('/searchBusinesses', async (request, response) => {
+app.get('/businessSearch', async (request, response) => {
     //console.log(request._parsedOriginalUrl.query);
-    let confirm = await controllers.utilities.businessSearch(request._parsedOriginalUrl.query);
-    response.json(confirm);
+    let results = await controllers.utilities.businessSearch(request._parsedOriginalUrl.query);
+    response.json(results);
 });
 
+app.get('/checkEmailAddress', async (request, response) => {
+    let results = await controllers.utilities.checkEmailAddress(request._parsedOriginalUrl.query);
+    response.json(results);
+});
 
+app.get('/getMembers', async (request, response) => {
+    let results = await controllers.utilities.getMembers(request._parsedOriginalUrl.query);
+    response.json(results);
+});
 
+app.get('/buildStatesDropdown', async (request, response) => {
+    let results = await controllers.utilities.buildStatesDropdown(request._parsedOriginalUrl.query);
+    response.json(results);
+});
+
+app.get('/memberBusinessSearch', async (request, response) => {
+    let results = await controllers.utilities.memberBusinessSearch(request._parsedOriginalUrl.query);
+    response.json(results);
+});
+
+app.get('/addMemberBusiness', async (request, response) => {
+    let results = await controllers.utilities.addMemberBusiness(request._parsedOriginalUrl.query);
+    response.json(results);
+});
+
+/**
+ * Utilities END
+ */
 
 /**
  * Renders the first registration page.
@@ -278,7 +304,12 @@ app.get('/links', (request, response) => {
 app.get('/scholarships', (request, response) => {
     response.render('./scholarships.ejs', { session: request.session, message: '' });
 });
-
+/**
+ * Renders the conference information page.
+ */
+app.get('/conference', (request, response) => {
+    response.render('./conference.ejs', { session: request.session, message: '' });
+});
 
 /*
 app.post('/register', async (request, response) => {
@@ -296,7 +327,16 @@ app.post('/register', async (request, response) => {
 
 });
 */
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}...`);
+//const PORT = process.env.PORT || 8080;
+app.listen(process.env.PORT, () => {
+  console.log(`Server listening on port ${process.env.PORT}...`);
 });
+
+// Uncomment for Production
+/*
+const options = {
+    key: fs.readFileSync("/etc/letsencrypt/live/wsfia.org/privkey.pem"),
+    cert: fs.readFileSync("/etc/letsencrypt/live/wsfia.org/fullchain.pem")
+};
+https.createServer(options, app).listen(HTTPS);
+*/
