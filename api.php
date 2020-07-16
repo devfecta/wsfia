@@ -95,6 +95,11 @@ switch ($requestMethod) {
                         case "updateAccountInfo":
                             echo $Membership->updateAccountInfo($_POST);
                             break;
+                        case "addConferenceRegistrants":
+                            echo json_encode($_POST, JSON_PRETTY_PRINT);
+                            exit();
+                            echo $Membership->addConferenceRegistrants($_POST);
+                            break;
                         default:
                             echo json_encode(array("error" => 'METHOD ERROR: The '.$_POST['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);
                             break;

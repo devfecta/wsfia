@@ -57,6 +57,38 @@ class Membership extends Member implements iRegistration {
 
     }
 
+    public function addConferenceRegistrants($sessionData) {
+
+        $data = json_decode(json_encode($sessionData), FALSE);
+
+        foreach($data->memberIds as $memberId) {
+
+            try {
+                $connection = Configuration::openConnection();
+                $member = new Member($memberId);
+
+                $result = json_encode($member->user, JSON_PRETTY_PRINT);
+
+                /*
+                $statement = $connection->prepare("SELECT * FROM users WHERE id=:userId");
+                $statement->bindParam(":userId", $memberId);
+                $statement->execute();
+                $result = $statement->fetch(PDO::FETCH_ASSOC);
+                */
+            }
+            catch (Exception $e) {
+                $result = json_encode(array("error" => $e->getMessage()), JSON_PRETTY_PRINT);
+            }
+            finally {
+                $connection = Configuration::closeConnection();
+            }
+
+        }
+
+        return $result;
+
+    }
+
     public function getRegistrants($sessionId) {
         
         $connection = Configuration::openConnection();
