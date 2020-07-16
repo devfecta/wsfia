@@ -1,6 +1,6 @@
 const axios = require("axios").default;
 
-const url = '';
+//const url = '';
 
 class Membership {
 

@@ -3,8 +3,14 @@ const fs = require("fs");
 const helmet = require("helmet");
 const express = require('express');
 const session = require('express-session');
+
+const bodyParser = require('body-parser');
 //const cookie = require('cookie');
 const app = express();
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
 app.use(helmet());
 app.set('trust proxy', true);
 //const bcrypt = require('bcrypt');
@@ -85,6 +91,7 @@ app.get('/addMemberBusiness', async (request, response) => {
  * Renders the first registration page.
  */
 app.get('/register', (request, response) => {
+    request.session.conference = false;
     response.render('./registration/businessSearch.ejs', { session: request.session });
 });
 /**
@@ -304,13 +311,32 @@ app.get('/links', (request, response) => {
 app.get('/scholarships', (request, response) => {
     response.render('./scholarships.ejs', { session: request.session, message: '' });
 });
+// CONFERENCE START
 /**
  * Renders the conference information page.
  */
 app.get('/conference', (request, response) => {
     response.render('./conference.ejs', { session: request.session, message: '' });
 });
+/**
+ * Renders the conference register current members page.
+ */
+app.get('/conference/register', (request, response) => {
+    request.session.conference = true;
+    response.render('./registration/businessSearch.ejs', { session: request.session });
+});
 
+app.post('/addConferenceRegistrants', async (request, response) => {
+    if(request.session.sessionId === undefined){
+        request.session.sessionId = uuidv4();
+    }
+    request.body.sessionId = request.session.sessionId;
+    //console.log(request.body);
+    let results = await controllers.conference.addConferenceRegistrants(JSON.stringify(request.body));
+    //response.json(results);
+});
+
+// CONFERENCE END
 /*
 app.post('/register', async (request, response) => {
 

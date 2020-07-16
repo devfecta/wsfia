@@ -8,7 +8,7 @@
  * function to process the results. 
  * @param {string} searchString Represents the name of the department or business.
  */
-const businessSearch = async (searchString) => {
+const businessSearch = async (searchString, conference) => {
 
     if(searchString.length <= 2) 
     { $('#searchResults').fadeOut(); } 
@@ -22,7 +22,7 @@ const businessSearch = async (searchString) => {
         await fetch('/businessSearch?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(json => {
-            getBusinesses(json)
+            getBusinesses(json, conference)
         })
         .catch(error => displayError(error));
     }
@@ -58,7 +58,7 @@ const checkEmailAddress = async (searchString) => {
  * Displays the departments/companies found in a search.
  * @param {*} data 
  */
-const getBusinesses = (data) => {
+const getBusinesses = (data, conference) => {
 
     const searchResults = document.getElementById('searchResultsId');
     searchResults.innerHTML = `
@@ -96,7 +96,7 @@ const getBusinesses = (data) => {
             let resultButton = document.createElement("button");
             resultButton.className = 'btn btn-success m-1';
             resultButton.style = 'cursor: pointer;';
-            resultButton.addEventListener('click', function(){ getMembers(business.id); });
+            resultButton.addEventListener('click', function(){ getMembers(business.id, conference); });
             resultButton.innerHTML = 'View Members';
             resultButtonColumn.appendChild(resultButton);
             /*
@@ -129,7 +129,7 @@ const getBusinesses = (data) => {
  * Displays members of a department/company.
  * @param {*} businessId 
  */
-const getMembers = async (businessId) => {
+const getMembers = async (businessId, conference) => {
 
     let parameters = 'class=Member';
         parameters += '&method=getMembersByBusiness';
@@ -145,9 +145,18 @@ const getMembers = async (businessId) => {
             searchTextBox.value = '';
             // Clears the business search results
             const currentForm = document.querySelector('#searchResultsId');
-            currentForm.innerHTML = `<p class="text-danger">If you are already a member you will see your account information listed below. 
-                If you don't see your account listed, click on the "Create New Account" button to register.</p>`;
 
+            if (conference) {
+                currentForm.innerHTML = `<p class="text-danger">If you are already a member you will see your account and others 
+                associated with the department/business information listed below. Simply leave the checkboxes checked for those 
+                members you wisth to register for the conference. If you don't see a member listed, and need to register them as 
+                a new member you will be able to do that later in the registration process. Click "Add Registrant" to continue.</p>`;
+            }
+            else {
+                currentForm.innerHTML = `<p class="text-danger">If you are already a member you will see your account information listed below. 
+                If you don't see your account listed, click on the "Create New Account" button to register.</p>`;
+            }
+            
             data.forEach( member => {
 
                 let resultRow = document.createElement("div");
@@ -160,20 +169,35 @@ const getMembers = async (businessId) => {
                 let resultButtonColumn = document.createElement("div");
                 resultButtonColumn.className = 'col-md-3';
 
-                let resultButton = document.createElement("a");
-                resultButton.className = 'btn btn-success';
-                //resultButton.style = 'cursor: pointer;';
-                
-                let currentDate = new Date();
-                var expirationDate = new Date(member.expirationDate);
-
-                if(currentDate > expirationDate) {
-                    resultButton.href = '/renewal/member?businessId=' + member.departments.id;
-                    resultButton.innerHTML = 'Renew Membership';
+                let resultButton = null;
+                if (conference) {
+                    // Conference Checkboxes
+                    resultButton = document.createElement("input");
+                    resultButton.setAttribute("class", "form-control w-50");
+                    resultButton.setAttribute("type", "checkbox");
+                    resultButton.setAttribute("value", "checkbox");
+                    resultButton.setAttribute("name", "members[]");
+                    resultButton.setAttribute("id", member.user.userId);
+                    resultButton.setAttribute("data-value", member.user.userId);
+                    resultButton.setAttribute("value", member.user.userId);
+                    resultButton.checked = true;
                 }
                 else {
-                    resultButton.href = '/login';
-                    resultButton.innerHTML = 'Login';
+                    // Non-Conference Buttons
+                    resultButton = document.createElement("a");
+                    resultButton.className = 'btn btn-success';
+                    //resultButton.style = 'cursor: pointer;';
+                    let currentDate = new Date();
+                    var expirationDate = new Date(member.expirationDate);
+
+                    if(currentDate > expirationDate) {
+                        resultButton.href = '/renewal/member?businessId=' + member.departments.id;
+                        resultButton.innerHTML = 'Renew Membership';
+                    }
+                    else {
+                        resultButton.href = '/login';
+                        resultButton.innerHTML = 'Login';
+                    }
                 }
 
                 resultButtonColumn.appendChild(resultButton);
@@ -203,10 +227,20 @@ const getMembers = async (businessId) => {
             let registerButtonColumn = document.createElement("div");
             registerButtonColumn.className = 'col-md-12 text-center';
 
-            let registerButton = document.createElement("a");
-            registerButton.className = 'btn btn-primary';
-            registerButton.href = '/register/member';
-            registerButton.innerHTML = 'Create New Account';
+            let registerButton = null;
+            if (conference) {
+                registerButton = document.createElement("button");
+                registerButton.className = 'btn btn-success';
+                registerButton.style = 'cursor: pointer;';
+                registerButton.addEventListener('click', function(){ addConferenceRegistrants(document.getElementsByName("members[]")); });
+                registerButton.innerHTML = 'Add Registrants';
+            }
+            else {
+                registerButton = document.createElement("a");
+                registerButton.className = 'btn btn-primary';
+                registerButton.href = '/register/member';
+                registerButton.innerHTML = 'Create New Account';
+            }
 
             registerButtonColumn.appendChild(registerButton);
             registerRow.appendChild(registerButtonColumn);
@@ -215,6 +249,26 @@ const getMembers = async (businessId) => {
 
         })
         .catch(error => displayError(error));
+}
+
+const addConferenceRegistrants = async (members) => {
+
+    let memberIds = [];
+
+    memberIds = Array.from(members).filter(member => {
+        if (member.checked) {
+            return member;
+        }
+    })
+    .map(member => parseInt(member.value));
+
+    await fetch('/addConferenceRegistrants', {
+        method: 'POST', 
+        body: JSON.stringify({"memberIds" : memberIds}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => console.log(response))
+    .catch(error => displayError(error));
 }
 /**
  * Gets a list of HTML options for the states.
