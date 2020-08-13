@@ -1,6 +1,17 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+require './vendor/autoload.php';
+
 require_once('Member.php');
 require_once('./interfaces/iRegistration.php');
+
+require_once('./PhpSpreadsheet/IOFactory.php');
+require_once('./PhpSpreadsheet/Spreadsheet.php');
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 /**
  * Handles the membership registration for WSFIA members.
  * Extends Member which extends User.
@@ -679,6 +690,40 @@ class Membership extends Member implements iRegistration {
         }
         
         
+    }
+
+    public function exportMemberInfo() {
+
+        $spreadsheet = new Spreadsheet();
+        
+        $spreadsheet->setActiveSheetIndex(0);
+        $spreadsheet->getActiveSheet()->setCellValue('B1', 'Invoice');
+        //$spreadsheet->getActiveSheet()->setCellValue('D1', Date::PHPToExcel(gmmktime(0, 0, 0, date('m'), date('d'), date('Y'))));
+        //$spreadsheet->getActiveSheet()->getStyle('D1')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_DATE_XLSX15);
+        //$spreadsheet->getActiveSheet()->setCellValue('E1', '#12566');
+
+        /*
+        // Saves to server
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $writer->save("05featuredemo.xls");
+        */
+        
+        
+        $FileName = 'MemberReport_'. date("Y-m-d", time());
+		header("Pragma: public");
+		header("Expires: 0");
+		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+		header("Content-type: application/ms-excel");
+		header("Content-Type: application/force-download");
+		header("Content-Type: application/octet-stream");
+		header("Content-Type: application/download");;
+		header("Content-Disposition: attachment;filename=".$FileName.".xlsx ");
+		header("Content-Type: text/plain; charset=UTF-8");
+		header("Content-Transfer-Encoding: binary ");
+		$objWriter = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $objWriter->save('php://output');
+        
+        return "test";
     }
 
 }
