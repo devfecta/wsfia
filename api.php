@@ -146,7 +146,7 @@ switch ($requestMethod) {
                             echo $Membership->getAccountInfo($_GET['wsfiaId']);
                             break;
                         case "exportMemberInfo":
-                            echo $Membership->exportMemberInfo();
+                            echo $Membership->exportMembersInfo();
                             break;
                         default:
                             echo json_encode(array("error" => 'GET METHOD ERROR: The '.$_GET['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);

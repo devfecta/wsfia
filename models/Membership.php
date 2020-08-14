@@ -692,24 +692,77 @@ class Membership extends Member implements iRegistration {
         
     }
 
-    public function exportMemberInfo() {
+    public function exportMembersInfo() {
 
         $spreadsheet = new Spreadsheet();
-        
-        $spreadsheet->setActiveSheetIndex(0);
-        $spreadsheet->getActiveSheet()->setCellValue('B1', 'Invoice');
-        //$spreadsheet->getActiveSheet()->setCellValue('D1', Date::PHPToExcel(gmmktime(0, 0, 0, date('m'), date('d'), date('Y'))));
-        //$spreadsheet->getActiveSheet()->getStyle('D1')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_DATE_XLSX15);
-        //$spreadsheet->getActiveSheet()->setCellValue('E1', '#12566');
 
-        /*
-        // Saves to server
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $writer->save("05featuredemo.xls");
-        */
+        try {
+            $connection = Configuration::openConnection();
+            $statement = $connection->prepare("SELECT users.firstName, users.lastName, users.emailAddress, users.type, members.* FROM users INNER JOIN members ON users.id=members.userId");
+            $statement->execute();
+
+            $members = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+            $rowCount = 1;
+            $columnLetter = 'A';
+            $columNames = '';
+
+            $spreadsheet->setActiveSheetIndex(0);
+
+            for ($c = 0; $c < $statement->columnCount(); $c++) {
+                $spreadsheet->getActiveSheet()->setCellValue($columnLetter.($rowCount), $statement->getColumnMeta($c)['name']);
+                $columnLetter++;
+            }
+
+            foreach($members as $index => $member) {
+
+                $columnLetter = 'A';
+                $rowCount++;
+                
+                for ($c = 0; $c < $statement->columnCount(); $c++) {
+                    
+                    $value = '';
+
+                    switch($statement->getColumnMeta($c)['name']) {
+                        case 'type':
+                            $types = array();
+                            array_push($types, json_decode($member[$statement->getColumnMeta($c)['name']]));
+                            foreach($types as $type) {
+                                $value .= $type->{key($type)} . "\n";
+                            }
+                            break;
+                        case 'departments':
+                            $departments = json_decode($member[$statement->getColumnMeta($c)['name']]);
+                            $lastKey = array_key_last($departments);
+                            foreach($departments as $key => $department) {
+                                $value .=  ($lastKey == $key) ? json_decode(json_encode($department))->name : json_decode(json_encode($department))->name . "\n";
+                            }
+                            break;
+                        case 'areas':
+                            $areas = json_decode($member[$statement->getColumnMeta($c)['name']]);
+                            $lastKey = array_key_last($areas);
+                            foreach($areas as $key=> $area) {
+                                $value .=  ($lastKey == $key) ? $area : $area . "\n";
+                            }
+                            break;
+                        default:
+                            $value = $member[$statement->getColumnMeta($c)['name']];
+                            break;
+                    }
+
+                    $spreadsheet->getActiveSheet()->setCellValue($columnLetter.($rowCount), $value);
+                    
+                    $columnLetter++;
+                }
+                
+            }
+
+        }
+        catch (PDOException $e) {
+            $result = '{"result" : ' . $e->getMessage() . '}';
+        }
         
-        
-        $FileName = 'MemberReport_'. date("Y-m-d", time());
+        $fileName = 'MemberReport_'. date("Y-m-d", time());
 		header("Pragma: public");
 		header("Expires: 0");
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
@@ -717,7 +770,7 @@ class Membership extends Member implements iRegistration {
 		header("Content-Type: application/force-download");
 		header("Content-Type: application/octet-stream");
 		header("Content-Type: application/download");;
-		header("Content-Disposition: attachment;filename=".$FileName.".xlsx ");
+		header("Content-Disposition: attachment;filename=".$fileName.".xlsx ");
 		header("Content-Type: text/plain; charset=UTF-8");
 		header("Content-Transfer-Encoding: binary ");
 		$objWriter = IOFactory::createWriter($spreadsheet, 'Xlsx');
