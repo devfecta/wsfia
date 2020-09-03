@@ -1,15 +1,15 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+//ini_set('display_errors', 1);
+//ini_set('display_startup_errors', 1);
+//error_reporting(E_ALL);
 
 require './vendor/autoload.php';
 
 require_once('Member.php');
 require_once('./interfaces/iRegistration.php');
 
-require_once('./PhpSpreadsheet/IOFactory.php');
-require_once('./PhpSpreadsheet/Spreadsheet.php');
+//require_once('./PhpSpreadsheet/IOFactory.php');
+//require_once('./PhpSpreadsheet/Spreadsheet.php');
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 /**
@@ -165,6 +165,8 @@ class Membership extends Member implements iRegistration {
 
                 $userInfo['id'] = $result['id'];
                 $userInfo['wsfiaId'] = $result['wsfiaId'];
+                $member = new Member($result['id']);
+                $userInfo['types'] = $member->user->getUserType();
                 $userInfo['firstName'] = $result['firstName'];
                 $userInfo['authenticated'] = password_verify($data->password, $result['password']);
                 $userInfo['expirationDate'] = date("Y-m-d", strtotime($result['expirationDate']));
@@ -271,7 +273,8 @@ class Membership extends Member implements iRegistration {
                 $password = '123abc';
                 // User Information
                 $statement = $connection->prepare("INSERT INTO users (`type`, `password`, `firstName`, `lastName`, `emailAddress`) VALUES (:type, :password, :firstName, :lastName, :emailAddress)");
-                $statement->bindParam(":type", json_encode(array(2=>"Member")));
+                //$statement->bindParam(":type", json_encode(array(2=>"Member")));
+                $statement->bindParam(":type", json_encode(array(0=>array("id"=>2, "name"=>"Member"))));
                 $statement->bindParam(":password", password_hash($password, PASSWORD_BCRYPT));
                 $statement->bindParam(":firstName", $registrant->firstName);
                 $statement->bindParam(":lastName", $registrant->lastName);
@@ -691,8 +694,8 @@ class Membership extends Member implements iRegistration {
         
         
     }
-
-    public function exportMembersInfo() {
+    
+    public function exportMembersInfo($service, $file) {
 
         $spreadsheet = new Spreadsheet();
 
@@ -725,11 +728,18 @@ class Membership extends Member implements iRegistration {
 
                     switch($statement->getColumnMeta($c)['name']) {
                         case 'type':
+                            $types = json_decode($member[$statement->getColumnMeta($c)['name']]);
+                            $lastKey = array_key_last($types);
+                            foreach($types as $key => $type) {
+                                $value .=  ($lastKey == $key) ? json_decode(json_encode($type))->name : json_decode(json_encode($type))->name . "\n";
+                            }
+                            /*
                             $types = array();
                             array_push($types, json_decode($member[$statement->getColumnMeta($c)['name']]));
                             foreach($types as $type) {
                                 $value .= $type->{key($type)} . "\n";
                             }
+                            */
                             break;
                         case 'departments':
                             $departments = json_decode($member[$statement->getColumnMeta($c)['name']]);
@@ -757,28 +767,52 @@ class Membership extends Member implements iRegistration {
                 
             }
 
+            $fileName = 'MemberReport_'. date("Y-m-d", time());
+
+            try{
+                $file->setMimeType("application/vnd.ms-excel");
+                $file->setName($fileName);
+                $file->setParents(array("1rxYn-ekD7zoTiXEv2DsgxigVqHJTiZIM"));
+
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+
+                $objWriter = IOFactory::createWriter($spreadsheet, 'Xlsx');
+                $objWriter->save("./".$fileName.".xlsx");
+
+                $mime_type = finfo_file($finfo, $objWriter);
+
+                $result2 = $service->files->create(
+                    $file,
+                    array(
+                    'data' => file_get_contents("./".$fileName.".xlsx"),
+                    'mimeType' => $mime_type,
+                    'uploadType' => 'multipart'
+                    )
+                );
+            }
+            catch(Exception $e) {
+                $result = '{"exceptionResult": "' . $e->getMessage() . '"}';
+            }
+
+            
         }
         catch (PDOException $e) {
-            $result = '{"result" : ' . $e->getMessage() . '}';
+            $result = '{"pdoResult" : ' . $e->getMessage() . '}';
         }
-        
+        /*
         $fileName = 'MemberReport_'. date("Y-m-d", time());
 		header("Pragma: public");
 		header("Expires: 0");
 		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-		header("Content-type: application/ms-excel");
-		header("Content-Type: application/force-download");
-		header("Content-Type: application/octet-stream");
-		header("Content-Type: application/download");;
-		header("Content-Disposition: attachment;filename=".$fileName.".xlsx ");
-		header("Content-Type: text/plain; charset=UTF-8");
-		header("Content-Transfer-Encoding: binary ");
+		header("Content-type: application/vnd.ms-excel");
+		header("Content-Disposition: attachment;filename=".$fileName.".xlsx");
+		header("Content-Transfer-Encoding: binary");
 		$objWriter = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $objWriter->save('php://output');
-        
-        return "test";
+        */
+        return $result;
     }
-
+    
 }
 
 ?>

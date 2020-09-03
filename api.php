@@ -32,19 +32,13 @@ require_once("models/RegisterConferenceMember.php");
 //require_once("./models/User.php");
 //require_once("./models/Vendor.php");
 
-/*
-$connection = Configuration::openConnection();
-
-$id = "1";
-$statement = $connection->prepare("SELECT typeName FROM `departmentTypes` WHERE `typeId`=:id");
-$statement->bindParam(":id", $id);
-$statement->execute();
-$typeName = $statement->fetch(PDO::FETCH_COLUMN);
-
-echo "Type:".$typeName;
-
-echo "API <br />";
-*/
+require './vendor/autoload.php';
+//require_once('./PhpSpreadsheet/IOFactory.php');
+//require_once('./PhpSpreadsheet/Spreadsheet.php');
+//require_once('./PhpSpreadsheet/Writer/IWriter.php');
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer;
 //echo "Session:".$_COOKIE['PHPSESSID'];
 
 if (isset($_SESSION['userId'])) {
@@ -146,7 +140,55 @@ switch ($requestMethod) {
                             echo $Membership->getAccountInfo($_GET['wsfiaId']);
                             break;
                         case "exportMemberInfo":
-                            echo $Membership->exportMembersInfo();
+
+                            $client = new Google_Client();
+                            $client->setAuthConfigFile('drive.json');
+                            $client->setRedirectUri('http://' . $_SERVER['HTTP_HOST'] . '/api.php?class=Membership&method=exportMemberInfo');
+                            $client->addScope("https://www.googleapis.com/auth/drive");
+                            
+                            if (isset($_GET['code'])) {
+
+                                $accessToken = $client->authenticate($_GET['code']);
+                                $client->setAccessToken($accessToken);
+                                $service = new Google_Service_Drive($client);
+                                $file = new Google_Service_Drive_DriveFile();
+
+                                echo $Membership->exportMembersInfo($service, $file);
+
+//echo $mime_type."<br/>";
+
+                                //echo $Membership->exportMembersInfo($_GET['code']);
+                            }
+                            else {
+                                
+                                $auth_url = $client->createAuthUrl();
+
+                                header('Location: ' . filter_var($auth_url, FILTER_SANITIZE_URL));
+                            }
+
+                            
+
+                            //$fileName = 'MemberReport_'. date("Y-m-d", time());
+                            /*
+                            header("Pragma: public");
+                            header("Expires: 0");
+                            header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+                            header("Content-type: application/vnd.ms-excel");
+                            header("Content-Disposition: attachment;filename=".$fileName.".xlsx");
+                            header("Content-Transfer-Encoding: binary");
+                            $writer = IOFactory::createWriter($Membership->exportMembersInfo(), 'Xlsx');
+                            $writer->save( $fileName . '.xlsx' );
+                            */
+                            /*
+                            header("Pragma: public");
+                            header("Expires: 0");
+                            header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+                            header("Content-type: application/vnd.ms-excel");
+                            header("Content-Disposition: attachment;filename=".$fileName.".xlsx");
+                            header("Content-Transfer-Encoding: binary");
+                            $objWriter = IOFactory::createWriter($Membership->exportMembersInfo(), 'Xlsx');
+                            $objWriter->save('php://output');
+                            */
                             break;
                         default:
                             echo json_encode(array("error" => 'GET METHOD ERROR: The '.$_GET['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);

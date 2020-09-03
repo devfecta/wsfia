@@ -83,6 +83,8 @@ class User {
     {
         $typesArray = json_decode($typesJSON, true);
 
+        $this->type = $typesArray;
+        /*
         foreach ($typesArray as $id => $type) {
             array_push($this->type, 
                 array(
@@ -91,6 +93,7 @@ class User {
                 )
             );
         }
+        */
     }
     /**
      * Get the value of password
