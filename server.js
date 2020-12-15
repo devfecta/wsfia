@@ -1,4 +1,5 @@
 const https = require("https");
+const http = require("http");
 const fs = require("fs");
 const helmet = require("helmet");
 const express = require('express');
@@ -32,6 +33,7 @@ app.use('/', express.static('public'));
  * Calls the script that instantiates all of the controllers.
  */
 const Controllers = require('./controllers');
+const { pathToFileURL } = require("url");
 const controllers = new Controllers();
 /**
  * EJS templating library.
@@ -311,6 +313,57 @@ app.get('/links', (request, response) => {
 app.get('/scholarships', (request, response) => {
     response.render('./scholarships.ejs', { session: request.session, message: '' });
 });
+// REPORTS START
+/**
+ * Downloads an Excel file of the members.
+ */
+app.get('/reports/members', (request, response) => {
+
+    http.get(process.env.API + '/api.php?class=Membership&method=exportMemberInfo', (file) => {
+
+        let fileName = file.headers["content-disposition"].split(";")[1].split("=")[1];
+
+        response.setHeader('Pragma', 'public'); 
+        response.setHeader('Expires', '0'); 
+        response.setHeader('Cache-Control','must-revalidate, post-check=0, pre-check=0');
+        response.setHeader('Content-Type', 'application/vnd.ms-excel'); 
+        response.setHeader('Content-Disposition','attachment; filename=' + fileName);
+        response.setHeader('Content-Transfer-Encoding', 'binary');
+
+        //let file;
+        
+        //console.log(file);
+        file.pipe(response);
+        
+        /*
+        file.on('end', () => {
+            console.log('test');
+            console.log(response.statusCode);
+            //response.attachment(fileName);
+        });
+        */
+        /*
+        file.on('data', chunk => {
+            console.log(chunk);
+            let excel = fs.readFile(chunk);
+            excel.pipe(response);
+        });
+
+        response.send();
+        */
+    })
+    .on('end', f => {
+        response.send();
+    })
+    .on('error', (e) => {
+        console.log(e.message);
+    });
+
+    //req.send();
+    
+    
+});
+// REPORTS END
 // CONFERENCE START
 /**
  * Renders the conference information page.
@@ -364,5 +417,5 @@ const options = {
     key: fs.readFileSync("/etc/letsencrypt/live/wsfia.org/privkey.pem"),
     cert: fs.readFileSync("/etc/letsencrypt/live/wsfia.org/fullchain.pem")
 };
-https.createServer(options, app).listen(HTTPS);
+https.createServer(options, app).listen(process.env.HTTPS);
 */

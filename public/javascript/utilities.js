@@ -138,8 +138,7 @@ const getMembers = async (businessId, conference) => {
         await fetch('/getMembers?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(data => {
-            //console.log(data);
-            //console.log(data)
+            console.log(data);
             // Clears the search textbox
             const searchTextBox = document.querySelector('#searchTextBoxId');
             searchTextBox.value = '';

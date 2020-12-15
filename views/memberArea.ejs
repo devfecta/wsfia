@@ -7,30 +7,53 @@
         <b>WSFIA Member ID</b>: <%= session.userInfo.wsfiaId %><br />
         <b>Expiration Date</b>: <%= session.userInfo.expirationDate %> &nbsp; 
         <b>Status</b>: <%= session.userInfo.status %><br />
+        <b>Membership Type</b>: <%= session.userInfo.types[0].name %><br />
         <b>Student ID</b>: <%= session.userInfo.studentId %>
     </div>
 
-    <div class="col-lg-8 p-4 justify-content-center align-self-center" style="border-radius: 1em;">
+    <%  
+        const currentDate = new Date();
+        const expirationDate = new Date(session.userInfo.expirationDate);
+    %>
+
+    <% if (currentDate > expirationDate) { %>
+        <div class="card text-white bg-secondary my-4 text-center" style="border-radius: 1em;">
+            <div class="card-body d-flex justify-content-around align-items-center">
+                <div class="col-md-8">
+                    <p class="text-white m-0">Your membership has expired. Please click on the "Renew Membership" button to look up your account. 
+                        You can also renew other within your department/business, if you choose.</p>
+                </div>
+                <div class="col-md-4">
+                    <a href="/register" class="m-3 btn btn-primary">Renew Membership</a>
+                </div>
+            </div>
+        </div>
+
+    <% } else { %>
         
-    </div>
-
-    <div class="card text-dark my-4 w-100 h-100" style="border-radius: 1em; border-radius: 1em; background-color: rgba(255,255,255, 0.8);">
-        <div class="card-header">
-            Announcements
-          </div>
-        <div class="card-body justify-content-around align-items-center">
-            
+        <div class="col-lg-8 p-4 justify-content-center align-self-center" style="border-radius: 1em;">
+        
         </div>
-    </div>
-
-    <div class="card text-dark my-4 w-100 h-100" style="border-radius: 1em; border-radius: 1em; background-color: rgba(255,255,255, 0.8);">
-        <div class="card-header">
-            News
-          </div>
-        <div class="card-body justify-content-around align-items-center">
-            
+    
+        <div class="card text-dark my-4 w-100 h-100" style="border-radius: 1em; border-radius: 1em; background-color: rgba(255,255,255, 0.8);">
+            <div class="card-header">
+                Announcements
+              </div>
+            <div class="card-body justify-content-around align-items-center">
+                
+            </div>
         </div>
-    </div>
+    
+        <div class="card text-dark my-4 w-100 h-100" style="border-radius: 1em; border-radius: 1em; background-color: rgba(255,255,255, 0.8);">
+            <div class="card-header">
+                News
+              </div>
+            <div class="card-body justify-content-around align-items-center">
+                
+            </div>
+        </div>
+            
+    <%  } %>
 
 </div>
 
