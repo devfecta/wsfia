@@ -310,6 +310,8 @@ class Membership {
             
             let params = new URLSearchParams();
 
+            formData.members = typeof(formData.members) === "string" ? [formData.members] : formData.members;
+
             params.append('members', JSON.stringify(formData.members));
             params.append('emailAddress', formData.emailAddress);
             params.append('businessId', formData.business);
