@@ -445,6 +445,8 @@ class Membership extends Member implements iRegistration {
          */
         try {
             $members = json_decode($data->members);
+
+            return $members;
             //$registrants = json_decode($this->getRegistrants($data->sessionId));
             // $connection is lets you use the same connection for multiple statements.
             $connection = Configuration::openConnection();
