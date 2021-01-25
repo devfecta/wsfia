@@ -307,17 +307,28 @@ class Membership extends Member implements iRegistration {
 
                 // Create an order and line item for new member.
                 $orderOption = 1;
+                //WSFIA Lifetime Member
+                foreach($registrant->businesses as $business) {
+                    if (preg_match('/WSFIA Lifetime Member/i', $business->name)) {
+                        $orderOption = 7;
+                        break;
+                    }
+                }
                 $statement = $connection->prepare("SELECT * FROM orderOptions WHERE id=:id");
                 $statement->bindParam(":id", $orderOption);
                 $statement->execute();
                 $results = $statement->fetch(PDO::FETCH_ASSOC);
                 $itemId = $results['id'];
                 $itemDescription = "Member Name: " . $registrant->firstName . " " . $registrant->lastName . "\nMember ID: " . $memberId;
+
+                $itemName = $results['description'];
                 $price = $results['price'];
 
                 array_push($lineItem, array("emailAddress" => $registrant->emailAddress, "userId" => $newUserId, "quantity" => 1, "itemId" => $itemId, "itemName" => $results['description'], "itemDescription" => $itemDescription, "price" => $price));
                 
             }
+
+            return "Data: " . json_encode($sessionData);
 
             $lineItems['lineItems'] = $lineItem;
 
@@ -486,6 +497,14 @@ class Membership extends Member implements iRegistration {
 
                         // Create an order and line item for new member.
                         $orderOption = 1;
+                        //WSFIA Lifetime Member
+                        $businesses = json_decode($result['departments']);
+                        foreach($businesses as $business) {
+                            if (preg_match('/WSFIA Lifetime Member/i', $business->name)) {
+                                $orderOption = 7;
+                                break;
+                            }
+                        }
                         $statement = $connection->prepare("SELECT * FROM orderOptions WHERE id=:id");
                         $statement->bindParam(":id", $orderOption);
                         $statement->execute();
