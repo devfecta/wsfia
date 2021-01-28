@@ -317,10 +317,17 @@ app.get('/scholarships', (request, response) => {
 /**
  * Downloads an Excel file of the members.
  */
-app.get('/reports/members', (request, response) => {
+app.get('/reports/members', async (request, response) => {
 
+    let exportResult = await controllers.membership.exportMemberInfo();
+    //console.log(exportResult);
+    //request.session.message = resultJSON.updatedAccount;
+    response.redirect('/');
+    /*
     http.get(process.env.API + '/api.php?class=Membership&method=exportMemberInfo', (file) => {
 
+        console.log(file);
+        
         let fileName = file.headers["content-disposition"].split(";")[1].split("=")[1];
 
         response.setHeader('Pragma', 'public'); 
@@ -330,27 +337,11 @@ app.get('/reports/members', (request, response) => {
         response.setHeader('Content-Disposition','attachment; filename=' + fileName);
         response.setHeader('Content-Transfer-Encoding', 'binary');
 
-        //let file;
+        //let file;  
         
-        //console.log(file);
+        
         file.pipe(response);
         
-        /*
-        file.on('end', () => {
-            console.log('test');
-            console.log(response.statusCode);
-            //response.attachment(fileName);
-        });
-        */
-        /*
-        file.on('data', chunk => {
-            console.log(chunk);
-            let excel = fs.readFile(chunk);
-            excel.pipe(response);
-        });
-
-        response.send();
-        */
     })
     .on('end', f => {
         response.send();
@@ -360,7 +351,7 @@ app.get('/reports/members', (request, response) => {
     });
 
     //req.send();
-    
+    */
     
 });
 // REPORTS END

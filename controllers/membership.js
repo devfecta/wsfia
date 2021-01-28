@@ -192,7 +192,7 @@ class Membership {
             )
             .then(response => {
                 const lineItems = response.data;
-
+                //console.log(lineItems);
                 params = new URLSearchParams();
                 params.append('lineItems', JSON.stringify(response.data));
                 //console.log("Parameters");
@@ -207,8 +207,6 @@ class Membership {
                 //confirmation = response.data;
             })
             .catch(error => console.log(error));
-            
-            return confirmation;
             
         }
         catch (e) {
@@ -388,6 +386,23 @@ class Membership {
             console.error(e);
         }
         
+    }
+
+    exportMemberInfo = async () => {
+        try {
+
+
+        // http://localhost/api.php?class=Membership&method=exportMemberInfo
+        // http://34.71.62.246/api.php?class=Membership&method=exportMemberInfo
+
+            return await axios.get(process.env.API + '/api.php?class=Membership&method=exportMemberInfo')
+            .then(response => response.data)
+            //.then(json => console.log(json))
+            .catch(error => console.log(error));
+        }
+        catch (e) {
+            console.error(e);
+        }
     }
 
 }
