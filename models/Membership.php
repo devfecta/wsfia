@@ -278,7 +278,7 @@ class Membership extends Member implements iRegistration {
                 $statement->bindParam(":password", password_hash($password, PASSWORD_BCRYPT));
                 $statement->bindParam(":firstName", $registrant->firstName);
                 $statement->bindParam(":lastName", $registrant->lastName);
-                $statement->bindParam(":emailAddress", $registrant->emailAddress);
+                $statement->bindParam(":emailAddress", strtolower($registrant->emailAddress));
                 $statement->execute();
 
                 $newUserId = $connection->lastInsertId();
@@ -307,13 +307,21 @@ class Membership extends Member implements iRegistration {
 
                 // Create an order and line item for new member.
                 $orderOption = 1;
-                //WSFIA Lifetime Member
-                foreach($registrant->businesses as $business) {
-                    if (preg_match('/WSFIA Lifetime Member/i', $business->name)) {
-                        $orderOption = 7;
-                        break;
+                $studentId = trim($registrant->studentId);
+                if(isset($studentId) && $studentId != '') {
+                    // WSFIA Student Member
+                    $orderOption = 8;
+                }
+                else {
+                    //WSFIA Lifetime Member
+                    foreach($registrant->businesses as $business) {
+                        if (preg_match('/WSFIA Lifetime Member/i', $business->name)) {
+                            $orderOption = 7;
+                            break;
+                        }
                     }
                 }
+                
                 $statement = $connection->prepare("SELECT * FROM orderOptions WHERE id=:id");
                 $statement->bindParam(":id", $orderOption);
                 $statement->execute();
@@ -497,14 +505,22 @@ class Membership extends Member implements iRegistration {
 
                         // Create an order and line item for new member.
                         $orderOption = 1;
-                        //WSFIA Lifetime Member
-                        $businesses = json_decode($result['departments']);
-                        foreach($businesses as $business) {
-                            if (preg_match('/WSFIA Lifetime Member/i', $business->name)) {
-                                $orderOption = 7;
-                                break;
+                        $studentId = trim($result['studentId']);
+                        if(isset($studentId) && $studentId != '') {
+                            // WSFIA Student Member
+                            $orderOption = 8;
+                        }
+                        else {
+                            //WSFIA Lifetime Member
+                            $businesses = json_decode($result['departments']);
+                            foreach($businesses as $business) {
+                                if (preg_match('/WSFIA Lifetime Member/i', $business->name)) {
+                                    $orderOption = 7;
+                                    break;
+                                }
                             }
                         }
+                        
                         $statement = $connection->prepare("SELECT * FROM orderOptions WHERE id=:id");
                         $statement->bindParam(":id", $orderOption);
                         $statement->execute();
@@ -731,6 +747,8 @@ class Membership extends Member implements iRegistration {
             $columnLetter = 'A';
             $columNames = '';
 
+            //return $members;
+
             $spreadsheet->setActiveSheetIndex(0);
 
             for ($c = 0; $c < $statement->columnCount(); $c++) {
@@ -802,7 +820,7 @@ class Membership extends Member implements iRegistration {
 
                 $mime_type = finfo_file($finfo, $objWriter);
 
-                $result2 = $service->files->create(
+                $result = $service->files->create(
                     $file,
                     array(
                     'data' => file_get_contents("./".$fileName.".xlsx"),

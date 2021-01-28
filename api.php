@@ -145,31 +145,44 @@ switch ($requestMethod) {
                             break;
                         case "exportMemberInfo":
 
-                            $client = new Google_Client();
-                            $client->setAuthConfigFile('drive.json');
-                            $client->setRedirectUri('http://' . $_SERVER['HTTP_HOST'] . '/api.php?class=Membership&method=exportMemberInfo');
-                            $client->addScope("https://www.googleapis.com/auth/drive");
-                            
-                            if (isset($_GET['code'])) {
+                            try {
 
-                                $accessToken = $client->authenticate($_GET['code']);
-                                $client->setAccessToken($accessToken);
-                                $service = new Google_Service_Drive($client);
-                                $file = new Google_Service_Drive_DriveFile();
+                                $client = new Google_Client();
+                                $client->setAuthConfigFile('../drive.json');
 
-                                echo $Membership->exportMembersInfo($service, $file);
-
-//echo $mime_type."<br/>";
-
-                                //echo $Membership->exportMembersInfo($_GET['code']);
-                            }
-                            else {
                                 
-                                $auth_url = $client->createAuthUrl();
+                                //$client->setRedirectUri('http://' . $_SERVER['HTTP_HOST'] . '/api.php?class=Membership&method=exportMemberInfo');
+                                $client->addScope("https://www.googleapis.com/auth/drive");
 
-                                header('Location: ' . filter_var($auth_url, FILTER_SANITIZE_URL));
+                                if (isset($_GET['code'])) {
+
+                                    $accessToken = $client->authenticate($_GET['code']);
+                                    $client->setAccessToken($accessToken);
+                                    $client->setAccessType("offline");
+                                    $service = new Google_Service_Drive($client);
+                                    $file = new Google_Service_Drive_DriveFile();
+
+                                    echo $Membership->exportMembersInfo($service, $file);
+
+                                    //echo $mime_type."<br/>";
+
+                                    //echo $Membership->exportMembersInfo($_GET['code']);
+                                }
+                                else {
+                                    
+                                    $auth_url = $client->createAuthUrl();
+
+                                    header('Location: ' . filter_var($auth_url, FILTER_SANITIZE_URL));
+                                }
+
+
                             }
-
+                            catch(Exception $e) {
+                                //echo $e->getMessage();
+                                //exit();
+                            }
+                            
+                            
                             
 
                             //$fileName = 'MemberReport_'. date("Y-m-d", time());
