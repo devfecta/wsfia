@@ -320,9 +320,11 @@ app.get('/scholarships', (request, response) => {
 app.get('/reports/members', async (request, response) => {
 
     let exportResult = await controllers.membership.exportMemberInfo();
-    //console.log(exportResult);
     //request.session.message = resultJSON.updatedAccount;
-    response.redirect('/');
+    console.log(exportResult);
+    //response.send(exportResult);
+
+    response.redirect("/");
     /*
     http.get(process.env.API + '/api.php?class=Membership&method=exportMemberInfo', (file) => {
 
