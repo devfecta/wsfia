@@ -150,7 +150,7 @@ switch ($requestMethod) {
                                 $client = new Google_Client();
                                 $client->setAuthConfigFile('../drive.json');
 
-                                
+                                $client->setRedirectUri('http://localhost:3000/reports/members');
                                 //$client->setRedirectUri('http://' . $_SERVER['HTTP_HOST'] . '/api.php?class=Membership&method=exportMemberInfo');
                                 $client->addScope("https://www.googleapis.com/auth/drive");
 
@@ -162,7 +162,9 @@ switch ($requestMethod) {
                                     $service = new Google_Service_Drive($client);
                                     $file = new Google_Service_Drive_DriveFile();
 
-                                    echo $Membership->exportMembersInfo($service, $file);
+                                    $Membership->exportMembersInfo($service, $file);
+
+                                    header('Location: https://wsfia.org/member-area');
 
                                     //echo $mime_type."<br/>";
 
@@ -173,6 +175,7 @@ switch ($requestMethod) {
                                     $auth_url = $client->createAuthUrl();
 
                                     header('Location: ' . filter_var($auth_url, FILTER_SANITIZE_URL));
+                                    //echo filter_var($auth_url, FILTER_SANITIZE_URL);
                                 }
 
 

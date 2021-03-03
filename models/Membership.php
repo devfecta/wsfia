@@ -816,14 +816,14 @@ class Membership extends Member implements iRegistration {
                 $finfo = finfo_open(FILEINFO_MIME_TYPE);
 
                 $objWriter = IOFactory::createWriter($spreadsheet, 'Xlsx');
-                $objWriter->save("./".$fileName.".xlsx");
+                $objWriter->save("./downloads/".$fileName.".xlsx");
 
                 $mime_type = finfo_file($finfo, $objWriter);
 
                 $result = $service->files->create(
                     $file,
                     array(
-                    'data' => file_get_contents("./".$fileName.".xlsx"),
+                    'data' => file_get_contents("./downloads/".$fileName.".xlsx"),
                     'mimeType' => $mime_type,
                     'uploadType' => 'multipart'
                     )
