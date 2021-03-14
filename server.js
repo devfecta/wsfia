@@ -365,6 +365,36 @@ app.get('/conference', (request, response) => {
     response.render('./conference.ejs', { session: request.session, message: '' });
 });
 /**
+ * Renders the conference registration page for current members.
+ */
+ app.get('/conference/currentMembers', async (request, response) => {
+    request.session.sessionId = uuidv4();
+    // Reusing the getRenewals method just to get current members.
+    request.session.members = await controllers.membership.getRenewals(JSON.stringify(request.query));
+    //request.session.conference = true;
+    response.render('./registration/attendeeCurrentMembers.ejs', { session: request.session });
+});
+/**
+ * Calls the addMember method to add registrant to the database, then redirects to a page listing the registrants.
+ */
+ app.post('/conference/currentMembers/process', async (request, response) => {
+    request.body.sessionId = request.session.sessionId;
+    console.log(JSON.stringify(request.body));
+    /*
+    let confirm = await controllers.membership.addConferenceCurrentMembers(JSON.stringify(request.body));
+    if (confirm) {
+        request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
+        //console.log(request.session.registrants);
+        response.redirect('/register/member/registrants');
+    }
+    else {
+        response.render('./registration/attendeeCurrentMembers.ejs', { session: request.session, message: '<div class="alert alert-danger m-1" role="alert">There was an error when trying to add the member.</div>' });
+    }
+    */
+});
+
+
+/**
  * Renders the conference register current members page.
  */
 app.get('/conference/register', (request, response) => {

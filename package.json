@@ -22,19 +22,19 @@
 	},
 	"homepage": "https://github.com/devfecta/wsfia#readme",
 	"dependencies": {
-		"axios": "^0.20.0",
-		"bootstrap": "^4.5.2",
+		"axios": ">=0.21.1",
+		"bootstrap": "^4.6.0",
 		"dotenv": "^8.2.0",
-		"ejs": "^3.1.5",
+		"ejs": "^3.1.6",
 		"express": "^4.17.1",
 		"express-session": "^1.17.1",
 		"googleapis": "^61.0.0",
 		"helmet": "^3.23.3",
-		"jquery": "^3.5.1",
+		"jquery": "^3.6.0",
 		"popper.js": "^1.16.1",
-		"uuid": ">=8.3.1"
+		"uuid": "^8.3.2"
 	},
 	"devDependencies": {
-		"nodemon": "^2.0.3"
+		"nodemon": "^2.0.7"
 	}
 }

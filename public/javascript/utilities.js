@@ -163,10 +163,10 @@ const getMembers = async (businessId, conference) => {
                 resultRow.id = 'memberId' + member.id;
 
                 let resultInfoColumn = document.createElement("div");
-                resultInfoColumn.className = 'col-md-9';
+                resultInfoColumn.className = 'col-md-8';
 
                 let resultButtonColumn = document.createElement("div");
-                resultButtonColumn.className = 'col-md-3';
+                resultButtonColumn.className = 'col-md-4 text-center';
 
                 let resultButton = null;
                 if (conference) {
@@ -194,8 +194,17 @@ const getMembers = async (businessId, conference) => {
                         resultButton.innerHTML = 'Renew Membership';
                     }
                     else {
+
                         resultButton.href = '/login';
                         resultButton.innerHTML = 'Login';
+
+
+                        conferenceButton = document.createElement("a");
+                        conferenceButton.className = 'btn btn-secondary m-2';
+
+                        conferenceButton.href = '/conference/currentMembers?businessId=' + member.departments.id;
+                        conferenceButton.innerHTML = 'Conference Registration';
+                        resultButtonColumn.appendChild(conferenceButton);
                     }
                 }
 
