@@ -508,6 +508,14 @@ const removeRenewal = (id) => {
     lineItem.remove();
     
 }
+/**
+ * Remove a member from the conference attendee registration form.
+ * @param {*} id 
+ */
+const removeAttendee = (id) => {
+    let lineItem = document.querySelector("#userRow" + id);
+    lineItem.remove();
+}
 
 /**
  * Displays the request error from the API call.

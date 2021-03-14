@@ -371,8 +371,8 @@ app.get('/conference', (request, response) => {
     request.session.sessionId = uuidv4();
     // Reusing the getRenewals method just to get current members.
     request.session.members = await controllers.membership.getRenewals(JSON.stringify(request.query));
-    //request.session.conference = true;
-    response.render('./registration/attendeeCurrentMembers.ejs', { session: request.session });
+    request.session.conference = true;
+    response.render('./registration/attendeeCurrentMembers.ejs', { session: request.session, message: '' });
 });
 /**
  * Calls the addMember method to add registrant to the database, then redirects to a page listing the registrants.
@@ -380,17 +380,19 @@ app.get('/conference', (request, response) => {
  app.post('/conference/currentMembers/process', async (request, response) => {
     request.body.sessionId = request.session.sessionId;
     console.log(JSON.stringify(request.body));
-    /*
-    let confirm = await controllers.membership.addConferenceCurrentMembers(JSON.stringify(request.body));
+    
+    let confirm = await controllers.conference.addConferenceCurrentMembers(JSON.stringify(request.body));
+    
     if (confirm) {
         request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
+        response.render('./registration/memberInfo.ejs', { session: request.session, message: '<div class="alert alert-danger m-1" role="alert">If you have any new member(s), you can register them now. Otherwise, click "Next"</div>' });
         //console.log(request.session.registrants);
-        response.redirect('/register/member/registrants');
+        //response.redirect('/register/member');
     }
     else {
-        response.render('./registration/attendeeCurrentMembers.ejs', { session: request.session, message: '<div class="alert alert-danger m-1" role="alert">There was an error when trying to add the member.</div>' });
+        response.render('./registration/attendeeCurrentMembers.ejs', { session: request.session, message: '<div class="alert alert-danger m-1" role="alert">There was an error when trying to process the member(s).</div>' });
     }
-    */
+    
 });
 
 

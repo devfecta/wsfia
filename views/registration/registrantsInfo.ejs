@@ -7,7 +7,7 @@
 %>
 
 <section id="membershipInfo">
-    <h1>Membership Registration</h1>
+    <h1><% if (session.conference) { %> Conference <% } else { %> Membership <% } %> Registration</h1>
     
 <% if ((session.registrants) && session.registrants.length > 0) {  %>
 
@@ -15,6 +15,8 @@
         "Add Another Person" button to fill out the registration for again. Otherwise, click on the "Register" button 
         to finish the registration process.</p>
         
+<form name="membershipForm" id="membershipForm" action="/register/process" method="POST">
+
     <table class="table table-striped">
         <thead>
             <tr>
@@ -53,6 +55,35 @@
                         <% }) %>
                     </td>
                 </tr>
+                <% if (session.conference) { %>
+                <tr>
+                    <td style="border-bottom: solid 1px #aaa"></td>
+                    <td style="border-bottom: solid 1px #aaa" colspan="3">
+
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="attendingMonday<% index %>" value="Monday">
+                            <label class="form-check-label" for="attendingMonday<%= index %>">Monday</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="attendingTuesday<% index %>" value="Tuesday">
+                            <label class="form-check-label" for="attendingTuesday<%= index %>">Tuesday</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="attendingWednesday<% index %>" value="Wednesday">
+                            <label class="form-check-label" for="attendingWednesday<%= index %>">Wednesday</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="attendingThursday<% index %>" value="Thursday">
+                            <label class="form-check-label" for="attendingThursday<%= index %>">Thursday</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="attendingFriday<% index %>" value="Friday">
+                            <label class="form-check-label" for="attendingFriday<%= index %>">Friday</label>
+                        </div>
+
+                    </td>
+                </tr>
+                <% } %>
             <% });
 
             
@@ -98,7 +129,7 @@
 
 <% if (session.registrants) {  %>
     
-<form name="membershipForm" id="membershipForm" action="/register/process" method="POST">
+
     <fieldset class="px-4">
         <legend>Billing Information</legend>
         <p class="mb-2">Select a billing e-mail address:</p>
