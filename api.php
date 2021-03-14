@@ -53,7 +53,6 @@ if (isset($_SESSION['userId'])) {
 
 switch ($requestMethod) {
     case "POST":
-    //echo "REQUEST_METHOD Post";
         header('Content-Type: application/json; charset=utf-8');
         //$post = json_decode($_POST, false);
         //echo json_encode(['test' => $_POST]);
@@ -110,6 +109,17 @@ switch ($requestMethod) {
                             //echo json_encode($_POST);
                             //exit();
                             echo $Business->createBusiness($_POST);
+                            break;
+                        default:
+                            echo json_encode(array("error" => 'METHOD ERROR: The '.$_POST['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);
+                            break;
+                    }
+                    break;
+                case "RegisterConferenceMember":
+                    $RegisterConferenceMember = new RegisterConferenceMember();
+                    switch ($_POST['method']) {
+                        case "addConferenceCurrentMembers":
+                            echo $RegisterConferenceMember->addConferenceCurrentMembers($_POST);
                             break;
                         default:
                             echo json_encode(array("error" => 'METHOD ERROR: The '.$_POST['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);

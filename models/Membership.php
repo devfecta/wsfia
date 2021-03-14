@@ -68,7 +68,7 @@ class Membership extends Member implements iRegistration {
 
     }
 
-    public function addConferenceRegistrants($sessionData) {
+    public function addConferenceRegistrantsREMOVE($sessionData) {
 
         $data = json_decode(json_encode($sessionData), FALSE);
 
