@@ -85,6 +85,15 @@ app.get('/addMemberBusiness', async (request, response) => {
     response.json(results);
 });
 
+app.get('/removeRegistrant', async (request, response) => {
+    console.log("Session: " +  request.session.sessionId);
+    let results = await controllers.utilities.removeRegistrant(request._parsedOriginalUrl.query);
+    request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
+    
+    //request.session.registrants = request.session.registrants.filter(registrant => registrant.emailAddress != request.query.emailAddress);    
+    response.json(results);
+});
+
 /**
  * Utilities END
  */
@@ -321,7 +330,7 @@ app.get('/reports/members', async (request, response) => {
 
     let exportResult = await controllers.membership.exportMemberInfo();
     //request.session.message = resultJSON.updatedAccount;
-    console.log(exportResult);
+    //console.log(exportResult);
     //response.send(exportResult);
 
     response.redirect("/");
@@ -368,7 +377,10 @@ app.get('/conference', (request, response) => {
  * Renders the conference registration page for current members.
  */
  app.get('/conference/currentMembers', async (request, response) => {
-    request.session.sessionId = uuidv4();
+    //request.session.sessionId = uuidv4();
+    if(request.session.sessionId === undefined){
+        request.session.sessionId = uuidv4();
+    }
     // Reusing the getRenewals method just to get current members.
     request.session.members = await controllers.membership.getRenewals(JSON.stringify(request.query));
     request.session.conference = true;
@@ -379,7 +391,7 @@ app.get('/conference', (request, response) => {
  */
  app.post('/conference/currentMembers/process', async (request, response) => {
     request.body.sessionId = request.session.sessionId;
-    console.log(JSON.stringify(request.body));
+    //console.log(JSON.stringify(request.body));
     
     let confirm = await controllers.conference.addConferenceCurrentMembers(JSON.stringify(request.body));
     

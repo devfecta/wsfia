@@ -275,7 +275,7 @@ const addConferenceRegistrants = async (members) => {
         body: JSON.stringify({"memberIds" : memberIds}), 
         headers: { 'Content-Type': 'application/json' },
     })
-    .then(response => console.log(response))
+    .then(response => response)
     .catch(error => displayError(error));
 }
 /**
@@ -496,6 +496,24 @@ const validateMembershipForm = (form) => {
         }
     }
 
+}
+/**
+ * Removes a member from the conference attendee registration form.
+ * @param {*} id 
+ * @param {*} emailAddress 
+ */
+ const removeRegistrant = (id, emailAddress) => {
+
+    document.querySelectorAll(".userRow" + id).forEach(element => element.remove());
+
+    let parameters = 'class=Membership&method=removeRegistrant&emailAddress=' + emailAddress;
+    
+    fetch('/removeRegistrant?' + parameters, {method: 'GET'})
+    .then(response => {
+        window.location = '/register/member/registrants';
+    })
+    .catch(error => displayError(error));
+    
 }
 /**
  * Remove a member from the membership renewal form.

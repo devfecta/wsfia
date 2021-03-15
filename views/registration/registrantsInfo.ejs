@@ -24,6 +24,7 @@
                 <th scope="col">Registrant</th>
                 <th scope="col">Department/Business</th>
                 <th scope="col">Areas</th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
@@ -32,7 +33,7 @@
                 emailAddresses = [...emailAddresses, registrant.emailAddress];
                 
             %>
-                <tr>
+                <tr class="userRow<%= index %>">
                     <th scope="row"><%= index + 1 %></th>
                     <td>
                         <strong>Name:</strong> <%= registrant.firstName + ' ' + registrant.lastName %><br />
@@ -54,12 +55,15 @@
                             <%= area %><br/>
                         <% }) %>
                     </td>
+                    <td>
+                        <button type="button" onclick="removeRegistrant(<%= index %>, '<%= registrant.emailAddress %>')" id="removeButton" class="btn btn-danger">Remove</button>
+                    </td>
                 </tr>
                 <% if (session.conference) { %>
-                <tr>
+                <tr class="userRow<%= index %>">
                     <td style="border-bottom: solid 1px #aaa"></td>
-                    <td style="border-bottom: solid 1px #aaa" colspan="3">
-
+                    <td style="border-bottom: solid 1px #aaa" colspan="4">
+                        <p class="m-0">Select the day(s) <%= registrant.firstName + ' ' + registrant.lastName %> will be attending:</p>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" id="attendingMonday<% index %>" value="Monday">
                             <label class="form-check-label" for="attendingMonday<%= index %>">Monday</label>

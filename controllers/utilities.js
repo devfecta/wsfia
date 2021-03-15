@@ -61,7 +61,14 @@ class Utilities {
     addMemberBusiness = (queryString) => {
         return this.getApi(queryString);
     }
-
+    /**
+     * Remove registrants from registration.
+     * @param {*} queryString
+     * @returns {json} JSON of the results.
+     */
+     removeRegistrant = (queryString) => {
+        return this.getApi(queryString);
+    }
 
     /**
      * Displays the request error from the API call.
