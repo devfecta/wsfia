@@ -63,6 +63,9 @@ class Membership extends Member implements iRegistration {
             $result = json_encode($e, JSON_PRETTY_PRINT); 
 
         }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
 
         return $result;
 
@@ -186,8 +189,6 @@ class Membership extends Member implements iRegistration {
 
                 $userInfo['studentId'] = $result['studentId'];
             }
-            
-            Configuration::closeConnection();
 
             return json_encode($userInfo, JSON_PRETTY_PRINT);
 
@@ -195,6 +196,9 @@ class Membership extends Member implements iRegistration {
         catch (PDOException $e) {
             //return "Error: " . $e->getMessage();
             return json_encode(array("error" => $e->getMessage()), JSON_PRETTY_PRINT);
+        }
+        finally {
+            $connection = Configuration::closeConnection();
         }
 
         return json_encode($userInfo, JSON_PRETTY_PRINT);
@@ -219,11 +223,12 @@ class Membership extends Member implements iRegistration {
                 $passwordUpdated["updatedPassword"] = true;
             }
             
-            Configuration::closeConnection();
-
         }
         catch (PDOException $e) {
             return $passwordUpdated["updatedPassword"] = $e->getMessage();
+        }
+        finally {
+            $connection = Configuration::closeConnection();
         }
 
         return json_encode($passwordUpdated, JSON_PRETTY_PRINT);
@@ -243,11 +248,42 @@ class Membership extends Member implements iRegistration {
             //$result = json_encode('{"result" : ' . $statement->rowCount() . '}', JSON_PRETTY_PRINT);
             $result = '{"result" : ' . $statement->rowCount() . '}';
 
-            Configuration::closeConnection();
         }
         catch (PDOException $e) {
             //return "Error: " . $e->getMessage();
             $result = '{"result" : ' . $e->getMessage() . '}';
+        }
+        finally {
+            Configuration::closeConnection();
+        }
+
+        return $result;
+    }
+
+    public function removeRegistrant($emailAddress) {
+        try {
+
+            $statement = Configuration::openConnection()->prepare("SELECT `id` FROM `userSessions` WHERE `registration` LIKE :emailAddress");
+            $statement->bindValue(":emailAddress", '%'.$emailAddress.'%', PDO::PARAM_STR);
+            $statement->execute();
+
+            $ids = $statement->fetchAll(PDO::FETCH_COLUMN);
+
+            foreach ($ids as $id) {
+                $statement = Configuration::openConnection()->prepare("DELETE FROM `userSessions` WHERE `id`=:id");
+                $statement->bindValue(":id", $id, PDO::PARAM_INT);
+                //$statement->execute();
+
+                $result = json_encode($statement->execute(), JSON_PRETTY_PRINT);
+            }
+
+        }
+        catch (PDOException $e) {
+            //return "Error: " . $e->getMessage();
+            $result = '{"result" : ' . $e->getMessage() . '}';
+        }
+        finally {
+            Configuration::closeConnection();
         }
 
         return $result;
@@ -380,12 +416,15 @@ class Membership extends Member implements iRegistration {
 
             $result = json_encode($result, JSON_PRETTY_PRINT);
             
-            Configuration::closeConnection();
         }
         catch(PDOException $e) {
             
             $result = '{"result" : ' . $e->getMessage() . '}';
         }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+
         return $result;
     }
 
@@ -443,13 +482,12 @@ class Membership extends Member implements iRegistration {
 
             $updatedAccount["updatedAccount"] = true;
 
-            
-
-            Configuration::closeConnection();
-
         }
         catch (PDOException $e) {
             return '{"updatedAccount" : "' . $e->getMessage() . '"';
+        }
+        finally {
+            $connection = Configuration::closeConnection();
         }
 
         return json_encode($updatedAccount, JSON_PRETTY_PRINT);
@@ -672,11 +710,14 @@ class Membership extends Member implements iRegistration {
                 array_push($members, json_decode($member));
             }
 
-            Configuration::closeConnection();
         }
         catch (PDOException $e) {
             return "Error: " . $e->getMessage();
         }
+        finally {
+            Configuration::closeConnection();
+        }
+
         $members = json_encode($members, JSON_PRETTY_PRINT);
 
         return $members;
@@ -837,6 +878,9 @@ class Membership extends Member implements iRegistration {
         }
         catch (PDOException $e) {
             $result = '{"pdoResult" : ' . $e->getMessage() . '}';
+        }
+        finally {
+            $connection = Configuration::closeConnection();
         }
         /*
         $fileName = 'MemberReport_'. date("Y-m-d", time());

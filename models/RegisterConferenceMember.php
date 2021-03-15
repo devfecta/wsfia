@@ -117,6 +117,9 @@ class RegisterConferenceMember extends Membership implements iRegistration {
             catch (Exception $e) {
                 $result = json_encode($e, JSON_PRETTY_PRINT); 
             }
+            finally {
+                Configuration::closeConnection();
+            }
 
             
 

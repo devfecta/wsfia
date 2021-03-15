@@ -153,6 +153,9 @@ switch ($requestMethod) {
                         case "getAccountInfo":
                             echo $Membership->getAccountInfo($_GET['wsfiaId']);
                             break;
+                        case "removeRegistrant":
+                            echo $Membership->removeRegistrant($_GET['emailAddress']);
+                            break;
                         case "exportMemberInfo":
 
                             try {
