@@ -32,7 +32,35 @@ class Conference {
         }
     }
 
-    
+    setAttendingDate = async (data) => {
+
+        let memberData = JSON.parse(data);
+
+        //console.log(memberData.sessionId);
+
+        try {
+            
+            let params = new URLSearchParams();
+
+            params.append('sessionId', memberData.sessionId);
+            params.append('emailAddress', memberData.emailAddress);
+            params.append('attendingDate', memberData.attendingDate);
+            params.append('attendingChecked', memberData.attendingChecked);
+            params.append('class', 'RegisterConferenceMember');
+            params.append('method', 'setAttendingDate');
+            
+            await axios.post(process.env.API + '/api.php'
+                , params
+            )
+            .then(response => console.log(response.data))
+            .catch(error => console.log(error));
+            
+        }
+        catch (e) {
+            console.error(e);
+        }
+
+    }
 
 }
 

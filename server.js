@@ -156,12 +156,39 @@ app.get('/register/member/registrants', (request, response) => {
     response.render('./registration/registrantsInfo.ejs', { session: request.session, message: '' });
 });
 /**
+ * Updates the user session data by setting the conference attending date for a specific registrant.
+ */
+app.post('/setAttendingDate', async (request, response) => {
+    //console.log(request.body);
+    let confirm = await controllers.conference.setAttendingDate(JSON.stringify(request.body));
+});
+/**
  * Calls the registerMember method to add registrants to the database, calls to the PayPal API to create and send an invoice, then redirect to the confirmation page.
  */
 app.post('/register/process', async (request, response) => {
+
     request.body.sessionId = request.session.sessionId;
+    console.log(request.body);
+    request.body.conferenceDates = [];
+
+    request.body.attendingDates.forEach(attendingDate => {
+
+        let data = attendingDate.split('-');
+
+        console.log(parseInt(data[0]));
+
+        request.body.conferenceDates[parseInt(data[0])];
+
+        //console.log(tempArray);
+
+        //request.body.conferenceDates[parseInt(data[0])][tempArray.length] = data[1];
+
+    });
+    console.log(request.body);
+    /*
     request.session.registration = await controllers.membership.registerMember(JSON.stringify(request.body));
     response.redirect('/register/confirm');
+    */
 });
 /**
  * Renders the page for listing all of the members for renewal.

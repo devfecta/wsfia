@@ -498,6 +498,25 @@ const validateMembershipForm = (form) => {
 
 }
 /**
+ * 
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} attendingDate 
+ */
+ const setAttendingDate = (sessionId, emailAddress, attendingDate, checked) => {
+
+    console.log(sessionId, emailAddress, attendingDate, checked);
+    
+    fetch('/setAttendingDate', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "attendingDate": attendingDate, "attendingChecked": checked}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+
+}
+/**
  * Removes a member from the conference attendee registration form.
  * @param {*} id 
  * @param {*} emailAddress 
