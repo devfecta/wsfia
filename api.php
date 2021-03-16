@@ -121,6 +121,9 @@ switch ($requestMethod) {
                         case "addConferenceCurrentMembers":
                             echo $RegisterConferenceMember->addConferenceCurrentMembers($_POST);
                             break;
+                        case "setAttendingDate":
+                            echo $RegisterConferenceMember->setAttendingDate($_POST);
+                            break;
                         default:
                             echo json_encode(array("error" => 'METHOD ERROR: The '.$_POST['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);
                             break;

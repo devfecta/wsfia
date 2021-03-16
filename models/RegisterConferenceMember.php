@@ -129,6 +129,70 @@ class RegisterConferenceMember extends Membership implements iRegistration {
 
     }
 
+    public function setAttendingDate($attendingData) {
+
+        
+
+        $data = json_decode(json_encode($attendingData), FALSE);
+
+        
+
+        try {
+
+            $connection = Configuration::openConnection();
+
+            $statement = $connection->prepare("SELECT * FROM userSessions WHERE sessionId=:id");
+            $statement->bindParam(":id", $data->sessionId);
+            $statement->execute();
+
+            $registrants = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($registrants as $registrantData) {
+
+                $registrant = json_decode($registrantData['registration'], false);
+
+                if($registrant->emailAddress == $data->emailAddress) {
+
+                    switch ($data->attendingDate) {
+                        case 'Monday':
+                            $registrant->attending->Monday = $data->attendingChecked;
+                            break;
+                        case 'Tuesday':
+                            $registrant->attending->Tuesday = $data->attendingChecked;
+                            break;
+                        case 'Wednesday':
+                            $registrant->attending->Wednesday = $data->attendingChecked;
+                            break;
+                        case 'Thursday':
+                            $registrant->attending->Thursday = $data->attendingChecked;
+                            break;
+                        case 'Friday':
+                            $registrant->attending->Friday = $data->attendingChecked;
+                            break;
+                        default:
+                            break;
+                    }                    
+
+                    $statement = $connection->prepare("UPDATE `userSessions` SET `registration`=:registration WHERE `id`=:id AND `sessionId`=:sessionId");
+                    $statement->bindParam(":id", $registrantData['id']);
+                    $statement->bindParam(":sessionId", $data->sessionId);
+                    $statement->bindParam(":registration", json_encode($registrant));
+
+                    return json_encode($statement->execute(), JSON_PRETTY_PRINT);
+                }
+                
+            }
+
+        }
+        catch (Exception $e) {
+            $result = json_encode($e, JSON_PRETTY_PRINT); 
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+
+    }
+
 }
 
 ?>
