@@ -138,7 +138,7 @@ const getMembers = async (businessId, conference) => {
         await fetch('/getMembers?' + parameters, {method: 'GET'})
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+            //console.log(data);
             // Clears the search textbox
             const searchTextBox = document.querySelector('#searchTextBoxId');
             searchTextBox.value = '';
@@ -147,9 +147,9 @@ const getMembers = async (businessId, conference) => {
 
             if (conference) {
                 currentForm.innerHTML = `<p class="text-danger">If you are already a member you will see your account and others 
-                associated with the department/business information listed below. Simply leave the checkboxes checked for those 
-                members you wisth to register for the conference. If you don't see a member listed, and need to register them as 
-                a new member you will be able to do that later in the registration process. Click "Add Registrant" to continue.</p>`;
+                associated with the department/business information listed below. Simply click on the "Conference Registration" button 
+                to continue with the conference registration process. If you don't see a member listed, and need to register them as 
+                a new member click "Add Registrant" to continue.</p>`;
             }
             else {
                 currentForm.innerHTML = `<p class="text-danger">If you are already a member you will see your account information listed below. 
@@ -169,6 +169,34 @@ const getMembers = async (businessId, conference) => {
                 resultButtonColumn.className = 'col-md-4 text-center';
 
                 let resultButton = null;
+
+                // Non-Conference Buttons
+                resultButton = document.createElement("a");
+                resultButton.className = 'btn btn-success';
+                //resultButton.style = 'cursor: pointer;';
+                let currentDate = new Date();
+                var expirationDate = new Date(member.expirationDate);
+
+                if(currentDate > expirationDate) {
+                    resultButton.href = '/renewal/member?businessId=' + member.departments.id;
+                    resultButton.innerHTML = 'Renew Membership';
+                }
+                else {
+
+                    resultButton.href = '/login';
+                    resultButton.innerHTML = 'Login';
+
+                    if (conference) {
+                        // Conference Buttons
+                        conferenceButton = document.createElement("a");
+                        conferenceButton.className = 'btn btn-secondary m-2';
+
+                        conferenceButton.href = '/conference/currentMembers?businessId=' + member.departments.id;
+                        conferenceButton.innerHTML = 'Conference Registration';
+                        resultButtonColumn.appendChild(conferenceButton);
+                    }
+                }
+                /*
                 if (conference) {
                     // Conference Checkboxes
                     resultButton = document.createElement("input");
@@ -182,32 +210,9 @@ const getMembers = async (businessId, conference) => {
                     resultButton.checked = true;
                 }
                 else {
-                    // Non-Conference Buttons
-                    resultButton = document.createElement("a");
-                    resultButton.className = 'btn btn-success';
-                    //resultButton.style = 'cursor: pointer;';
-                    let currentDate = new Date();
-                    var expirationDate = new Date(member.expirationDate);
-
-                    if(currentDate > expirationDate) {
-                        resultButton.href = '/renewal/member?businessId=' + member.departments.id;
-                        resultButton.innerHTML = 'Renew Membership';
-                    }
-                    else {
-
-                        resultButton.href = '/login';
-                        resultButton.innerHTML = 'Login';
-
-
-                        conferenceButton = document.createElement("a");
-                        conferenceButton.className = 'btn btn-secondary m-2';
-
-                        conferenceButton.href = '/conference/currentMembers?businessId=' + member.departments.id;
-                        conferenceButton.innerHTML = 'Conference Registration';
-                        resultButtonColumn.appendChild(conferenceButton);
-                    }
+                    
                 }
-
+                */
                 resultButtonColumn.appendChild(resultButton);
                 
 
@@ -236,6 +241,12 @@ const getMembers = async (businessId, conference) => {
             registerButtonColumn.className = 'col-md-12 text-center';
 
             let registerButton = null;
+
+            registerButton = document.createElement("a");
+            registerButton.className = 'btn btn-primary';
+            registerButton.href = '/register/member';
+            registerButton.innerHTML = 'Create New Account';
+            /*
             if (conference) {
                 registerButton = document.createElement("button");
                 registerButton.className = 'btn btn-success';
@@ -244,12 +255,9 @@ const getMembers = async (businessId, conference) => {
                 registerButton.innerHTML = 'Add Registrants';
             }
             else {
-                registerButton = document.createElement("a");
-                registerButton.className = 'btn btn-primary';
-                registerButton.href = '/register/member';
-                registerButton.innerHTML = 'Create New Account';
+                
             }
-
+            */
             registerButtonColumn.appendChild(registerButton);
             registerRow.appendChild(registerButtonColumn);
 

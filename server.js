@@ -36,6 +36,11 @@ const Controllers = require('./controllers');
 const { pathToFileURL } = require("url");
 const controllers = new Controllers();
 /**
+ * Sets start and end dates for conference registration.
+ */
+ const startDateConference = Date.parse('2021-03-10');
+ const endDateConference = Date.parse('2021-03-16');
+/**
  * EJS templating library.
  */
 app.set('view-engine', 'ejs');
@@ -53,8 +58,9 @@ app.get('/', (request, response) => {
 /**
  * Utilities START
  */
-
 app.get('/businessSearch', async (request, response) => {
+
+    request.session.conference = (Date.now() >= startDateConference && Date.now() <= endDateConference) ? true : false;
     //console.log(request._parsedOriginalUrl.query);
     let results = await controllers.utilities.businessSearch(request._parsedOriginalUrl.query);
     response.json(results);
@@ -102,7 +108,6 @@ app.get('/removeRegistrant', async (request, response) => {
  * Renders the first registration page.
  */
 app.get('/register', (request, response) => {
-    request.session.conference = false;
     response.render('./registration/businessSearch.ejs', { session: request.session });
 });
 /**
@@ -127,6 +132,7 @@ app.post('/addBusiness', async (request, response) => {
  * Renders the page for adding a registrant.
  */
 app.get('/register/member', (request, response) => {
+
     if(request.session.sessionId === undefined){
         request.session.sessionId = uuidv4();
     }
@@ -410,7 +416,6 @@ app.get('/conference', (request, response) => {
     }
     // Reusing the getRenewals method just to get current members.
     request.session.members = await controllers.membership.getRenewals(JSON.stringify(request.query));
-    request.session.conference = true;
     response.render('./registration/attendeeCurrentMembers.ejs', { session: request.session, message: '' });
 });
 /**
@@ -421,10 +426,15 @@ app.get('/conference', (request, response) => {
     //console.log(JSON.stringify(request.body));
     
     let confirm = await controllers.conference.addConferenceCurrentMembers(JSON.stringify(request.body));
+
+    let registrationMessage = '';
+    if (request.session.conference) {
+        registrationMessage = '<div class="alert alert-danger m-1" role="alert">If you have any new member(s), you can register them now. Otherwise, click "Next".</div>';
+    }
     
     if (confirm) {
         request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
-        response.render('./registration/memberInfo.ejs', { session: request.session, message: '<div class="alert alert-danger m-1" role="alert">If you have any new member(s), you can register them now. Otherwise, click "Next"</div>' });
+        response.render('./registration/memberInfo.ejs', { session: request.session, message: registrationMessage });
         //console.log(request.session.registrants);
         //response.redirect('/register/member');
     }
@@ -439,7 +449,6 @@ app.get('/conference', (request, response) => {
  * Renders the conference register current members page.
  */
 app.get('/conference/register', (request, response) => {
-    request.session.conference = true;
     response.render('./registration/businessSearch.ejs', { session: request.session });
 });
 
