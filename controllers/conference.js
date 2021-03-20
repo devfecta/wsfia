@@ -32,11 +32,11 @@ class Conference {
         }
     }
 
-    setAttendingDate = async (data) => {
+    setAttendingDate = (data) => {
+
+        console.log('setAttendingDate');
 
         let memberData = JSON.parse(data);
-
-        //console.log(memberData.sessionId);
 
         try {
             
@@ -49,7 +49,94 @@ class Conference {
             params.append('class', 'RegisterConferenceMember');
             params.append('method', 'setAttendingDate');
             
-            await axios.post(process.env.API + '/api.php'
+            axios.post(process.env.API + '/api.php'
+                , params
+            )
+            .then(response => console.log(response.data))
+            .catch(error => console.log(error));
+            
+        }
+        catch (e) {
+            console.error(e);
+        }
+
+    }
+
+    setCEU = (data) => {
+
+        let memberData = JSON.parse(data);
+
+        console.log(memberData);
+
+        try {
+            
+            let params = new URLSearchParams();
+
+            params.append('sessionId', memberData.sessionId);
+            params.append('emailAddress', memberData.emailAddress);
+            params.append('ceu', memberData.ceu);
+            params.append('class', 'RegisterConferenceMember');
+            params.append('method', 'setCEU');
+            
+            axios.post(process.env.API + '/api.php'
+                , params
+            )
+            .then(response => console.log(response.data))
+            .catch(error => console.log(error));
+            
+        }
+        catch (e) {
+            console.error(e);
+        }
+
+    }
+
+    setLicenseType = (data) => {
+
+        let memberData = JSON.parse(data);
+
+        console.log(memberData);
+
+        try {
+            
+            let params = new URLSearchParams();
+
+            params.append('sessionId', memberData.sessionId);
+            params.append('emailAddress', memberData.emailAddress);
+            params.append('licenseType', memberData.licenseType);
+            params.append('class', 'RegisterConferenceMember');
+            params.append('method', 'setLicenseType');
+            
+            axios.post(process.env.API + '/api.php'
+                , params
+            )
+            .then(response => console.log(response.data))
+            .catch(error => console.log(error));
+            
+        }
+        catch (e) {
+            console.error(e);
+        }
+
+    }
+
+    setLicenseNumber = (data) => {
+
+        let memberData = JSON.parse(data);
+
+        console.log(memberData);
+
+        try {
+            
+            let params = new URLSearchParams();
+
+            params.append('sessionId', memberData.sessionId);
+            params.append('emailAddress', memberData.emailAddress);
+            params.append('licenseNumber', memberData.licenseNumber);
+            params.append('class', 'RegisterConferenceMember');
+            params.append('method', 'setLicenseNumber');
+            
+            axios.post(process.env.API + '/api.php'
                 , params
             )
             .then(response => console.log(response.data))

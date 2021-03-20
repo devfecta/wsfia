@@ -39,7 +39,7 @@ const controllers = new Controllers();
  * Sets start and end dates for conference registration.
  */
  const startDateConference = Date.parse('2021-03-10');
- const endDateConference = Date.parse('2021-03-16');
+ const endDateConference = Date.parse('2021-03-23');
 /**
  * EJS templating library.
  */
@@ -59,8 +59,6 @@ app.get('/', (request, response) => {
  * Utilities START
  */
 app.get('/businessSearch', async (request, response) => {
-
-    request.session.conference = (Date.now() >= startDateConference && Date.now() <= endDateConference) ? true : false;
     //console.log(request._parsedOriginalUrl.query);
     let results = await controllers.utilities.businessSearch(request._parsedOriginalUrl.query);
     response.json(results);
@@ -92,7 +90,7 @@ app.get('/addMemberBusiness', async (request, response) => {
 });
 
 app.get('/removeRegistrant', async (request, response) => {
-    console.log("Session: " +  request.session.sessionId);
+    //console.log("Session: " +  request.session.sessionId);
     let results = await controllers.utilities.removeRegistrant(request._parsedOriginalUrl.query);
     request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
     
@@ -108,6 +106,7 @@ app.get('/removeRegistrant', async (request, response) => {
  * Renders the first registration page.
  */
 app.get('/register', (request, response) => {
+    request.session.conference = (Date.now() >= startDateConference && Date.now() <= endDateConference) ? true : false;
     response.render('./registration/businessSearch.ejs', { session: request.session });
 });
 /**
@@ -157,7 +156,7 @@ app.post('/register/addMember', async (request, response) => {
  * Renders the page for listing all of the current registrants.
  */
 app.get('/register/member/registrants', (request, response) => {
-    //console.log("Registrants");
+    console.log("Registrants");
     //console.log(request.session.registrants);
     response.render('./registration/registrantsInfo.ejs', { session: request.session, message: '' });
 });
@@ -167,7 +166,34 @@ app.get('/register/member/registrants', (request, response) => {
 app.post('/setAttendingDate', async (request, response) => {
     //console.log(request.body);
     let confirm = await controllers.conference.setAttendingDate(JSON.stringify(request.body));
+    response.end();
 });
+/**
+ * 
+ */
+ app.post('/setCEU', async (request, response) => {
+    //console.log(request.body);
+    let confirm = await controllers.conference.setCEU(JSON.stringify(request.body));
+    response.end();
+});
+/**
+ * 
+ */
+ app.post('/setLicenseType', async (request, response) => {
+    //console.log(request.body);
+    let confirm = await controllers.conference.setLicenseType(JSON.stringify(request.body));
+    response.end();
+});
+/**
+ * 
+ */
+ app.post('/setLicenseNumber', async (request, response) => {
+    //console.log(request.body);
+    let confirm = await controllers.conference.setLicenseNumber(JSON.stringify(request.body));
+    response.end();
+});
+
+
 /**
  * Calls the registerMember method to add registrants to the database, calls to the PayPal API to create and send an invoice, then redirect to the confirmation page.
  */

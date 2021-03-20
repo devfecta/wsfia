@@ -196,25 +196,8 @@ const getMembers = async (businessId, conference) => {
                         resultButtonColumn.appendChild(conferenceButton);
                     }
                 }
-                /*
-                if (conference) {
-                    // Conference Checkboxes
-                    resultButton = document.createElement("input");
-                    resultButton.setAttribute("class", "form-control w-50");
-                    resultButton.setAttribute("type", "checkbox");
-                    resultButton.setAttribute("value", "checkbox");
-                    resultButton.setAttribute("name", "members[]");
-                    resultButton.setAttribute("id", member.user.userId);
-                    resultButton.setAttribute("data-value", member.user.userId);
-                    resultButton.setAttribute("value", member.user.userId);
-                    resultButton.checked = true;
-                }
-                else {
-                    
-                }
-                */
+
                 resultButtonColumn.appendChild(resultButton);
-                
 
                 if(member.studentId === null) {
                     member.studentId = 'N/A';
@@ -246,18 +229,7 @@ const getMembers = async (businessId, conference) => {
             registerButton.className = 'btn btn-primary';
             registerButton.href = '/register/member';
             registerButton.innerHTML = 'Create New Account';
-            /*
-            if (conference) {
-                registerButton = document.createElement("button");
-                registerButton.className = 'btn btn-success';
-                registerButton.style = 'cursor: pointer;';
-                registerButton.addEventListener('click', function(){ addConferenceRegistrants(document.getElementsByName("members[]")); });
-                registerButton.innerHTML = 'Add Registrants';
-            }
-            else {
-                
-            }
-            */
+
             registerButtonColumn.appendChild(registerButton);
             registerRow.appendChild(registerButtonColumn);
 
@@ -506,10 +478,11 @@ const validateMembershipForm = (form) => {
 
 }
 /**
- * 
+ * Sets the dates an attendee will be attending at the conference.
  * @param {*} sessionId 
  * @param {*} emailAddress
  * @param {*} attendingDate 
+ * @param {*} checked 
  */
  const setAttendingDate = (sessionId, emailAddress, attendingDate, checked) => {
 
@@ -524,6 +497,64 @@ const validateMembershipForm = (form) => {
     .catch(error => displayError(error));
 
 }
+/**
+ * Sets the CEU field if the attendee requires it.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} checked 
+ */
+ const setCEU = (sessionId, emailAddress, checked) => {
+
+    console.log(sessionId, emailAddress, checked);
+    
+    fetch('/setCEU', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "ceu": checked}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+    
+}
+/**
+ * Sets the license type field for the attendee.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} licenseType 
+ */
+ const setLicenseType = (sessionId, emailAddress, licenseType) => {
+
+    console.log(sessionId, emailAddress, licenseType);
+    
+    fetch('/setLicenseType', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "licenseType": licenseType}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+    
+}
+/**
+ * Sets the license type field for the attendee.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} licenseNumber 
+ */
+ const setLicenseNumber = (sessionId, emailAddress, licenseNumber) => {
+
+    console.log(sessionId, emailAddress, licenseNumber);
+    
+    fetch('/setLicenseNumber', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "licenseNumber": licenseNumber}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+    
+}
+
 /**
  * Removes a member from the conference attendee registration form.
  * @param {*} id 
