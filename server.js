@@ -39,7 +39,7 @@ const controllers = new Controllers();
  * Sets start and end dates for conference registration.
  */
  const startDateConference = Date.parse('2021-03-10');
- const endDateConference = Date.parse('2021-03-23');
+ const endDateConference = Date.parse('2021-03-30');
 /**
  * EJS templating library.
  */
@@ -144,7 +144,6 @@ app.post('/register/addMember', async (request, response) => {
     request.body.sessionId = request.session.sessionId;
     let confirm = await controllers.membership.addMember(JSON.stringify(request.body));
     if (confirm) {
-        request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
         //console.log(request.session.registrants);
         response.redirect('/register/member/registrants');
     }
@@ -155,8 +154,9 @@ app.post('/register/addMember', async (request, response) => {
 /**
  * Renders the page for listing all of the current registrants.
  */
-app.get('/register/member/registrants', (request, response) => {
+app.get('/register/member/registrants', async (request, response) => {
     console.log("Registrants");
+    request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
     //console.log(request.session.registrants);
     response.render('./registration/registrantsInfo.ejs', { session: request.session, message: '' });
 });
@@ -200,27 +200,21 @@ app.post('/setAttendingDate', async (request, response) => {
 app.post('/register/process', async (request, response) => {
 
     request.body.sessionId = request.session.sessionId;
-    console.log(request.body);
-    request.body.conferenceDates = [];
+    //console.log(request.body);
+    // Remove unnessecary properties because they're in the database.
+    delete request.body.attendingDates;
+    delete request.body.ceu;
+    delete request.body.licenseType;
+    delete request.body.licenseNumber;
 
-    request.body.attendingDates.forEach(attendingDate => {
+    //console.log(request.body);
 
-        let data = attendingDate.split('-');
-
-        console.log(parseInt(data[0]));
-
-        request.body.conferenceDates[parseInt(data[0])];
-
-        //console.log(tempArray);
-
-        //request.body.conferenceDates[parseInt(data[0])][tempArray.length] = data[1];
-
-    });
-    console.log(request.body);
-    /*
+    
     request.session.registration = await controllers.membership.registerMember(JSON.stringify(request.body));
+    /*
     response.redirect('/register/confirm');
     */
+    response.end();
 });
 /**
  * Renders the page for listing all of the members for renewal.

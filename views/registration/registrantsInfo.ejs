@@ -30,6 +30,7 @@
         <tbody>
             <% session.registrants.forEach(function(registrant, index) { 
 
+
                 emailAddresses = [...emailAddresses, registrant.emailAddress];
                 
             %>
@@ -69,26 +70,29 @@
                                 <tr class="bg-transparent">
                                     <td>
                                         <p class="m-0">Select the day(s) <%= registrant.firstName + ' ' + registrant.lastName %> will be attending the conference:</p>
+
+                                        
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Monday', this.checked)" name="attendingDates" id="attendingMonday<%= index %>" value="<%= index %>-Monday">
+                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Monday', this.checked)" checked=<%= attendingMonday %> name="attendingDates" id="attendingMonday<%= index %>" value="<%= index %>-Monday">
                                             <label class="form-check-label" for="attendingMonday<%= index %>">Monday</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Tuesday', this.checked)" name="attendingDates" id="attendingTuesday<%= index %>" value="<%= index %>-Tuesday">
+                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Tuesday', this.checked)" checked=<%= attendingMonday %> name="attendingDates" id="attendingTuesday<%= index %>" value="<%= index %>-Tuesday">
                                             <label class="form-check-label" for="attendingTuesday<%= index %>">Tuesday</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Wednesday', this.checked)" name="attendingDates" id="attendingWednesday<%= index %>" value="<%= index %>-Wednesday">
+                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Wednesday', this.checked)" checked=<%= attendingMonday %> name="attendingDates" id="attendingWednesday<%= index %>" value="<%= index %>-Wednesday">
                                             <label class="form-check-label" for="attendingWednesday<%= index %>">Wednesday</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Thursday', this.checked)" name="attendingDates" id="attendingThursday<%= index %>" value="<%= index %>-Thursday">
+                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Thursday', this.checked)" checked=<%= attendingMonday %> name="attendingDates" id="attendingThursday<%= index %>" value="<%= index %>-Thursday">
                                             <label class="form-check-label" for="attendingThursday<%= index %>">Thursday</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Friday', this.checked)" name="attendingDates" id="attendingFriday<%= index %>" value="<%= index %>-Friday">
+                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Friday', this.checked)" checked=<%= attendingMonday %> name="attendingDates" id="attendingFriday<%= index %>" value="<%= index %>-Friday">
                                             <label class="form-check-label" for="attendingFriday<%= index %>">Friday</label>
                                         </div>
+                                        
                                     </td>
                                 </tr>
                                 <tr>
@@ -116,7 +120,37 @@
                         </div>
                     </td>
                 </tr>
+                
+
+                <%
+                    attendingMonday = false;
+                    attendingTuesday = false;
+                    attendingWednesday = false;
+                    attendingThursday = false;
+                    attendingFriday = false;
+
+                    if (typeof registrant.conference !== 'undefined') {
+                        if (typeof registrant.conference.attending !== 'undefined') {
+                            attendingMonday = (typeof registrant.conference.attending.Monday !== 'undefined') ? registrant.conference.attending.Monday : false;
+                            attendingTuesday = (typeof registrant.conference.attending.Tuesday !== 'undefined') ? registrant.conference.attending.Tuesday : false;
+                            attendingWednesday = (typeof registrant.conference.attending.Wednesday !== 'undefined') ? registrant.conference.attending.Wednesday : false;
+                            attendingThursday = (typeof registrant.conference.attending.Thursday !== 'undefined') ? registrant.conference.attending.Thursday : false;
+                            attendingFriday = (typeof registrant.conference.attending.Friday !== 'undefined') ? registrant.conference.attending.Friday : false;                            
+                        }
+                    }
+                %>
+
+                <script>
+                    document.getElementById('attendingMonday<%= index %>').checked = <%= attendingMonday %>;
+                    document.getElementById('attendingTuesday<%= index %>').checked = <%= attendingTuesday %>;
+                    document.getElementById('attendingWednesday<%= index %>').checked = <%= attendingWednesday %>;
+                    document.getElementById('attendingThursday<%= index %>').checked = <%= attendingThursday %>;
+                    document.getElementById('attendingFriday<%= index %>').checked = <%= attendingFriday %>;
+                </script>
+                
+
                 <% } %>
+
             <% });
 
             
@@ -200,5 +234,7 @@
 <% } %>
 
 </section>
+
+
 
 <%- include ('../template/footer') -%>
