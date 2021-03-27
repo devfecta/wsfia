@@ -1,0 +1,1 @@
+C:37:"PHPUnit\Runner\DefaultTestResultCache":172:{a:2:{s:7:"defects";a:1:{s:50:"RegisterConferenceMemberTest::testSetLicenseNumber";i:3;}s:5:"times";a:1:{s:50:"RegisterConferenceMemberTest::testSetLicenseNumber";d:0.003;}}}

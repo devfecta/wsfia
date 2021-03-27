@@ -114,8 +114,11 @@ class RegisterConferenceMember extends Membership implements iRegistration {
                 }
 
             }
+            catch (PDOException $e) { 
+                error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+            }
             catch (Exception $e) {
-                $result = json_encode($e, JSON_PRETTY_PRINT); 
+                error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
             }
             finally {
                 Configuration::closeConnection();
@@ -169,10 +172,6 @@ class RegisterConferenceMember extends Membership implements iRegistration {
                             break;
                     }
 
-                    //$registrant->conference->ceu = isset($data->ceu) ? $data->ceu : false;
-                    //$registrant->conference->licenseType = isset($data->licenseType) ? $data->licenseType : '';
-                    //$registrant->conference->licenseNumber = isset($data->licenseNumber) ? $data->licenseNumber : '';
-
                     $statement = $connection->prepare("UPDATE `userSessions` SET `registration`=:registration WHERE `id`=:id AND `sessionId`=:sessionId");
                     $statement->bindParam(":id", $registrantData['id']);
                     $statement->bindParam(":sessionId", $data->sessionId);
@@ -184,8 +183,11 @@ class RegisterConferenceMember extends Membership implements iRegistration {
             }
 
         }
+        catch (PDOException $e) { 
+            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
         catch (Exception $e) {
-            $result = json_encode($e, JSON_PRETTY_PRINT); 
+            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         finally {
             $connection = Configuration::closeConnection();
@@ -226,8 +228,11 @@ class RegisterConferenceMember extends Membership implements iRegistration {
             }
 
         }
+        catch (PDOException $e) { 
+            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
         catch (Exception $e) {
-            $result = json_encode($e, JSON_PRETTY_PRINT); 
+            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         finally {
             $connection = Configuration::closeConnection();
@@ -268,8 +273,11 @@ class RegisterConferenceMember extends Membership implements iRegistration {
             }
 
         }
+        catch (PDOException $e) { 
+            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
         catch (Exception $e) {
-            $result = json_encode($e, JSON_PRETTY_PRINT); 
+            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         finally {
             $connection = Configuration::closeConnection();
@@ -278,6 +286,8 @@ class RegisterConferenceMember extends Membership implements iRegistration {
     }
 
     public function setLicenseNumber($attendingData) {
+
+        error_log(date('Y-m-d H:i:s') . "\n", 3, "/var/www/html/php-errors.log");
 
         $data = json_decode(json_encode($attendingData), FALSE);
 
@@ -310,8 +320,11 @@ class RegisterConferenceMember extends Membership implements iRegistration {
             }
 
         }
+        catch (PDOException $e) { 
+            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
         catch (Exception $e) {
-            $result = json_encode($e, JSON_PRETTY_PRINT); 
+            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         finally {
             $connection = Configuration::closeConnection();

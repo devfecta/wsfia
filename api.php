@@ -192,7 +192,6 @@ switch ($requestMethod) {
                                     header('Location: https://wsfia.org/member-area');
 
                                     //echo $mime_type."<br/>";
-
                                     //echo $Membership->exportMembersInfo($_GET['code']);
                                 }
                                 else {
