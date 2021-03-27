@@ -1,9 +1,166 @@
 <%- include ('template/header') -%>
 
-<div class="row justify-content-center align-self-center">
-    
-    <h1>Under Construction</h1>
+<section id="membershipInfo">
+    <h1>Account Information</h1>
 
-</div>
+    <% if (session.message != null) {  %>
+        <% if (session.message) {  %>
+            <div class="alert alert-success" role="alert">Account Updated</div>
+        <% } else { %>
+            <div class="alert alert-danger" role="alert">Account NOT Updated</div>
+        <% } session.message = null; %>
+    <% } %>
+
+    <p class="text-danger">Memberships run January 1 - December 31 of the current year.</p>
+
+    <div class="text-light col-lg-5 p-4" style="border-radius: 1em; background-color: rgba(206,32,41, 0.8);">
+        Hello, <%= session.userInfo.firstName %><br />
+        <b>WSFIA Member ID</b>: <%= session.userInfo.wsfiaId %><br />
+        <b>Expiration Date</b>: <%= session.userInfo.expirationDate %> &nbsp; 
+        <b>Status</b>: <%= session.userInfo.status %><br />
+        <b>Student ID</b>: <%= session.userInfo.studentId %>
+    </div>
+
+    <form name="membershipForm" id="membershipForm" action="/account" method="POST" class="needs-validation" novalidate>
+        <fieldset>
+            <legend>Member Information</legend>
+
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label" for="firstName">First Name</label>
+                <input type="text" class="col-md-10 form-control" name="firstName" id="firstName" size="20" maxlength="24" value="<%= session.accountInfo.firstName %>" required />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label" for="lastName">Last Name</label>
+                <input type="text" class="col-md-10 form-control" name="lastName" id="lastName" size="20" maxlength="24" value="<%= session.accountInfo.lastName %>" required />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label" for="jobTitle">Job Title</label>
+                <input type="text" class="col-sm-10 form-control" name="jobTitle" id="jobTitle" size="36" maxlength="48" value="<%= session.accountInfo.jobTitle %>" />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label" for="studentId">Student ID</label>
+                <input type="text" class="col-md-10 form-control" name="studentId" id="studentId" size="12" maxlength="16" value="<%= session.accountInfo.studentId %>" />
+            </div>
+        
+        </fieldset>
+
+        <fieldset>
+            <legend>Member Area(s)</legend>
+
+            <img src="../../images/area-map.gif" class="float-right figure-img img-fluid rounded" style="width: 30%;" alt="WSFIA Area Map">
+
+            <p>Look for the county your department/organization is in and the corresponding area number to the left of the line; 
+                this will be the area number you will use when filling in your membership application.<br />
+                <em>Example: Your department is in Brown County, so your area number would be 7.</em></p>
+
+            <%
+                let areas = JSON.parse(session.accountInfo.areas);
+                let mapAreas = areas.map(area => ({"area" : area, checked : "true"}));
+            %>
+            
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[1]" value="1" data-value="Area 1" <%= mapAreas.find(({area}) => area == 'Area 1') !== undefined ? "checked" : ""; %> />
+                <label class="form-check-label ml-1 mr-3" for="area[1]">(Area 1) Kenosha, Walworth, Racine, Jefferson, Milwaukee, Waukesha</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[2]" value="2" data-value="Area 2" <%= mapAreas.find(({area}) => area == 'Area 2') !== undefined ? "checked" : ""; %> />
+                <label class="form-check-label ml-1 mr-3" for="area[2]">(Area 2) Dane, Green, Rock, Sauk, Columbia</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[3]" value="3" data-value="Area 3" <%= mapAreas.find(({area}) => area == 'Area 3') !== undefined ? "checked" : ""; %> />
+                <label class="form-check-label ml-1 mr-3" for="area[3]">(Area 3) LaCrosse, Vernon, Richland, Crawford, Iowa, Grant, Lafayette</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[4]" value="4" data-value="Area 4" <%= mapAreas.find(({area}) => area == 'Area 4') !== undefined ? "checked" : ""; %> />
+                <label class="form-check-label ml-1 mr-3" for="area[4]">(Area 4) Rusk, Taylor, Chippewa, Clark, Eau Claire, Jackson, Trempealeau</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[5]" value="5" data-value="Area 5" <%= mapAreas.find(({area}) => area == 'Area 5') !== undefined ? "checked" : ""; %> />
+                <label class="form-check-label ml-1 mr-3" for="area[5]">(Area 5) Barron, Polk, St Croix, Dunn, Pierce, Pepin, Buffalo</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[6]" value="6" data-value="Area 6" <%= mapAreas.find(({area}) => area == 'Area 6') !== undefined ? "checked" : ""; %> />
+                <label class="form-check-label ml-1 mr-3" for="area[6]">(Area 6) Green Lake, Washington, Ozaukee, Sheboygan, Fond Du Lac, Dodge, Marquette</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[7]" value="7" data-value="Area 7" <%= mapAreas.find(({area}) => area == 'Area 7') !== undefined ? "checked" : ""; %> />
+                <label class="form-check-label ml-1 mr-3" for="area[7]">(Area 7) Brown, Calumet, Door, Kewaunee, Manitowoc, Outagamie, Waushara, Winnebago</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[8]" value="8" data-value="Area 8" <%= mapAreas.find(({area}) => area == 'Area 8') !== undefined ? "checked" : ""; %> />
+                <label class="form-check-label ml-1 mr-3" for="area[8]">(Area 8) Florence, Marinette, Oconto, Menomonee</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[9]" value="9" data-value="Area 9" <%= mapAreas.find(({area}) => area == 'Area 9') !== undefined ? "checked" : ""; %> />
+                <label class="form-check-label ml-1 mr-3" for="area[9]">(Area 9) Adams, Wood, Portage, Waupaca, Marathon, Shawano, Juneau, Monroe</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[10]" value="10" data-value="Area 10" <%= mapAreas.find(({area}) => area == 'Area 10') !== undefined ? "checked" : ""; %> />
+                <label class="form-check-label ml-1 mr-3" for="area[10]">(Area 10) Vilas, Oneida, Lincoln, Langlade, Price, Forrest</label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="areas" id="area[11]" value="11" data-value="Area 11" <%= mapAreas.find(({area}) => area == 'Area 11') !== undefined ? "checked" : ""; %> />
+                <label class="form-check-label ml-1 mr-3" for="area[11]">(Area 11) Douglas, Bayfield, Iron, Ashland, Sawyer, Burnett, Washburn</label>
+            </div>
+
+        </fieldset>
+
+        <fieldset>
+            <legend>Member Department/Business(s)</legend>
+            <p>If a Department/Business is found, click on the <strong>"Add Department/Business"</strong> button to add it to your membership. 
+            If a Department/Business is NOT found, go to the <a href="/register/business"><strong>"Add a Department/Business"</strong></a> page to add a Department/Business to our system.</p>
+            <div class="form-group">
+                <label for="searchTextBoxId">Department/Business:</label>
+                <input type="text" class="form-control mb-3" name="searchTextBox" id="searchTextBoxId" 
+                    onkeyup="memberBusinessSearch(this.value);" placeholder="Search for your Department/Business by Name">
+            </div>
+            <div id="searchResults"></div>
+            <div id="businessList">
+
+                <% JSON.parse(session.accountInfo.departments).forEach( department => { %>
+
+                <div class="form-check">
+                    <input type="checkbox" id="business[<%= department.id %>]" onclick="validateMembershipForm(this.form)" data-value="<%= department.name %> (Station <%= department.station %>)" name="businesses" class="form-check-input" value="<%= department.id %>" checked />
+                    <label for="business[<%= department.id %>]" class="form-check-label ml-1 mr-3"><%= department.name %> (Station <%= department.station %>)</label>
+                </div>
+
+                <% }); %>
+
+            </div>
+        </fieldset>
+            
+        <div class="form-group row">
+            <div class="col-md-12 p-5 text-right">
+                <button type="submit" id="updateButton" style="min-width: 150px; width:25%" class="btn btn-primary">Update</button>
+                <a href="/member-area" id="cancelButton" style="min-width: 150px; width:25%" class="btn btn-secondary">Cancel</a>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+                }, false);
+            });
+            }, false);
+        })();
+    </script>
+    
+</section>
 
 <%- include ('template/footer') -%>

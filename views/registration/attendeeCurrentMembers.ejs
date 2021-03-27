@@ -1,0 +1,82 @@
+<%- include ('../template/header') -%>
+
+<% 
+    let businesses = []; 
+    let businessIds = [];
+    let emailAddresses = [];
+%>
+
+<section id="membershipInfo">
+    <h1>Conference Registration</h1>
+    <h2>Current Members</h2>
+
+    <%- message %>
+    
+<% if ((session.members) && session.members.length > 0) {  %>
+
+    <p class="text-danger">Click on the <strong>Remove</strong> button to remove the person from this registration process.</p>
+    <p>You will be able to assign specific attendance date(s) later in the registration process.</p>
+
+<form name="membershipForm" id="membershipForm" action="/conference/currentMembers/process" method="POST">
+    <div class="table-responsive-lg">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Registrant</th>
+                <th scope="col">Department/Business</th>
+                <th scope="col">Areas</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <% session.members.forEach(function(member, index) { %>
+                <tr class="text-nowrap" id="userRow<%= index %>">
+                    
+                    <td>
+                        <strong>Name:</strong> <%= member.user.firstName + ' ' + member.user.lastName %><br />
+                        <strong>Job Title:</strong> <%= member.jobTitle %><br />
+                        <strong>e-Mail Address:</strong> <%= member.user.emailAddress %><br />
+                        <strong>Student ID:</strong> <%= (member.studentId) ? member.studentId : 'NA' %>
+                    </td>
+                    <td>
+                        <%  
+                            businessIds = [...businessIds, member.departments.id];
+                            businesses = [...businesses, member.departments];
+                        %>
+                        <%= member.departments.name %> <%= (member.departments.station) ? '(Station '+ member.departments.station +')' : '' %><br/>          
+                    </td>
+                    <td>
+                        <% member.areas.forEach(function(area) { %>
+                            <%= area %><br/>
+                        <% }) %>
+                    </td>
+                    <td>
+                        <button type="button" onclick="removeAttendee(<%= index %>)" id="removeButton" class="btn btn-danger">Remove</button>
+                        <input type="hidden" id="members[]" name="members" value="<%= member.id %>" />
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+    </div>
+<% } else { %>
+    <p class="text-danger">There are no current members.</p>
+        <a href="/register" id="backButton" style="min-width: 150px; width:25%" class="btn btn-success">Go Back</a>
+<% } %>
+
+<% if (session.members) {  %>
+            
+    <div class="form-group row">
+        <div class="col-md-12 p-5 text-right">
+            <button type="submit" id="registerButton" style="min-width: 150px; width:25%" class="btn btn-primary">Add Member(s)</button>
+            <a href="/register" id="nextButton" style="min-width: 150px; width:25%" class="btn btn-secondary">Cancel</a>
+        </div>
+    </div>
+
+</form>
+
+<% } %>
+
+</section>
+
+<%- include ('../template/footer') -%>

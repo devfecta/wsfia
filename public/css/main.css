@@ -5,8 +5,21 @@ html {
 
 a {
   cursor: pointer;
+  color: #ce2029;
 }
 
+a:hover {
+  text-decoration: underline;
+  color: #ce2029;
+}
+/*
+a:active {
+  color: #ce2029;
+}
+a:visited {
+  color: #ce2029;
+}
+*/
 .bg-wsfia-red {
   background-color: #ce2029;
 }
@@ -52,7 +65,7 @@ section {
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 1em;
   padding: 3em;
-  margin-bottom: 3em;
+  margin-bottom: 2em;
 }
 
 .checkboxFieldset {
@@ -83,7 +96,7 @@ section {
 }
 
 footer {
-  position: absolute;
+  position: relative;
   bottom: 0;
   width: 100%;
 }

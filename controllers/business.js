@@ -11,7 +11,7 @@ class Business {
         let confirmation = false;
 
 
-        console.log("Host: " + process.env.HOST);
+        //console.log("Host: " + process.env.HOST);
 
         try {
 
