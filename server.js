@@ -209,7 +209,6 @@ app.post('/register/process', async (request, response) => {
 
     //console.log(request.body);
 
-    
     request.session.registration = await controllers.membership.registerMember(JSON.stringify(request.body));
     /*
     response.redirect('/register/confirm');
@@ -232,14 +231,14 @@ app.get('/renewal/member', async (request, response) => {
 app.post('/renewal/process', async (request, response) => {
     //console.log(request.session);
     //console.log(request.body);
-    //request.body.sessionId = request.session.sessionId;
+    request.body.sessionId = request.session.sessionId;
     
     request.session.registration = await controllers.membership.renewMember(JSON.stringify(request.body));
     
-    //console.log(request.session.registration);
+    console.log(request.session.registration);
     
     response.redirect('/register/confirm');
-    
+    //request.end();
 });
 /**
  * Renders the confirmation of registrants, after the registration(s) have been processed.

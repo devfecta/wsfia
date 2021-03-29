@@ -191,32 +191,22 @@ class Membership {
                 , params
             )
             .then(response => {
-                console.log(response.data);
-                /*
-                response.data.forEach(element => {
-                    console.log(element.firstName);
-                });
-                */
-                /*
+                //console.log(response.data);
+                
                 const lineItems = response.data;
-                //console.log(lineItems);
                 params = new URLSearchParams();
                 params.append('lineItems', JSON.stringify(response.data));
-                //console.log("Parameters");
-                //console.log(params);
-                */
-                /*
+                
                 return axios.post(process.env.API + '/PayPal-PHP-SDK/SendInvoice.php'
                     , params
                 )
                 .then(response => lineItems)
                 .catch(error => console.log(error));
-                */
-
-                //return false;
-                //confirmation = response.data;
+                
             })
             .catch(error => console.log(error));
+
+            return confirmation;
             
         }
         catch (e) {

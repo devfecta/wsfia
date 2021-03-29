@@ -32,6 +32,31 @@
 
 
                 emailAddresses = [...emailAddresses, registrant.emailAddress];
+
+                
+                attendingMonday = '';
+                attendingTuesday = '';
+                attendingWednesday = '';
+                attendingThursday = '';
+                attendingFriday = '';
+                ceu = '';
+                licenseType = '';
+                licenseNumber = '';
+
+                if (typeof registrant.conference !== 'undefined') {
+                    if (typeof registrant.conference.attending !== 'undefined') {
+                        attendingMonday = ((typeof registrant.conference.attending.Monday !== 'undefined') && registrant.conference.attending.Monday === 'true') ? 'checked=true' : '';
+                        attendingTuesday = ((typeof registrant.conference.attending.Tuesday !== 'undefined') && registrant.conference.attending.Tuesday === 'true') ? 'checked=true' : '';
+                        attendingWednesday = ((typeof registrant.conference.attending.Wednesday !== 'undefined') && registrant.conference.attending.Wednesday === 'true') ? 'checked=true' : '';
+                        attendingThursday = ((typeof registrant.conference.attending.Thursday !== 'undefined') && registrant.conference.attending.Thursday === 'true') ? 'checked=true' : '';
+                        attendingFriday = ((typeof registrant.conference.attending.Friday !== 'undefined') && registrant.conference.attending.Friday === 'true') ? 'checked=true' : '';                         
+                    }
+
+                    ceu = ((typeof registrant.conference.ceu !== 'undefined') && registrant.conference.ceu === 'true') ? 'checked=true' : '';
+                    licenseType = (typeof registrant.conference.licenseType !== 'undefined') ? registrant.conference.licenseType : '';
+                    licenseNumber = (typeof registrant.conference.licenseNumber !== 'undefined') ? registrant.conference.licenseNumber : '';
+                }
+                
                 
             %>
                 <tr class="userRow<%= index %>">
@@ -73,23 +98,23 @@
 
                                         
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Monday', this.checked)" checked=<%= attendingMonday %> name="attendingDates" id="attendingMonday<%= index %>" value="<%= index %>-Monday">
+                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Monday', this.checked)" <%= attendingMonday %> name="attendingDates" id="attendingMonday<%= index %>" value="<%= index %>-Monday">
                                             <label class="form-check-label" for="attendingMonday<%= index %>">Monday</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Tuesday', this.checked)" checked=<%= attendingMonday %> name="attendingDates" id="attendingTuesday<%= index %>" value="<%= index %>-Tuesday">
+                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Tuesday', this.checked)" <%= attendingTuesday %> name="attendingDates" id="attendingTuesday<%= index %>" value="<%= index %>-Tuesday">
                                             <label class="form-check-label" for="attendingTuesday<%= index %>">Tuesday</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Wednesday', this.checked)" checked=<%= attendingMonday %> name="attendingDates" id="attendingWednesday<%= index %>" value="<%= index %>-Wednesday">
+                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Wednesday', this.checked)" <%= attendingWednesday %> name="attendingDates" id="attendingWednesday<%= index %>" value="<%= index %>-Wednesday">
                                             <label class="form-check-label" for="attendingWednesday<%= index %>">Wednesday</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Thursday', this.checked)" checked=<%= attendingMonday %> name="attendingDates" id="attendingThursday<%= index %>" value="<%= index %>-Thursday">
+                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Thursday', this.checked)" <%= attendingThursday %> name="attendingDates" id="attendingThursday<%= index %>" value="<%= index %>-Thursday">
                                             <label class="form-check-label" for="attendingThursday<%= index %>">Thursday</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Friday', this.checked)" checked=<%= attendingMonday %> name="attendingDates" id="attendingFriday<%= index %>" value="<%= index %>-Friday">
+                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Friday', this.checked)" <%= attendingFriday %> name="attendingDates" id="attendingFriday<%= index %>" value="<%= index %>-Friday">
                                             <label class="form-check-label" for="attendingFriday<%= index %>">Friday</label>
                                         </div>
                                         
@@ -99,16 +124,16 @@
                                     <td>
                                         <div class="row form-check form-check-inline">
                                             <div class="col">
-                                                <input class="form-check-input" type="checkbox" onclick="setCEU('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.checked)" name="ceu" id="ceu<%= index %>" />
+                                                <input class="form-check-input" type="checkbox" onclick="setCEU('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.checked)" <%= ceu %> name="ceu" id="ceu<%= index %>" />
                                                 <label class="form-check-label" for="ceu<%= index %>">Do you require CEUs?</label>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col">
-                                                <input type="text" onblur="setLicenseType('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.value)" class="form-control" maxlength="32" name="licenseType" id="licenseType<%= index %>" placeholder="License Type" aria-label="License Type">
+                                                <input type="text" onblur="setLicenseType('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.value)" value="<%= licenseType %>" class="form-control" maxlength="32" name="licenseType" id="licenseType<%= index %>" placeholder="License Type" aria-label="License Type">
                                             </div>
                                             <div class="col">
-                                                <input type="text" onblur="setLicenseNumber('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.value)" class="form-control" maxlength="24" name="licenseNumber" id="licenseNumber<%= index %>" placeholder="License Number" aria-label="License Number">
+                                                <input type="text" onblur="setLicenseNumber('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.value)" value="<%= licenseNumber %>" class="form-control" maxlength="24" name="licenseNumber" id="licenseNumber<%= index %>" placeholder="License Number" aria-label="License Number">
                                             </div>
                                         </div>
                                     </td>
@@ -121,31 +146,25 @@
                     </td>
                 </tr>
                 
-
-                <%
-                    attendingMonday = false;
-                    attendingTuesday = false;
-                    attendingWednesday = false;
-                    attendingThursday = false;
-                    attendingFriday = false;
-
-                    if (typeof registrant.conference !== 'undefined') {
-                        if (typeof registrant.conference.attending !== 'undefined') {
-                            attendingMonday = (typeof registrant.conference.attending.Monday !== 'undefined') ? registrant.conference.attending.Monday : false;
-                            attendingTuesday = (typeof registrant.conference.attending.Tuesday !== 'undefined') ? registrant.conference.attending.Tuesday : false;
-                            attendingWednesday = (typeof registrant.conference.attending.Wednesday !== 'undefined') ? registrant.conference.attending.Wednesday : false;
-                            attendingThursday = (typeof registrant.conference.attending.Thursday !== 'undefined') ? registrant.conference.attending.Thursday : false;
-                            attendingFriday = (typeof registrant.conference.attending.Friday !== 'undefined') ? registrant.conference.attending.Friday : false;                            
-                        }
-                    }
-                %>
-
                 <script>
-                    document.getElementById('attendingMonday<%= index %>').checked = <%= attendingMonday %>;
-                    document.getElementById('attendingTuesday<%= index %>').checked = <%= attendingTuesday %>;
-                    document.getElementById('attendingWednesday<%= index %>').checked = <%= attendingWednesday %>;
-                    document.getElementById('attendingThursday<%= index %>').checked = <%= attendingThursday %>;
-                    document.getElementById('attendingFriday<%= index %>').checked = <%= attendingFriday %>;
+/*
+                    let attendingMonday = <%= attendingMonday %>;
+                    let attendingTuesday = <%= attendingTuesday %>;
+                    let attendingWednesday = <%= attendingWednesday %>;
+                    let attendingThursday = <%= attendingThursday %>;
+                    let attendingFriday = <%= attendingFriday %>;
+
+                    document.getElementById('attendingMonday<%= index %>').checked = attendingMonday;
+                    document.getElementById('attendingTuesday<%= index %>').checked = attendingTuesday;
+                    document.getElementById('attendingWednesday<%= index %>').checked = attendingWednesday;
+                    document.getElementById('attendingThursday<%= index %>').checked = attendingThursday;
+                    document.getElementById('attendingFriday<%= index %>').checked = attendingFriday;
+*/
+                    //let ceu = <%= ceu %>;
+
+                    //document.getElementById('ceu<%= index %>').checked = ceu;
+                   // document.getElementById('licenseType<%= index %>').value = '<%= licenseType %>';
+                    //document.getElementById('licenseNumber<%= index %>').value = '<%= licenseNumber %>';
                 </script>
                 
 
