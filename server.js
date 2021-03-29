@@ -155,7 +155,7 @@ app.post('/register/addMember', async (request, response) => {
  * Renders the page for listing all of the current registrants.
  */
 app.get('/register/member/registrants', async (request, response) => {
-    console.log("Registrants");
+    //console.log("Registrants");
     request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
     //console.log(request.session.registrants);
     response.render('./registration/registrantsInfo.ejs', { session: request.session, message: '' });
@@ -206,14 +206,11 @@ app.post('/register/process', async (request, response) => {
     delete request.body.ceu;
     delete request.body.licenseType;
     delete request.body.licenseNumber;
-
     //console.log(request.body);
-
     request.session.registration = await controllers.membership.registerMember(JSON.stringify(request.body));
-    /*
+    //console.log("Registration Session");
+    //console.log(request.session.registration);
     response.redirect('/register/confirm');
-    */
-    response.end();
 });
 /**
  * Renders the page for listing all of the members for renewal.
@@ -232,11 +229,7 @@ app.post('/renewal/process', async (request, response) => {
     //console.log(request.session);
     //console.log(request.body);
     request.body.sessionId = request.session.sessionId;
-    
     request.session.registration = await controllers.membership.renewMember(JSON.stringify(request.body));
-    
-    console.log(request.session.registration);
-    
     response.redirect('/register/confirm');
     //request.end();
 });
@@ -380,41 +373,7 @@ app.get('/scholarships', (request, response) => {
  */
 app.get('/reports/members', async (request, response) => {
 
-    let exportResult = await controllers.membership.exportMemberInfo();
-    //request.session.message = resultJSON.updatedAccount;
-    //console.log(exportResult);
-    //response.send(exportResult);
-
-    response.redirect("/");
-    /*
-    http.get(process.env.API + '/api.php?class=Membership&method=exportMemberInfo', (file) => {
-
-        console.log(file);
-        
-        let fileName = file.headers["content-disposition"].split(";")[1].split("=")[1];
-
-        response.setHeader('Pragma', 'public'); 
-        response.setHeader('Expires', '0'); 
-        response.setHeader('Cache-Control','must-revalidate, post-check=0, pre-check=0');
-        response.setHeader('Content-Type', 'application/vnd.ms-excel'); 
-        response.setHeader('Content-Disposition','attachment; filename=' + fileName);
-        response.setHeader('Content-Transfer-Encoding', 'binary');
-
-        //let file;  
-        
-        
-        file.pipe(response);
-        
-    })
-    .on('end', f => {
-        response.send();
-    })
-    .on('error', (e) => {
-        console.log(e.message);
-    });
-
-    //req.send();
-    */
+    response.redirect("https://api.wsfia.org/api.php?class=Membership&method=exportMemberInfo");
     
 });
 // REPORTS END

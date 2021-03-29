@@ -1,6 +1,6 @@
 <%- include ('template/header') -%>
 
-<div class="row">
+<div class="d-flex justify-content-between row">
     
     <div class="text-light col-lg-5 p-4" style="border-radius: 1em; background-color: rgba(206,32,41, 0.8);">
         Hello, <%= session.userInfo.firstName %><br />
@@ -11,6 +11,16 @@
         <b>Student ID</b>: <%= session.userInfo.studentId %>
     </div>
 
+    <%  
+        console.log(session.userInfo);
+        let adminUser = session.userInfo.types.filter(type => type.name === 'Administrator').length;
+        if (adminUser) {
+    %>
+        <div class="text-light col-lg-5 p-4" style="border-radius: 1em; background-color: rgba(255,255,255, 0.8);">
+            <a href="/reports/members" class="m-3 btn btn-primary">Export Membership</a>
+        </div>
+    <% } %>
+        
     <%  
         const currentDate = new Date();
         const expirationDate = new Date(session.userInfo.expirationDate);

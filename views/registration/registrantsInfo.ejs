@@ -15,7 +15,7 @@
         "Add Another Person" button to fill out the registration for again. Otherwise, click on the "Register" button 
         to finish the registration process.</p>
         
-<form name="membershipForm" id="membershipForm" action="/register/process" method="POST">
+<form class="table-responsive" name="membershipForm" id="membershipForm" action="/register/process" method="POST">
 
     <table class="table table-striped">
         <thead>
@@ -89,14 +89,15 @@
                 <tr class="userRow<%= index %>">
 
                     <td style="border-bottom: solid 1px #aaa"></td>
-                    <td style="border-bottom: solid 1px #aaa" colspan="4">
-                        <div class="table-responsive">
-                            <table class="table">
+                    <td class="p-0" style="border-bottom: solid 1px #aaa" colspan="4">
+                        <div class="table">
+                            <table class="table w-100">
+                                <tr>
+                                    <thead><strong>Conference Registration Information</strong></thead>
+                                </tr>
                                 <tr class="bg-transparent">
                                     <td>
                                         <p class="m-0">Select the day(s) <%= registrant.firstName + ' ' + registrant.lastName %> will be attending the conference:</p>
-
-                                        
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Monday', this.checked)" <%= attendingMonday %> name="attendingDates" id="attendingMonday<%= index %>" value="<%= index %>-Monday">
                                             <label class="form-check-label" for="attendingMonday<%= index %>">Monday</label>
@@ -120,54 +121,28 @@
                                         
                                     </td>
                                 </tr>
-                                <tr>
+                                <tr class="bg-transparent">
                                     <td>
                                         <div class="row form-check form-check-inline">
-                                            <div class="col">
+                                            <div class="col-md-12">
                                                 <input class="form-check-input" type="checkbox" onclick="setCEU('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.checked)" <%= ceu %> name="ceu" id="ceu<%= index %>" />
                                                 <label class="form-check-label" for="ceu<%= index %>">Do you require CEUs?</label>
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col">
+                                            <div class="col-md-6">
                                                 <input type="text" onblur="setLicenseType('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.value)" value="<%= licenseType %>" class="form-control" maxlength="32" name="licenseType" id="licenseType<%= index %>" placeholder="License Type" aria-label="License Type">
                                             </div>
-                                            <div class="col">
+                                            <div class="col-md-6">
                                                 <input type="text" onblur="setLicenseNumber('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.value)" value="<%= licenseNumber %>" class="form-control" maxlength="24" name="licenseNumber" id="licenseNumber<%= index %>" placeholder="License Number" aria-label="License Number">
                                             </div>
                                         </div>
-                                    </td>
-                                    <td>
-
                                     </td>
                                 </tr>
                             </table>
                         </div>
                     </td>
                 </tr>
-                
-                <script>
-/*
-                    let attendingMonday = <%= attendingMonday %>;
-                    let attendingTuesday = <%= attendingTuesday %>;
-                    let attendingWednesday = <%= attendingWednesday %>;
-                    let attendingThursday = <%= attendingThursday %>;
-                    let attendingFriday = <%= attendingFriday %>;
-
-                    document.getElementById('attendingMonday<%= index %>').checked = attendingMonday;
-                    document.getElementById('attendingTuesday<%= index %>').checked = attendingTuesday;
-                    document.getElementById('attendingWednesday<%= index %>').checked = attendingWednesday;
-                    document.getElementById('attendingThursday<%= index %>').checked = attendingThursday;
-                    document.getElementById('attendingFriday<%= index %>').checked = attendingFriday;
-*/
-                    //let ceu = <%= ceu %>;
-
-                    //document.getElementById('ceu<%= index %>').checked = ceu;
-                   // document.getElementById('licenseType<%= index %>').value = '<%= licenseType %>';
-                    //document.getElementById('licenseNumber<%= index %>').value = '<%= licenseNumber %>';
-                </script>
-                
-
                 <% } %>
 
             <% });

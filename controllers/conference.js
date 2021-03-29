@@ -34,7 +34,7 @@ class Conference {
 
     setAttendingDate = (data) => {
 
-        console.log('setAttendingDate');
+        //console.log('setAttendingDate');
 
         let memberData = JSON.parse(data);
 
@@ -66,7 +66,7 @@ class Conference {
 
         let memberData = JSON.parse(data);
 
-        console.log(memberData);
+        //console.log(memberData);
 
         try {
             
@@ -95,7 +95,7 @@ class Conference {
 
         let memberData = JSON.parse(data);
 
-        console.log(memberData);
+        //console.log(memberData);
 
         try {
             
@@ -124,7 +124,7 @@ class Conference {
 
         let memberData = JSON.parse(data);
 
-        console.log(memberData);
+        //console.log(memberData);
 
         try {
             
