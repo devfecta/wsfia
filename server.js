@@ -293,6 +293,16 @@ app.get('/member-area', authenticateUser, (request, response) => {
     response.render('./memberArea.ejs', { session: request.session, message: '' });
 });
 /**
+ * Gets the member card PDF.
+ */
+ app.get('/member-card', authenticateUser, async (request, response) => {
+    //console.log(request.session.userInfo.wsfiaId);
+    //let resultJSON = await controllers.membership.getMembershipCard(request.session.userInfo.wsfiaId);
+
+    response.redirect(process.env.API + '/api.php?class=Membership&method=getMembershipCard&memberId=' + request.session.userInfo.wsfiaId);
+
+});
+/**
  * Logs out the user by removing the userInfo property from the session, then redirects to the login page.
  */
 app.get('/logout', (request, response) => {

@@ -11,15 +11,16 @@
         <b>Student ID</b>: <%= session.userInfo.studentId %>
     </div>
 
-    <%  
-        console.log(session.userInfo);
-        let adminUser = session.userInfo.types.filter(type => type.name === 'Administrator').length;
-        if (adminUser) {
+    <div class="text-light col-lg-5 p-4" style="border-radius: 1em; background-color: rgba(255,255,255, 0.8);">
+    <%
+            let adminUser = session.userInfo.types.filter(type => type.name === 'Administrator').length;
+            if (adminUser) {
     %>
-        <div class="text-light col-lg-5 p-4" style="border-radius: 1em; background-color: rgba(255,255,255, 0.8);">
             <a href="/reports/members" class="m-3 btn btn-primary">Export Membership</a>
-        </div>
     <% } %>
+            <a href="/member-card" class="m-3 btn btn-primary">Membership Card</a>
+    </div>
+
         
     <%  
         const currentDate = new Date();

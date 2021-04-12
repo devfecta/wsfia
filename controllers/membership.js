@@ -409,6 +409,21 @@ class Membership {
         }
     }
 
+    getMembershipCard = async (memberId) => {
+        try {
+            let pdf = null;
+
+            await axios.get(process.env.API + '/api.php?class=Membership&method=getMembershipCard&memberId=' + memberId)
+            .then(response => {pdf = response.data})
+            //.then(json => console.log(json))
+            .catch(error => console.log("Controller Error:", error));
+            return pdf;
+        }
+        catch(e) {
+            console.error(e);
+        }
+    }
+
 }
 
 module.exports = Membership;
