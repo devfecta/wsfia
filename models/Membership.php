@@ -4,6 +4,7 @@
 //error_reporting(E_ALL);
 
 require './vendor/autoload.php';
+require './vendor/fpdf/fpdf.php';
 
 require_once('Member.php');
 require_once('./interfaces/iRegistration.php');
@@ -943,16 +944,22 @@ class Membership extends Member implements iRegistration {
             $fileName = 'MemberReport_'. date("Y-m-d", time());
 
             try{
+                // Sets the document type for the file on Google Drive.
                 $file->setMimeType("application/vnd.ms-excel");
+                // Sets the file name for the file on Google Drive.
                 $file->setName($fileName);
+                // Sets the folder to which the file should be placed on Google Drive.
                 $file->setParents(array("1rxYn-ekD7zoTiXEv2DsgxigVqHJTiZIM"));
-
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-
+                // Creates the file.
                 $objWriter = IOFactory::createWriter($spreadsheet, 'Xlsx');
+                // Saves the file to a location on the server.
                 $objWriter->save("./downloads/".$fileName.".xlsx");
-
+                // Prepares to get the file type information from the server file.
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                // Gets the file type.
                 $mime_type = finfo_file($finfo, $objWriter);
+
+                error_log(date('Y-m-d H:i:s') . " Creating file type: " . $mime_type . "\n", 3, "/var/www/html/php-errors.log");
 
                 $result = $service->files->create(
                     $file,
@@ -964,13 +971,13 @@ class Membership extends Member implements iRegistration {
                 );
             }
             catch(Exception $e) {
-                $result = '{"exceptionResult": "' . $e->getMessage() . '"}';
+                error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
             }
 
             
         }
         catch (PDOException $e) {
-            $result = '{"pdoResult" : ' . $e->getMessage() . '}';
+            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         finally {
             $connection = Configuration::closeConnection();
@@ -987,6 +994,99 @@ class Membership extends Member implements iRegistration {
         $objWriter->save('php://output');
         */
         return $result;
+    }
+
+    public function getMembershipCard($memberId) {
+
+        try {
+            $connection = Configuration::openConnection();
+            $statement = $connection->prepare("SELECT u.firstName, u.lastName, u.emailAddress, m.* FROM users AS u INNER JOIN members AS m ON u.id=m.userId WHERE m.id=:memberId");
+            $statement->bindParam(":memberId", $memberId, PDO::PARAM_STR);
+            $statement->execute();
+
+            $member = $statement->fetch(PDO::FETCH_ASSOC);
+
+            $pdf = new FPDF('L', 'in', array(3.5, 2));
+            $pdf->AddPage();
+            $pdf->SetAutoPageBreak(true);
+            $pdf->AcceptPageBreak(true);
+            $pdf->AliasNbPages();
+            
+            $pdf->Image('https://wsfia.org/images/WSFIA_Logo.png', .125, 0, .75, .75);
+
+            if (date('Y', strtotime($member['expirationDate'])) % 2 == 0)
+            { $pdf->SetFillColor(255, 216, 0); }
+            else
+            { $pdf->SetFillColor(207, 32, 42); }
+
+            $pdf->Rect(1, 0, 2.5, .75, 'F');
+
+            $pdf->SetFillColor(0);
+            $pdf->SetLineWidth(.0375);
+            $pdf->Rect(0, 0, 3.5, 2, 'D');
+
+
+
+            if (date('Y', strtotime($member['expirationDate'])) % 2 == 0)
+            { $pdf->SetTextColor(0); }
+            else
+            { $pdf->SetTextColor(255); }
+            $pdf->SetTextColor(255);
+            $pdf->SetFont('Arial', 'B', 12);
+            $pdf->Text(2.05, .225, date('Y', strtotime($member['expirationDate'])));
+            $pdf->SetFont('Arial', 'B', 10);
+            $pdf->Text(1.18, .4, 'Wisconsin State Fire Inspectors');
+            $pdf->SetFont('Arial', 'B', 10);
+            $pdf->Text(1.825, .55, 'Association');
+            $pdf->SetFont('Arial', '', 7);
+            $pdf->Text(1.925, .675, 'www.wsfia.org');
+            
+            $pdf->SetTextColor(0);
+            $pdf->SetFont('Arial', '', 8);
+            $t = 'Dedicated to the prevention of fire through Fire Inspection';
+            $s = $pdf->GetStringWidth($t);
+            $pdf->Text(.43, .91, $t);
+            $t = 'and Public Education';
+            $s = $pdf->GetStringWidth($t);
+            $pdf->Text(1.2, 1.04, $t);
+            
+            
+            $t = $member['firstName'].' '.$member['lastName'];
+            $s = $pdf->GetStringWidth($t);
+            $pdf->SetFont('Arial', 'B', 12);
+            $pdf->Text(abs(1.85 - $s), 1.27, $t);
+            
+            $pdf->SetFont('Arial', 'B', 8);
+            $pdf->Text(.25, 1.5, 'Membership ID:');
+            $pdf->SetFont('Arial', '', 8);
+            $pdf->Text(1.15, 1.5, $member['id']);
+            /*
+            $pdf->SetFont('Arial', 'B', 7);
+            $pdf->Text(.25, 1.58, 'Membership Type:');
+            $pdf->SetFont('Arial', '', 7);
+            $pdf->Text(1.285, 1.58, $User['memberships_Name']);
+            */
+            /*
+            $pdf->SetFont('Arial', 'B', 7);
+            $pdf->Text(.25, 1.70, 'Area:');
+            $pdf->SetFont('Arial', '', 7);
+            $pdf->Text(.55, 1.70, $User['areas_Name'] . ' (' . $User['areas_Description'] . ')');
+            */
+            $pdf->SetFont('Arial', '', 7);
+            $pdf->Text(1, 1.85, 'Membership Expires: '.date('m-d-Y', strtotime($member['expirationDate'])));
+
+        }
+        catch (PDOException $e) {
+            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        catch (Exception $e) {
+            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+        
+        return $pdf->Output('membershipcard.pdf', 'I');
     }
     
 }

@@ -175,8 +175,8 @@ switch ($requestMethod) {
                                 $client = new Google_Client();
                                 $client->setAuthConfigFile('../drive.json');
 
-                                $client->setRedirectUri('http://localhost:3000/reports/members');
-                                //$client->setRedirectUri('http://' . $_SERVER['HTTP_HOST'] . '/api.php?class=Membership&method=exportMemberInfo');
+                                //$client->setRedirectUri('http://localhost:3000/reports/members');
+                                $client->setRedirectUri('http://' . $_SERVER['HTTP_HOST'] . '/api.php?class=Membership&method=exportMemberInfo');
                                 $client->addScope("https://www.googleapis.com/auth/drive");
 
                                 if (isset($_GET['code'])) {
@@ -233,6 +233,10 @@ switch ($requestMethod) {
                             $objWriter = IOFactory::createWriter($Membership->exportMembersInfo(), 'Xlsx');
                             $objWriter->save('php://output');
                             */
+                            break;
+                        case "getMembershipCard":
+                            //echo $_GET['memberId'];
+                            return $Membership->getMembershipCard($_GET['memberId']);
                             break;
                         default:
                             echo json_encode(array("error" => 'GET METHOD ERROR: The '.$_GET['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);
