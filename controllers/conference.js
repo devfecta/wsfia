@@ -31,7 +31,10 @@ class Conference {
             console.error(e);
         }
     }
-
+    /**
+     * Sets the dates an attendee will be attending at the conference.
+     * @param {string} data 
+     */
     setAttendingDate = (data) => {
 
         //console.log('setAttendingDate');
@@ -61,7 +64,10 @@ class Conference {
         }
 
     }
-
+    /**
+     * Sets the CEU field if the attendee requires it.
+     * @param {string} data 
+     */
     setCEU = (data) => {
 
         let memberData = JSON.parse(data);
@@ -90,7 +96,10 @@ class Conference {
         }
 
     }
-
+    /**
+     * Sets the license type field for the attendee.
+     * @param {string} data 
+     */
     setLicenseType = (data) => {
 
         let memberData = JSON.parse(data);
@@ -119,7 +128,10 @@ class Conference {
         }
 
     }
-
+    /**
+     * Sets the license number field for the attendee.
+     * @param {string} data 
+     */
     setLicenseNumber = (data) => {
 
         let memberData = JSON.parse(data);

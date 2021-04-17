@@ -39,7 +39,7 @@ const controllers = new Controllers();
  * Sets start and end dates for conference registration.
  */
  const startDateConference = Date.parse('2021-03-10');
- const endDateConference = Date.parse('2021-03-30');
+ const endDateConference = Date.parse('2021-05-30');
 /**
  * EJS templating library.
  */
@@ -407,12 +407,11 @@ app.get('/conference', (request, response) => {
     response.render('./registration/attendeeCurrentMembers.ejs', { session: request.session, message: '' });
 });
 /**
- * Calls the addMember method to add registrant to the database, then redirects to a page listing the registrants.
+ * Adds selected current member(s) to the registration session data.
  */
  app.post('/conference/currentMembers/process', async (request, response) => {
     request.body.sessionId = request.session.sessionId;
     //console.log(JSON.stringify(request.body));
-    
     let confirm = await controllers.conference.addConferenceCurrentMembers(JSON.stringify(request.body));
 
     let registrationMessage = '';

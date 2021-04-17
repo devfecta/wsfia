@@ -477,6 +477,7 @@ const validateMembershipForm = (form) => {
     }
 
 }
+
 /**
  * Sets the dates an attendee will be attending at the conference.
  * @param {*} sessionId 
@@ -484,6 +485,7 @@ const validateMembershipForm = (form) => {
  * @param {*} attendingDate 
  * @param {*} checked 
  */
+/*
  const setAttendingDate = (sessionId, emailAddress, attendingDate, checked) => {
 
     console.log(sessionId, emailAddress, attendingDate, checked);
@@ -497,12 +499,14 @@ const validateMembershipForm = (form) => {
     .catch(error => displayError(error));
 
 }
+*/
 /**
  * Sets the CEU field if the attendee requires it.
  * @param {*} sessionId 
  * @param {*} emailAddress
  * @param {*} checked 
  */
+/*
  const setCEU = (sessionId, emailAddress, checked) => {
 
     console.log(sessionId, emailAddress, checked);
@@ -516,12 +520,14 @@ const validateMembershipForm = (form) => {
     .catch(error => displayError(error));
     
 }
+*/
 /**
  * Sets the license type field for the attendee.
  * @param {*} sessionId 
  * @param {*} emailAddress
  * @param {*} licenseType 
  */
+/*
  const setLicenseType = (sessionId, emailAddress, licenseType) => {
 
     console.log(sessionId, emailAddress, licenseType);
@@ -535,12 +541,14 @@ const validateMembershipForm = (form) => {
     .catch(error => displayError(error));
     
 }
+*/
 /**
  * Sets the license type field for the attendee.
  * @param {*} sessionId 
  * @param {*} emailAddress
  * @param {*} licenseNumber 
  */
+/*
  const setLicenseNumber = (sessionId, emailAddress, licenseNumber) => {
 
     console.log(sessionId, emailAddress, licenseNumber);
@@ -554,7 +562,7 @@ const validateMembershipForm = (form) => {
     .catch(error => displayError(error));
     
 }
-
+*/
 /**
  * Removes a member from the conference attendee registration form.
  * @param {*} id 
