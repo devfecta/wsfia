@@ -18,8 +18,6 @@ final class MembershipTest extends TestCase
         $client = new Google_Client();
         $client->setAuthConfigFile('../drive.json');
 
-        
-
         //$client->setRedirectUri('http://localhost:3000/reports/members');
         $client->setRedirectUri('http://localhost/api.php?class=Membership&method=exportMemberInfo');
         $client->addScope("https://www.googleapis.com/auth/drive");

@@ -15,31 +15,7 @@ class RegisterConferenceMember extends Membership implements iRegistration {
     
     public function setSession($sessionData) {}
 
-    public function register($order) {
-
-        $newMember = false;
-
-        if (isset($order['userId'])) {
-            $userId = $order['userId'];
-        } else {
-            $registerMembership = new Membership();
-            $userId = json_decode($registerMembership->register($order))->response;
-
-            $newMember = true;
-        }
-
-        $member = new Member($userId);
-
-        $processOrder = new ProcessOrder();
-
-        if ($newMember) {
-
-            $processOrder->addLineItem($order);
-
-        } else {}
-        
-        return $member;
-    }
+    public function register($order) {}
         
     public function unRegister($member) {}
         
@@ -51,26 +27,27 @@ class RegisterConferenceMember extends Membership implements iRegistration {
 
     public function reportRegistration($member) {}
     /**
-     * Uses the WSFIA member ID to get add the selected member(s) to the userSessions table, 
-     * just like as if they were registering a new account. The only real differenc is the 
-     * departments and areas properties.
+     * Uses the WSFIA member ID to get selected current member information, and add the member(s) 
+     * to the userSessions table, just like as if they were registering a new account.
+     * Endpoint: /conference/currentMembers/process
+     *
+     * @param [json] $sessionData
+     * @return boolean
      */
-    public function addConferenceCurrentMembers($sessionData) {
+    public function addConferenceCurrentMembers($currentUsersSessionData) {
 
-        //return json_encode($sessionData, JSON_PRETTY_PRINT);
-        $data = json_decode(json_encode($sessionData), FALSE);
-
+        $result = false;
+        $data = json_decode(json_encode($currentUsersSessionData), FALSE);
         $memberArray = [];
-
         $memberIds = explode(',', $data->memberIds);
 
         foreach($memberIds as $memberId) {
 
-            //return json_encode($memberId, JSON_PRETTY_PRINT);
-
             try {
 
-                $statement = Configuration::openConnection()->prepare("SELECT u.firstName, u.lastName, u.emailAddress, m.id, m.userId, m.jobTitle, m.departments, m.areas, m.studentId FROM users AS u INNER JOIN members AS m ON u.id=m.userId, statuses AS s WHERE m.id=:id AND s.statusId=m.status");
+                $connection = Configuration::openConnection();
+
+                $statement = $connection->prepare("SELECT u.firstName, u.lastName, u.emailAddress, m.id, m.userId, m.jobTitle, m.departments, m.areas, m.studentId FROM users AS u INNER JOIN members AS m ON u.id=m.userId, statuses AS s WHERE m.id=:id AND s.statusId=m.status");
                 $statement->bindParam(":id", $memberId);
                 $statement->execute();
 
@@ -97,20 +74,14 @@ class RegisterConferenceMember extends Membership implements iRegistration {
 
                 $results['areas'] = $areas;
 
-                $result = '';
-
                 try{
-
-                    $connection = Configuration::openConnection();
                     $statement = $connection->prepare("INSERT INTO userSessions (`sessionId`, `registration`) VALUES (:sessionId, :registration)");
                     $statement->bindParam(":sessionId", $data->sessionId);
                     $statement->bindParam(":registration", json_encode($results));
 
-                    $result = json_encode($statement->execute(), JSON_PRETTY_PRINT);
+                    $result = $statement->execute();
                 } catch (Exception $e) {
-                    
-                    $result = json_encode($e, JSON_PRETTY_PRINT); 
-
+                    error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
                 }
 
             }
@@ -124,16 +95,19 @@ class RegisterConferenceMember extends Membership implements iRegistration {
                 Configuration::closeConnection();
             }
 
-            
-
         }
 
         return $result;
-
     }
-
+    /**
+     * Sets the conference dates a specific registrant will be attending.
+     *
+     * @param [json] $attendingData
+     * @return boolean
+     */
     public function setAttendingDate($attendingData) {
 
+        $result = false;
         $data = json_decode(json_encode($attendingData), FALSE);
 
         try {
@@ -152,32 +126,38 @@ class RegisterConferenceMember extends Membership implements iRegistration {
 
                 if($registrant->emailAddress == $data->emailAddress) {
 
+                    $registrant = json_decode($registrantData['registration'], true);
+
                     switch ($data->attendingDate) {
                         case 'Monday':
-                            $registrant->conference->attending->Monday = $data->attendingChecked;
+                            $registrant['conference']['attending']['Monday'] = $data->attendingChecked;
                             break;
                         case 'Tuesday':
-                            $registrant->conference->attending->Tuesday = $data->attendingChecked;
+                            $registrant['conference']['attending']['Tuesday'] = $data->attendingChecked;
                             break;
                         case 'Wednesday':
-                            $registrant->conference->attending->Wednesday = $data->attendingChecked;
+                            $registrant['conference']['attending']['Wednesday'] = $data->attendingChecked;
                             break;
                         case 'Thursday':
-                            $registrant->conference->attending->Thursday = $data->attendingChecked;
+                            $registrant['conference']['attending']['Thursday'] = $data->attendingChecked;
                             break;
                         case 'Friday':
-                            $registrant->conference->attending->Friday = $data->attendingChecked;
+                            $registrant['conference']['attending']['Friday'] = $data->attendingChecked;
                             break;
                         default:
                             break;
                     }
 
-                    $statement = $connection->prepare("UPDATE `userSessions` SET `registration`=:registration WHERE `id`=:id AND `sessionId`=:sessionId");
-                    $statement->bindParam(":id", $registrantData['id']);
-                    $statement->bindParam(":sessionId", $data->sessionId);
-                    $statement->bindParam(":registration", json_encode($registrant));
+                    $registrant = json_encode($registrant);
+                    $registrant = json_decode($registrant, false);
 
-                    return json_encode($statement->execute(), JSON_PRETTY_PRINT);
+                    $jsonString = json_encode($registrant);
+
+                    $statement = $connection->prepare("UPDATE `userSessions` SET `registration`=:registration WHERE `id`=:id AND `sessionId`=:sessionId");
+                    $statement->bindParam(":id", $registrantData['id'], PDO::PARAM_INT);
+                    $statement->bindParam(":sessionId", $data->sessionId, PDO::PARAM_STR);
+                    $statement->bindParam(":registration", $jsonString, PDO::PARAM_STR);
+                    $result = $statement->execute();
                 }
                 
             }
@@ -193,10 +173,17 @@ class RegisterConferenceMember extends Membership implements iRegistration {
             $connection = Configuration::closeConnection();
         }
 
+        return $result;
     }
-
+    /**
+     * Sets the boolean for a specific registrant if they are attending the conference for CEU.
+     *
+     * @param [json] $attendingData
+     * @return boolean
+     */
     public function setCEU($attendingData) {
 
+        $result = false;
         $data = json_decode(json_encode($attendingData), FALSE);
 
         try {
@@ -214,15 +201,22 @@ class RegisterConferenceMember extends Membership implements iRegistration {
                 $registrant = json_decode($registrantData['registration'], false);
 
                 if($registrant->emailAddress == $data->emailAddress) {
+
+                    $registrant = json_decode($registrantData['registration'], true);
+                    $registrant['conference']['ceu'] = '';
+                    $registrant = json_encode($registrant);
+                    $registrant = json_decode($registrant, false);
 
                     $registrant->conference->ceu = isset($data->ceu) ? $data->ceu : false;
 
-                    $statement = $connection->prepare("UPDATE `userSessions` SET `registration`=:registration WHERE `id`=:id AND `sessionId`=:sessionId");
-                    $statement->bindParam(":id", $registrantData['id']);
-                    $statement->bindParam(":sessionId", $data->sessionId);
-                    $statement->bindParam(":registration", json_encode($registrant));
+                    $jsonString = json_encode($registrant);
 
-                    return json_encode($statement->execute(), JSON_PRETTY_PRINT);
+                    $statement = $connection->prepare("UPDATE `userSessions` SET `registration`=:registration WHERE `id`=:id AND `sessionId`=:sessionId");
+                    $statement->bindParam(":id", $registrantData['id'], PDO::PARAM_INT);
+                    $statement->bindParam(":sessionId", $data->sessionId, PDO::PARAM_STR);
+                    $statement->bindParam(":registration", $jsonString, PDO::PARAM_STR);
+
+                    $result = $statement->execute();
                 }
                 
             }
@@ -238,10 +232,18 @@ class RegisterConferenceMember extends Membership implements iRegistration {
             $connection = Configuration::closeConnection();
         }
 
+        return $result;
     }
 
+    /**
+     * Sets the license type for a specific registrant's .
+     *
+     * @param [json] $attendingData
+     * @return boolean
+     */
     public function setLicenseType($attendingData) {
 
+        $result = false;
         $data = json_decode(json_encode($attendingData), FALSE);
 
         try {
@@ -259,15 +261,22 @@ class RegisterConferenceMember extends Membership implements iRegistration {
                 $registrant = json_decode($registrantData['registration'], false);
 
                 if($registrant->emailAddress == $data->emailAddress) {
+
+                    $registrant = json_decode($registrantData['registration'], true);
+                    $registrant['conference']['licenseType'] = '';
+                    $registrant = json_encode($registrant);
+                    $registrant = json_decode($registrant, false);
 
                     $registrant->conference->licenseType = isset($data->licenseType) ? $data->licenseType : '';
 
-                    $statement = $connection->prepare("UPDATE `userSessions` SET `registration`=:registration WHERE `id`=:id AND `sessionId`=:sessionId");
-                    $statement->bindParam(":id", $registrantData['id']);
-                    $statement->bindParam(":sessionId", $data->sessionId);
-                    $statement->bindParam(":registration", json_encode($registrant));
+                    $jsonString = json_encode($registrant);
 
-                    return json_encode($statement->execute(), JSON_PRETTY_PRINT);
+                    $statement = $connection->prepare("UPDATE `userSessions` SET `registration`=:registration WHERE `id`=:id AND `sessionId`=:sessionId");
+                    $statement->bindParam(":id", $registrantData['id'], PDO::PARAM_INT);
+                    $statement->bindParam(":sessionId", $data->sessionId, PDO::PARAM_STR);
+                    $statement->bindParam(":registration", $jsonString, PDO::PARAM_STR);
+
+                    $result = $statement->execute();
                 }
                 
             }
@@ -283,14 +292,20 @@ class RegisterConferenceMember extends Membership implements iRegistration {
             $connection = Configuration::closeConnection();
         }
 
+        return $result;
     }
-
+    /**
+     * Sets the license number for a specific registrant.
+     *
+     * @param [json] $attendingData
+     * @return boolean
+     */
     public function setLicenseNumber($attendingData) {
 
-        error_log(date('Y-m-d H:i:s') . "\n", 3, "/var/www/html/php-errors.log");
-
+        
+        $result = false;
         $data = json_decode(json_encode($attendingData), FALSE);
-
+        
         try {
 
             $connection = Configuration::openConnection();
@@ -307,29 +322,38 @@ class RegisterConferenceMember extends Membership implements iRegistration {
 
                 if($registrant->emailAddress == $data->emailAddress) {
 
-                    $registrant->conference->licenseNumber = isset($data->licenseNumber) ? $data->licenseNumber : '';
+                    $registrant = json_decode($registrantData['registration'], true);
+                    $registrant['conference']['licenseNumber'] = '';
+                    $registrant = json_encode($registrant);
+                    $registrant = json_decode($registrant, false);
+
+                    $registrant->conference->licenseNumber = isset($data->licenseNumber) ? $data->licenseNumber : null;
+                    
+                    $jsonString = json_encode($registrant);
 
                     $statement = $connection->prepare("UPDATE `userSessions` SET `registration`=:registration WHERE `id`=:id AND `sessionId`=:sessionId");
-                    $statement->bindParam(":id", $registrantData['id']);
-                    $statement->bindParam(":sessionId", $data->sessionId);
-                    $statement->bindParam(":registration", json_encode($registrant));
+                    $statement->bindParam(":id", $registrantData['id'], PDO::PARAM_INT);
+                    $statement->bindParam(":sessionId", $data->sessionId, PDO::PARAM_STR);
+                    $statement->bindParam(":registration", $jsonString, PDO::PARAM_STR);
 
-                    return json_encode($statement->execute(), JSON_PRETTY_PRINT);
+                    $result = $statement->execute();
+                    
                 }
                 
             }
 
         }
         catch (PDOException $e) { 
-            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         catch (Exception $e) {
-            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         finally {
             $connection = Configuration::closeConnection();
         }
 
+        return $result;
     }
 
 }
