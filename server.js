@@ -418,7 +418,7 @@ app.get('/conference', (request, response) => {
     if (request.session.conference) {
         registrationMessage = '<div class="alert alert-danger m-1" role="alert">If you have any new member(s), you can register them now. Otherwise, click "Next".</div>';
     }
-    
+
     if (confirm) {
         request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
         response.render('./registration/memberInfo.ejs', { session: request.session, message: registrationMessage });

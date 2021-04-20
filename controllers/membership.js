@@ -173,7 +173,6 @@ class Membership {
         let formData = JSON.parse(data);
         //console.log(formData);
         let confirmation = false;
-
         //let registrants = await this.getRegistrants(sessionId);
         
         try {
@@ -191,8 +190,7 @@ class Membership {
                 , params
             )
             .then(response => {
-                //console.log(response.data);
-                //
+                // returns line items for invoice.
                 const lineItems = response.data;
                 params = new URLSearchParams();
                 params.append('lineItems', JSON.stringify(response.data));
@@ -203,6 +201,7 @@ class Membership {
                 .then(response => {
                     //console.log("PayPal Response");
                     //console.log(response.data);
+                    // NOTE: Response is empty if successful.
                     return lineItems
                 })
                 .catch(error => console.log(error));

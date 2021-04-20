@@ -41,6 +41,8 @@ class Conference {
 
         let memberData = JSON.parse(data);
 
+        console.log(memberData);
+
         try {
             
             let params = new URLSearchParams();
