@@ -306,37 +306,52 @@ class Membership extends Member implements iRegistration {
     /**
      * Registers new members and conference attendees.
      *
-     * @param [json] $sessionData
-     * @return void
+     * @param array $sessionData
+     * @return json 
      */
     public function register($sessionData) {
 
+        //error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . json_encode($sessionData, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
+
         $data = json_decode(json_encode($sessionData), FALSE);
 
-        //return json_encode(json_decode($this->getRegistrants($data->sessionId), false), JSON_PRETTY_PRINT);
+        $businessId = $data->businessId;
+        $emailAddress = $data->emailAddress;
         
         try {
-            $registrants = json_decode($this->getRegistrants($data->sessionId));
+            // Get registrants from the userSessions table using the session ID.
+            $registrants = json_decode($this->getRegistrants($data->sessionId), false);
+
             // $connection is lets you use the same connection for multiple statements.
             $connection = Configuration::openConnection();
 
+            
+
             $memberId = '';
             $lineItem = array();
-            
+           
             //$characters = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%&";
             foreach($registrants as $registrant) {
+                // This variable is for non-member pricing.
+                $newMember = false;
                 // Checks to see if the registrant is a new member.
                 if (!isset($registrant->id)) {
+
+                    $newMember = true;
                     //$password = $characters[mt_rand(0, strlen($Characters))];
                     $password = '123abc';
+                    $password = password_hash($password, PASSWORD_BCRYPT);
                     // Inserts new member information into the users table.
                     $statement = $connection->prepare("INSERT INTO users (`type`, `password`, `firstName`, `lastName`, `emailAddress`) VALUES (:type, :password, :firstName, :lastName, :emailAddress)");
+                    // Converts array into a string for the database.
+                    $memberType = json_encode(array(0=>array("id"=>2, "name"=>"Member")));
+                    $registrant->emailAddress = strtolower($registrant->emailAddress);
                     // The default member type is Member.
-                    $statement->bindParam(":type", json_encode(array(0=>array("id"=>2, "name"=>"Member"))));
-                    $statement->bindParam(":password", password_hash($password, PASSWORD_BCRYPT));
-                    $statement->bindParam(":firstName", $registrant->firstName);
-                    $statement->bindParam(":lastName", $registrant->lastName);
-                    $statement->bindParam(":emailAddress", strtolower($registrant->emailAddress));
+                    $statement->bindParam(":type", $memberType, PDO::PARAM_STR);
+                    $statement->bindParam(":password", $password, PDO::PARAM_STR);
+                    $statement->bindParam(":firstName", $registrant->firstName, PDO::PARAM_STR);
+                    $statement->bindParam(":lastName", $registrant->lastName, PDO::PARAM_STR);
+                    $statement->bindParam(":emailAddress", $registrant->emailAddress, PDO::PARAM_STR);
                     $statement->execute();
                     // Create member ID
                     $newUserId = $connection->lastInsertId();
@@ -345,23 +360,21 @@ class Membership extends Member implements iRegistration {
                     $statement->execute();
                     $dateCurrent = $statement->fetch(PDO::FETCH_COLUMN);
                     $memberId = 'WSFIA-' . $newUserId . date('ynj', strtotime($dateCurrent));
-    
+                    // Converts array into a string for the database.
+                    $businesses = json_encode($registrant->businesses);
+                    $areas = json_encode($registrant->areas);
                     // Member Information
                     $statement = $connection->prepare("INSERT INTO members (`id`, `userId`, `jobTitle`, `departments`, `areas`, `expirationDate`, `studentId`) VALUES (:id, :userId, :jobTitle, :departments, :areas, :expirationDate, :studentId)");
-                    $statement->bindParam(":id", $memberId);
-                    $statement->bindParam(":userId", $newUserId);
-                    $statement->bindParam(":jobTitle", $registrant->jobTitle);
-                    $statement->bindParam(":departments", json_encode($registrant->businesses));
-                    $statement->bindParam(":areas", json_encode($registrant->areas));
+                    $statement->bindParam(":id", $memberId, PDO::PARAM_STR);
+                    $statement->bindParam(":userId", $newUserId, PDO::PARAM_INT);
+                    $statement->bindParam(":jobTitle", $registrant->jobTitle, PDO::PARAM_STR);
+                    $statement->bindParam(":departments", $businesses, PDO::PARAM_STR);
+                    $statement->bindParam(":areas", $areas, PDO::PARAM_STR);
                     // After October the expiration date is increased to the following year.
-                    if (strtotime($dateCurrent) < strtotime(date('Y-11-1'))) {
-                        $statement->bindParam(":expirationDate", date('Y-12-31', strtotime($dateCurrent)));
-                    } else {
-                        $statement->bindParam(":expirationDate", date('Y-12-31', strtotime($dateCurrent . '+1 year')));
-                    }
+                    $expirationDate = (strtotime($dateCurrent) < strtotime(date('Y-11-1'))) ? date('Y-12-31', strtotime($dateCurrent)) : date('Y-12-31', strtotime($dateCurrent . '+1 year'));
+                    $statement->bindParam(":expirationDate", $expirationDate, PDO::PARAM_STR);
                     $statement->bindParam(":studentId", $registrant->studentId);
                     $statement->execute();
-    
                     // Create an order and line item for new member.
                     // WSFIA Regular Member option ID
                     $orderOption = 1;
@@ -383,36 +396,36 @@ class Membership extends Member implements iRegistration {
                     }
                     // Gets the pricing for the registrant.
                     $statement = $connection->prepare("SELECT * FROM orderOptions WHERE id=:id");
-                    $statement->bindParam(":id", $orderOption);
+                    $statement->bindParam(":id", $orderOption, PDO::PARAM_INT);
                     $statement->execute();
                     $results = $statement->fetch(PDO::FETCH_ASSOC);
                     // Create a invoice line item for the new membership.
                     $itemDescription = "Member Name: " . $registrant->firstName . " " . $registrant->lastName . "\nMember ID: " . $memberId;    
                     array_push($lineItem, array("emailAddress" => $registrant->emailAddress, "quantity" => 1, "itemId" => $results['id'], "itemName" => $results['description'], "itemDescription" => $itemDescription, "price" => $results['price']));
                 }
+                
 
                 // Conference Information
-                if (isset($registrant->conference)) {
+                // Creates a separate line item for conference registrations.
+                if (isset($registrant->conference->attending)) {
 
-                    $datesAttending->dates = [];
+                    $datesAttending['dates'] = array();
+
+                    //error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . json_encode($registrant->conference, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
 
                     $memberId = isset($registrant->id) ? $registrant->id : $memberId;
                     // Sets the attendind days variables to a boolean.
-                    $attendingMonday = filter_var($registrant->conference->attending->Monday, FILTER_VALIDATE_BOOLEAN);
-                    $attendingTuesday = filter_var($registrant->conference->attending->Tuesday, FILTER_VALIDATE_BOOLEAN);
-                    $attendingWednesday = filter_var($registrant->conference->attending->Wednesday, FILTER_VALIDATE_BOOLEAN);
-                    $attendingThursday = filter_var($registrant->conference->attending->Thursday, FILTER_VALIDATE_BOOLEAN);
-                    $attendingFriday = filter_var($registrant->conference->attending->Friday, FILTER_VALIDATE_BOOLEAN);
+                    $attendingMonday = (isset($registrant->conference->attending->Monday)) ? filter_var($registrant->conference->attending->Monday, FILTER_VALIDATE_BOOLEAN) : false;
+                    $attendingTuesday = (isset($registrant->conference->attending->Tuesday)) ? filter_var($registrant->conference->attending->Tuesday, FILTER_VALIDATE_BOOLEAN) : false;
+                    $attendingWednesday = (isset($registrant->conference->attending->Wednesday)) ? filter_var($registrant->conference->attending->Wednesday, FILTER_VALIDATE_BOOLEAN) : false;
+                    $attendingThursday = (isset($registrant->conference->attending->Thursday)) ? filter_var($registrant->conference->attending->Thursday, FILTER_VALIDATE_BOOLEAN) : false;
+                    $attendingFriday = (isset($registrant->conference->attending->Friday)) ? filter_var($registrant->conference->attending->Friday, FILTER_VALIDATE_BOOLEAN) : false;
                     // Add to the datesAttending array if the registrant is attending a specific day.
-                    if ($attendingMonday) $datesAttending->dates[] = 'Monday';
-                    if ($attendingTuesday) $datesAttending->dates[] = 'Tuesday';
-                    if ($attendingWednesday) $datesAttending->dates[] = 'Wednesday';
-                    if ($attendingThursday) $datesAttending->dates[] = 'Thursday';
-                    if ($attendingFriday) $datesAttending->dates[] = 'Friday';
-
-
-                    error_log(date('Y-m-d H:i:s') . " " . json_encode($datesAttending, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
-                    
+                    if ($attendingMonday) array_push($datesAttending['dates'], "Monday");
+                    if ($attendingTuesday) array_push($datesAttending['dates'], "Tuesday");
+                    if ($attendingWednesday) array_push($datesAttending['dates'], "Wednesday");
+                    if ($attendingThursday) array_push($datesAttending['dates'], "Thursday");
+                    if ($attendingFriday) array_push($datesAttending['dates'], "Friday");
 
                     // Adds up the number of days the registrant will be attending the conference.
                     $daysAttending = 0;
@@ -438,9 +451,11 @@ class Membership extends Member implements iRegistration {
                     if ($orderOption > 0) {
                         // Gets the pricing for the registrant.
                         $statement = $connection->prepare("SELECT * FROM orderOptions WHERE id=:id");
-                        $statement->bindParam(":id", $orderOption);
+                        $statement->bindParam(":id", $orderOption, PDO::PARAM_INT);
                         $statement->execute();
                         $results = $statement->fetch(PDO::FETCH_ASSOC);
+                        // Adds $40 to the conference pricing for a new member.
+                        $results['price'] = ($newMember) ? $results['price'] + 40 : $results['price'];
                         // Create a invoice line item for the new membership.
                         $itemDescription = "Conference Registration\nMember Name: " . $registrant->firstName . " " . $registrant->lastName . "\nMember ID: " . $memberId;    
                         array_push($lineItem, array("emailAddress" => $registrant->emailAddress, "quantity" => 1, "itemId" => $results['id'], "itemName" => $results['description'], "itemDescription" => $itemDescription, "price" => $results['price']));
@@ -450,45 +465,50 @@ class Membership extends Member implements iRegistration {
                         $ceu = $ceu ? 1 : 0;
                         $licenseType = isset($registrant->conference->licenseType) ? $registrant->conference->licenseType : '';
                         $licenseNumber = isset($registrant->conference->licenseNumber) ? $registrant->conference->licenseNumber : '';
-                    
+                        // Converts array into a string for the database.
+                        $datesAttending = json_encode($datesAttending);
                         // Conference Information
                         $statement = $connection->prepare("INSERT INTO attendees (`memberId`, `datesAttending`, `ceu`, `licenseType`, `licenseNumber`) VALUES (:memberId, :datesAttending, :ceu, :licenseType, :licenseNumber)");
-                        $statement->bindParam(":memberId", $memberId);
-                        $statement->bindParam(":datesAttending", json_encode($datesAttending));
+                        $statement->bindParam(":memberId", $memberId, PDO::PARAM_STR);
+                        $statement->bindParam(":datesAttending", $datesAttending, PDO::PARAM_STR);
                         $statement->bindParam(":ceu", $ceu, PDO::PARAM_INT);
                         $statement->bindParam(":licenseType", $licenseType, PDO::PARAM_STR);
                         $statement->bindParam(":licenseNumber", $licenseNumber, PDO::PARAM_STR);
                         $statement->execute();
-                        
                     }
-                    
-                }
 
+                }
+                
             }
+
             // Adds all of the new line items to the lineItems array.
             $lineItems['lineItems'] = $lineItem;
+
             
+
             // Get Billing Business Information
             $statement = $connection->prepare("SELECT * FROM businesses as b, states as s WHERE b.id=:id AND s.stateId=b.state");
-            $statement->bindParam(":id", $data->businessId);
+            $statement->bindParam(":id", $data->businessId, PDO::PARAM_INT);
             $statement->execute();
             $billingBusiness = $statement->fetch(PDO::FETCH_ASSOC);
             // Adds billing information to the line items for the invoice.
             $lineItems['billing'] = array("billingEmailAddress" => $data->emailAddress, "billingBusiness" => $billingBusiness);
-
+/* Commented for testing
             // Removes session data from the database to clean up the userSessions table.
             $statement = Configuration::openConnection()->prepare("DELETE FROM `userSessions` WHERE `sessionId`=:sessionId");
             $statement->bindParam(":sessionId", $data->sessionId);
             $statement->execute();
+*/
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . json_encode($lineItems, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
                         
             return json_encode($lineItems, JSON_PRETTY_PRINT);
             
         }
         catch (PDOException $e) { 
-            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         catch (Exception $e) {
-            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         finally {
             $connection = Configuration::closeConnection();

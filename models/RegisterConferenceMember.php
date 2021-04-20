@@ -27,17 +27,17 @@ class RegisterConferenceMember extends Membership implements iRegistration {
 
     public function reportRegistration($member) {}
     /**
-     * Uses the WSFIA member ID to get selected current member information, and add the member(s) 
+     * Uses the WSFIA member ID to get selected current member information, and adds the member(s) 
      * to the userSessions table, just like as if they were registering a new account.
      * Endpoint: /conference/currentMembers/process
      *
-     * @param [json] $sessionData
+     * @param array $sessionData
      * @return boolean
      */
     public function addConferenceCurrentMembers($currentUsersSessionData) {
 
         $result = false;
-        $data = json_decode(json_encode($currentUsersSessionData), FALSE);
+        $data = json_decode(json_encode($currentUsersSessionData), false);
         $memberArray = [];
         $memberIds = explode(',', $data->memberIds);
 
@@ -75,21 +75,23 @@ class RegisterConferenceMember extends Membership implements iRegistration {
                 $results['areas'] = $areas;
 
                 try{
+                    $jsonString = json_encode($results);
+                    
                     $statement = $connection->prepare("INSERT INTO userSessions (`sessionId`, `registration`) VALUES (:sessionId, :registration)");
-                    $statement->bindParam(":sessionId", $data->sessionId);
-                    $statement->bindParam(":registration", json_encode($results));
+                    $statement->bindParam(":sessionId", $data->sessionId, PDO::PARAM_STR);
+                    $statement->bindParam(":registration", $jsonString, PDO::PARAM_STR);
 
                     $result = $statement->execute();
                 } catch (Exception $e) {
-                    error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+                    error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
                 }
 
             }
             catch (PDOException $e) { 
-                error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+                error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
             }
             catch (Exception $e) {
-                error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+                error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
             }
             finally {
                 Configuration::closeConnection();
@@ -100,12 +102,14 @@ class RegisterConferenceMember extends Membership implements iRegistration {
         return $result;
     }
     /**
-     * Sets the conference dates a specific registrant will be attending.
+     * Sets the conference dates a specific registrant will be attending based on their member ID.
      *
-     * @param [json] $attendingData
+     * @param array $attendingData
      * @return boolean
      */
     public function setAttendingDate($attendingData) {
+
+        //error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . json_encode($attendingData, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
 
         $result = false;
         $data = json_decode(json_encode($attendingData), FALSE);
@@ -164,10 +168,10 @@ class RegisterConferenceMember extends Membership implements iRegistration {
 
         }
         catch (PDOException $e) { 
-            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         catch (Exception $e) {
-            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         finally {
             $connection = Configuration::closeConnection();
@@ -176,9 +180,9 @@ class RegisterConferenceMember extends Membership implements iRegistration {
         return $result;
     }
     /**
-     * Sets the boolean for a specific registrant if they are attending the conference for CEU.
+     * Sets the boolean for a specific registrant based on their member ID if they are attending the conference for CEU.
      *
-     * @param [json] $attendingData
+     * @param array $attendingData
      * @return boolean
      */
     public function setCEU($attendingData) {
@@ -223,10 +227,10 @@ class RegisterConferenceMember extends Membership implements iRegistration {
 
         }
         catch (PDOException $e) { 
-            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         catch (Exception $e) {
-            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         finally {
             $connection = Configuration::closeConnection();
@@ -236,9 +240,9 @@ class RegisterConferenceMember extends Membership implements iRegistration {
     }
 
     /**
-     * Sets the license type for a specific registrant's .
+     * Sets the license type for a specific registrant based on their member ID.
      *
-     * @param [json] $attendingData
+     * @param array $attendingData
      * @return boolean
      */
     public function setLicenseType($attendingData) {
@@ -283,10 +287,10 @@ class RegisterConferenceMember extends Membership implements iRegistration {
 
         }
         catch (PDOException $e) { 
-            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         catch (Exception $e) {
-            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         finally {
             $connection = Configuration::closeConnection();
@@ -295,9 +299,9 @@ class RegisterConferenceMember extends Membership implements iRegistration {
         return $result;
     }
     /**
-     * Sets the license number for a specific registrant.
+     * Sets the license number for a specific registrant based on their member ID.
      *
-     * @param [json] $attendingData
+     * @param array $attendingData
      * @return boolean
      */
     public function setLicenseNumber($attendingData) {

@@ -11,7 +11,18 @@ use PhpOffice\PhpSpreadsheet\Writer;
 
 final class MembershipTest extends TestCase
 {
+    public $registrants = array(
+        "sessionId" => "test-data-123"
+        , "emailAddress" => "kkelm@outlook.com"
+        , "businessId" => "270"
+    );
 
+    public function testRegister(): void {
+        $Membership = new Membership();
+        //$this->assertTrue($Membership->register($this->registrants));
+        $this->assertIsArray($Membership->register($this->registrants));
+    }
+    /*
     public function testExportMembersInfo(): void
     {
         $Membership = new Membership();
@@ -40,6 +51,7 @@ final class MembershipTest extends TestCase
 
         
     }
+    */
     
 }
 ?>

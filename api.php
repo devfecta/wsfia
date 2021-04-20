@@ -122,6 +122,8 @@ switch ($requestMethod) {
                             echo $RegisterConferenceMember->addConferenceCurrentMembers($_POST);
                             break;
                         case "setAttendingDate":
+                            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . json_encode($attendingData, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
+
                             echo $RegisterConferenceMember->setAttendingDate($_POST);
                             break;
                         case "setCEU":
