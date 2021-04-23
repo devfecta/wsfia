@@ -30,6 +30,26 @@ class Membership extends Member implements iRegistration {
     public function setSession($sessionData) {
         $this->sessionData = $sessionData;
     }
+
+    public function getRegistrantCount($sessionId) {
+
+        try {
+            $connection = Configuration::openConnection();
+            $statement = $connection->prepare("SELECT `sessionId` FROM userSessions WHERE `sessionId`=:sessionId");
+            $statement->bindParam(":sessionId", $sessionId, PDO::PARAM_STR);
+            $statement->execute();
+            return $statement->rowCount();
+        }
+        catch (PDOException $e) { 
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        catch (Exception $e) {
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+    }
     
     public function addMember($sessionData) {
 
@@ -484,8 +504,6 @@ class Membership extends Member implements iRegistration {
             // Adds all of the new line items to the lineItems array.
             $lineItems['lineItems'] = $lineItem;
 
-            
-
             // Get Billing Business Information
             $statement = $connection->prepare("SELECT * FROM businesses as b, states as s WHERE b.id=:id AND s.stateId=b.state");
             $statement->bindParam(":id", $data->businessId, PDO::PARAM_INT);
@@ -493,13 +511,13 @@ class Membership extends Member implements iRegistration {
             $billingBusiness = $statement->fetch(PDO::FETCH_ASSOC);
             // Adds billing information to the line items for the invoice.
             $lineItems['billing'] = array("billingEmailAddress" => $data->emailAddress, "billingBusiness" => $billingBusiness);
-/* Commented for testing
+
             // Removes session data from the database to clean up the userSessions table.
             $statement = Configuration::openConnection()->prepare("DELETE FROM `userSessions` WHERE `sessionId`=:sessionId");
             $statement->bindParam(":sessionId", $data->sessionId);
             $statement->execute();
-*/
-            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . json_encode($lineItems, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
+
+            //error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . json_encode($lineItems, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
                         
             return json_encode($lineItems, JSON_PRETTY_PRINT);
             

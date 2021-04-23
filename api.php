@@ -154,6 +154,9 @@ switch ($requestMethod) {
                 case "Membership":
                     $Membership = new Membership();
                     switch ($_GET['method']) {
+                        case "getRegistrantCount":
+                            echo $Membership->getRegistrantCount($_GET['sessionId']);
+                            break;
                         case "getRegistrants":
                             echo $Membership->getRegistrants($_GET['formData']);
                             break;
