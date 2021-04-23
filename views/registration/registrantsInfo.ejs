@@ -8,6 +8,10 @@
 
 <section id="membershipInfo">
     <h1><% if (session.conference) { %> Conference <% } else { %> Membership <% } %> Registration</h1>
+
+    <% if ((session.errorMessage) && session.errorMessage.length > 0) {  %>
+        <div class="alert alert-danger m-1" role="alert"><%- session.errorMessage %></div>
+    <% } %>
     
 <% if ((session.registrants) && session.registrants.length > 0) {  %>
 

@@ -199,10 +199,16 @@ class Membership {
                     , params
                 )
                 .then(response => {
+                    if(response.data) {
+                        return false;
+                    }
+                    else {
+                        return lineItems
+                    }
                     //console.log("PayPal Response");
                     //console.log(response.data);
                     // NOTE: Response is empty if successful.
-                    return lineItems
+                    
                 })
                 .catch(error => console.log(error));
                 

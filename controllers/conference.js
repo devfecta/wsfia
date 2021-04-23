@@ -41,7 +41,7 @@ class Conference {
 
         let memberData = JSON.parse(data);
 
-        console.log(memberData);
+        //console.log(memberData);
 
         try {
             

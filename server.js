@@ -34,6 +34,7 @@ app.use('/', express.static('public'));
  */
 const Controllers = require('./controllers');
 const { pathToFileURL } = require("url");
+const { request } = require("express");
 const controllers = new Controllers();
 /**
  * Sets start and end dates for conference registration.
@@ -58,6 +59,16 @@ app.get('/', (request, response) => {
 /**
  * Utilities START
  */
+app.get('/getRegistrantCount', async (request, response) => {
+    request.session.sessionId = request.sessionID;
+    //console.log(request._parsedOriginalUrl.query + "&sessionId=" + request.session.sessionId);
+    let results = await controllers.utilities.getRegistrantCount(request._parsedOriginalUrl.query + "&sessionId=" + request.session.sessionId);
+    request.session.showRegistrationsButton = (results > 0) ? true : false;
+    //console.log(results);
+    response.end();
+    //response.json(results);
+});
+
 app.get('/businessSearch', async (request, response) => {
     //console.log(request._parsedOriginalUrl.query);
     let results = await controllers.utilities.businessSearch(request._parsedOriginalUrl.query);
@@ -131,10 +142,11 @@ app.post('/addBusiness', async (request, response) => {
  * Renders the page for adding a registrant.
  */
 app.get('/register/member', (request, response) => {
-
+    /*
     if(request.session.sessionId === undefined){
         request.session.sessionId = uuidv4();
     }
+    */
     response.render('./registration/memberInfo.ejs', { session: request.session, message: '' });
 });
 /**
@@ -207,10 +219,22 @@ app.post('/register/process', async (request, response) => {
     delete request.body.licenseType;
     delete request.body.licenseNumber;
     //console.log(request.body);
-    request.session.registration = await controllers.membership.registerMember(JSON.stringify(request.body));
+    let result = await controllers.membership.registerMember(JSON.stringify(request.body));
     //console.log("Registration Session");
     //console.log(request.session.registration);
-    response.redirect('/register/confirm');
+
+    request.session.errorMessage = "";
+
+    if (result) {
+        request.session.registration = result;
+        response.redirect('/register/confirm');
+    }
+    else {
+        //console.log(result);
+        //console.log("PayPal Error");
+        request.session.errorMessage = 'There was an error with PayPal. Please contact us at <a href="mailto:treasurer@wsfia.org">treasurer@wsfia.org</a> to finish your registration.';
+        response.redirect('/register/member/registrants');
+    }
 });
 /**
  * Renders the page for listing all of the members for renewal.

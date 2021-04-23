@@ -2,6 +2,31 @@
 // wsfia-php
 //const url = 'http://34.71.62.246';
 //const url = 'http://localhost';
+/**
+ * Methods that should be called when every page loads.
+ */
+let init = () => {
+    
+}
+
+const getRegistrantCount = () => {
+
+    let parameters = 'class=Membership';
+    parameters += '&method=getRegistrantCount';
+
+    fetch('/getRegistrantCount?' + parameters, {method: 'GET'})
+    .then(response => response)
+    /*
+    .then(json => {
+        console.log(json);
+    })
+    */
+    .catch(error => displayError(error));
+}
+
+getRegistrantCount();
+
+
 
 /**
  * Searches for departments or businesses in the database, and calls the getBusinesses 
@@ -147,13 +172,13 @@ const getMembers = async (businessId, conference) => {
 
             if (conference) {
                 currentForm.innerHTML = `<p class="text-danger">If you are already a member you will see your account and others 
-                associated with the department/business information listed below. Simply click on the "Conference Registration" button 
-                to continue with the conference registration process. If you don't see a member listed, and need to register them as 
-                a new member click "Add Registrant" to continue.</p>`;
+                associated with the department/business information listed below. Simply click on the "<strong>Conference Registration</strong>" button 
+                to continue with the conference registration process. If you don't see a member listed you will need to register them as 
+                a new member by clicking "<strong>Create New Account</strong>".</p>`;
             }
             else {
                 currentForm.innerHTML = `<p class="text-danger">If you are already a member you will see your account information listed below. 
-                If you don't see your account listed, click on the "Create New Account" button to register.</p>`;
+                If you don't see your account listed, click on the "<strong>Create New Account</strong>" button to register.</p>`;
             }
             
             data.forEach( member => {
