@@ -506,8 +506,7 @@ app.post('/addConferenceRegistrants', async (request, response) => {
  * Renders the conference sponsor registration form.
  */
  app.get('/conference/sponsor', async (request, response) => {
-    request.body.inventory = await controllers.conference.getInventory("Sponsor");
-    console.log(request.body.inventory);
+    request.session.inventory = await controllers.conference.getInventory("Sponsor");
     response.render('./registration/sponsorInfo.ejs', { session: request.session, message: '' });
 });
 /**
@@ -516,11 +515,12 @@ app.post('/addConferenceRegistrants', async (request, response) => {
  * then redirects to the confirmation page.
  */
  app.post('/conference/sponsor/register', async (request, response) => {
-    //console.log(request.body);
-    
-    let result = await controllers.conference.registerSponsor(JSON.stringify(request.body));
-    request.session.errorMessage = "";
+    let formData = Object.assign({}, request.body);
+    let result = await controllers.conference.registerSponsor(JSON.stringify(formData));
+    response.send(result);
 
+    request.session.errorMessage = "";
+    /*
     if (result) {
         // result is line items
         request.session.registration = result;
@@ -531,6 +531,7 @@ app.post('/addConferenceRegistrants', async (request, response) => {
         request.session.errorMessage = 'There was an error with PayPal. Please contact us at <a href="mailto:treasurer@wsfia.org">treasurer@wsfia.org</a> to finish your registration.';
         response.redirect('/conference/sponsor/register');
     }
+    */
 });
 /**
  * Renders the sponsor registration confirmation, after the registration has been processed.

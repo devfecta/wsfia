@@ -269,6 +269,43 @@ class Conference {
             console.error(e);
         }
     }
+
+    registerSponsor = async (formData) => {
+        let data = JSON.parse(formData);
+
+        console.log(data);
+
+
+
+        try {
+            
+            let params = new URLSearchParams();
+
+            params.append('companyName', data.companyName);
+            params.append('contactName', data.contactName);
+            params.append('emailAddress', data.emailAddress);
+            params.append('contactPhone', data.contactPhone);
+            params.append('streetAddress', data.streetAddress);
+            params.append('city', data.city);
+            params.append('state', data.state);
+            params.append('zipcode', data.zipcode);
+            params.append('companyUrl', data.companyUrl);
+            params.append('services', data.services);
+            params.append('sponsorships', data.sponsorships);
+            params.append('class', 'Sponsor');
+            params.append('method', 'registerSponsor');
+            
+            axios.post(process.env.API + '/api.php'
+                , params
+            )
+            .then(response => console.log(response.data))
+            .catch(error => console.log(error));
+            
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
     
 }
 

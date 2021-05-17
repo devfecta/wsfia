@@ -6,13 +6,15 @@
 
     <%- message %>
 
+    
+
     <form name="sponsorForm" id="sponsorForm" action="/conference/sponsor/register" method="POST" class="needs-validation" novalidate>
         <fieldset>
             <legend>Sponsor Information</legend>
 
             <div class="form-group row">
                 <label class="col-md-2 col-form-label" for="companyName">Company Name</label>
-                <input type="text" class="col-sm-10 form-control" name="companyName" id="companyName" size="36" maxlength="48" value="" />
+                <input type="text" class="col-sm-10 form-control" name="companyName" id="companyName" size="36" maxlength="48" value="" required />
             </div>
 
             <div class="form-group row">
@@ -33,22 +35,22 @@
 
             <div class="form-group row">
                 <label class="col-md-2 col-form-label" for="streetAddress">Street Address</label>
-                <input type="text" class="col-sm-10 form-control" name="streetAddress" id="streetAddress" size="48" maxlength="64" value="" />
+                <input type="text" class="col-sm-10 form-control" name="streetAddress" id="streetAddress" size="48" maxlength="64" value="" required />
             </div>
 
             <div class="form-group row">
                 <label class="col-md-2 col-form-label" for="city">City</label>
-                <input type="text" class="col-md-10 form-control" name="city" id="city" size="18" maxlength="24" value="" />
+                <input type="text" class="col-md-10 form-control" name="city" id="city" size="18" maxlength="24" value="" required />
             </div>
 
             <div class="form-group row">
                 <label class="col-md-2 col-form-label" for="state">State Abbreviation</label>
-                <input type="text" class="col-md-10 form-control" name="state" id="state" size="2" maxlength="2" value="" />
+                <input type="text" class="col-md-10 form-control" name="state" id="state" size="2" maxlength="2" value="" required />
             </div>
 
             <div class="form-group row">
-                <label class="col-md-2 col-form-label" for="companyUrl">Company URL</label>
-                <input type="text" class="col-md-10 form-control" name="companyUrl" id="companyUrl" size="128" maxlength="256" value="" />
+                <label class="col-md-2 col-form-label" for="zipcode">Zipcode</label>
+                <input type="text" class="col-md-10 form-control" name="zipcode" id="zipcode" size="7" maxlength="10" value="" required />
             </div>
 
             <div class="form-group row">
@@ -63,50 +65,26 @@
         
         </fieldset>
 
+        <script>
+            document.querySelectorAll("input[type=text]").forEach(element => {
+                console.log(element.type);
+                element.value = "test";
+            });
+            document.querySelectorAll("input[type=email]").forEach(element => {
+                console.log(element.type);
+                element.value = "test@email.com";
+            });
+        </script>
+
         <fieldset>
             <legend>Available Sponsorships</legend>
 
-            <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[0]" value="9" data-value="Conference Sponsor" />
-                <label class="form-check-label ml-1 mr-3" for="sponsorship[0]">Conference Sponsor (include vendor table) - <em>$1,200</em></label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[1]" value="10" data-value="Lanyard Sponsor" />
-                <label class="form-check-label ml-1 mr-3" for="sponsorship[1]">Lanyard Sponsor - <em>$900</em></label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[2]" value="11" data-value="Brochure Sponsor Back Page Ad" />
-                <label class="form-check-label ml-1 mr-3" for="sponsorship[2]">Brochure Sponsor Back Page Ad - <em>$750</em></label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[3]" value="12" data-value="Brochure Sponsor Inside Cover" />
-                <label class="form-check-label ml-1 mr-3" for="sponsorship[3]">Brochure Sponsor Inside Cover 1/2 Page Ad - <em>$450</em></label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[4]" value="13" data-value="Pre-Conference Breaks" />
-                <label class="form-check-label ml-1 mr-3" for="sponsorship[4]">Pre-Conference Breaks - <em>$300</em></label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[5]" value="14" data-value="Main Conference Keynote Speaker" />
-                <label class="form-check-label ml-1 mr-3" for="sponsorship[5]">Main Conference Keynote Speaker - <em>$500</em></label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[6]" value="15" data-value="Main Conference Break" />
-                <label class="form-check-label ml-1 mr-3" for="sponsorship[6]">Main Conference Break - <em>$300</em></label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[7]" value="16" data-value="Vendor Night Sponsor" />
-                <label class="form-check-label ml-1 mr-3" for="sponsorship[7]">Vendor Night Sponsor - <em>$400</em></label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[8]" value="17" data-value="Break Out Sessions" />
-                <label class="form-check-label ml-1 mr-3" for="sponsorship[8]">Break Out Sessions - <em>$100</em></label>
-            </div>
-            <div class="form-check">
-                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[9]" value="18" data-value="Scholarship Sponsor" />
-                <label class="form-check-label ml-1 mr-3" for="sponsorship[9]">Scholarship Sponsor - <em>$100</em></label>
-            </div>
-
+            <% session.inventory.forEach(function(orderOption, index) { %>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name="sponsorships" id="sponsorship[<%- index %>]" value="<%- orderOption.id %>" data-value="<%- orderOption.description %>" />
+                    <label class="form-check-label ml-1 mr-3" for="sponsorship[<%- index %>]"><%- orderOption.description %> - <em>$<%- orderOption.price %></em> <span style="font-size: 90%;">(Availability: <%= (orderOption.inventory > 0) ? orderOption.inventory : (orderOption.inventory < 0) ? "Unlimited" : "Unvailable"; %>)</span></label>
+                </div>
+            <% }); %>
         </fieldset>
             
         <div class="form-group row">
