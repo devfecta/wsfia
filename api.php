@@ -31,7 +31,7 @@ require_once("models/ProcessOrder.php");
 require_once("models/RegisterConferenceMember.php");
 //require_once("./models/RegisterConferenceSpeaker.php");
 //require_once("./models/RegisterConferenceVendor.php");
-//require_once("./models/School.php");
+require_once("./models/Sponsor.php");
 //require_once("./models/Speaker.php");
 //require_once("./models/User.php");
 //require_once("./models/Vendor.php");
@@ -122,8 +122,7 @@ switch ($requestMethod) {
                             echo $RegisterConferenceMember->addConferenceCurrentMembers($_POST);
                             break;
                         case "setAttendingDate":
-                            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . json_encode($attendingData, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
-
+                            //error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . json_encode($attendingData, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
                             echo $RegisterConferenceMember->setAttendingDate($_POST);
                             break;
                         case "setCEU":
@@ -134,6 +133,15 @@ switch ($requestMethod) {
                             break;
                         case "setLicenseNumber":
                             echo $RegisterConferenceMember->setLicenseNumber($_POST);
+                            break;
+                        case "setBanquet":
+                            echo $RegisterConferenceMember->setBanquet($_POST);
+                            break;
+                        case "setVendorNight":
+                            echo $RegisterConferenceMember->setVendorNight($_POST);
+                            break;
+                        case "setGuestName":
+                            echo $RegisterConferenceMember->setGuestName($_POST);
                             break;
                         default:
                             echo json_encode(array("error" => 'METHOD ERROR: The '.$_POST['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);
@@ -274,6 +282,14 @@ switch ($requestMethod) {
                             break;
                         default:
                             echo json_encode(array("error" => 'GET METHOD ERROR: The '.$_GET['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);
+                            break;
+                    }
+                    break;
+                case 'Sponsor':
+                    $Sponsor = new Sponsor(null);
+                    switch ($_GET['method']) {
+                        case "getInventory":
+                            echo $Sponsor->getInventory($_GET['type']);
                             break;
                     }
                     break;

@@ -18,7 +18,7 @@ class RegisterConferenceMember extends Membership implements iRegistration {
     public function register($order) {}
         
     public function unRegister($member) {}
-        
+
     public function updateRegistration($member) {}
         
     public function sendConfirmation($member) {}
@@ -102,6 +102,77 @@ class RegisterConferenceMember extends Membership implements iRegistration {
         return $result;
     }
     /**
+     * Gets all of the current registrations from the session using the session ID.
+     *
+     * @param array $attendingData
+     * @return array registration data
+     */
+    public function getRegistrations($sessionId) {
+
+        $result = false;
+
+        error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $sessionId . "\n", 3, "/var/www/html/php-errors.log");
+
+        try {
+
+            $connection = Configuration::openConnection();
+
+            $statement = $connection->prepare("SELECT * FROM userSessions WHERE sessionId=:id");
+            $statement->bindParam(":id", $sessionId, PDO::PARAM_STR);
+            $statement->execute();
+
+            $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+            
+        }
+        catch (PDOException $e) { 
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        catch (Exception $e) {
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+
+        return $result;
+    }
+    /**
+     * Updates the registration session information.
+     *
+     * @param [type] $registrationId
+     * @param [type] $sessionId
+     * @param [type] $registration
+     * @return boolean
+     */
+    public function updateSessionRegistration($registrationId, $sessionId, $registration) {
+
+        $result = false;
+
+        try {
+
+            $connection = Configuration::openConnection();
+
+            $statement = $connection->prepare("UPDATE `userSessions` SET `registration`=:registration WHERE `id`=:id AND `sessionId`=:sessionId");
+            $statement->bindParam(":id", $registrationId, PDO::PARAM_INT);
+            $statement->bindParam(":sessionId", $sessionId, PDO::PARAM_STR);
+            $statement->bindParam(":registration", $registration, PDO::PARAM_STR);
+            $result = $statement->execute();
+
+        }
+        catch (PDOException $e) { 
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        catch (Exception $e) {
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+
+        return $result;
+    }
+
+    /**
      * Sets the conference dates a specific registrant will be attending based on their member ID.
      *
      * @param array $attendingData
@@ -109,20 +180,14 @@ class RegisterConferenceMember extends Membership implements iRegistration {
      */
     public function setAttendingDate($attendingData) {
 
-        //error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . json_encode($attendingData, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
-
         $result = false;
         $data = json_decode(json_encode($attendingData), FALSE);
 
         try {
+            
+            $registrants = $this->getRegistrations($data->sessionId);
 
-            $connection = Configuration::openConnection();
-
-            $statement = $connection->prepare("SELECT * FROM userSessions WHERE sessionId=:id");
-            $statement->bindParam(":id", $data->sessionId);
-            $statement->execute();
-
-            $registrants = $statement->fetchAll(PDO::FETCH_ASSOC);
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $registrants . "\n", 3, "/var/www/html/php-errors.log");
 
             foreach ($registrants as $registrantData) {
 
@@ -156,12 +221,8 @@ class RegisterConferenceMember extends Membership implements iRegistration {
                     $registrant = json_decode($registrant, false);
 
                     $jsonString = json_encode($registrant);
-
-                    $statement = $connection->prepare("UPDATE `userSessions` SET `registration`=:registration WHERE `id`=:id AND `sessionId`=:sessionId");
-                    $statement->bindParam(":id", $registrantData['id'], PDO::PARAM_INT);
-                    $statement->bindParam(":sessionId", $data->sessionId, PDO::PARAM_STR);
-                    $statement->bindParam(":registration", $jsonString, PDO::PARAM_STR);
-                    $result = $statement->execute();
+                    
+                    $result = $this->updateSessionRegistration($registrantData['id'], $data->sessionId, $jsonString);
                 }
                 
             }
@@ -191,14 +252,8 @@ class RegisterConferenceMember extends Membership implements iRegistration {
         $data = json_decode(json_encode($attendingData), FALSE);
 
         try {
-
-            $connection = Configuration::openConnection();
-
-            $statement = $connection->prepare("SELECT * FROM userSessions WHERE sessionId=:id");
-            $statement->bindParam(":id", $data->sessionId);
-            $statement->execute();
-
-            $registrants = $statement->fetchAll(PDO::FETCH_ASSOC);
+            
+            $registrants = $this->getRegistrations($data->sessionId);
 
             foreach ($registrants as $registrantData) {
 
@@ -214,13 +269,8 @@ class RegisterConferenceMember extends Membership implements iRegistration {
                     $registrant->conference->ceu = isset($data->ceu) ? $data->ceu : false;
 
                     $jsonString = json_encode($registrant);
-
-                    $statement = $connection->prepare("UPDATE `userSessions` SET `registration`=:registration WHERE `id`=:id AND `sessionId`=:sessionId");
-                    $statement->bindParam(":id", $registrantData['id'], PDO::PARAM_INT);
-                    $statement->bindParam(":sessionId", $data->sessionId, PDO::PARAM_STR);
-                    $statement->bindParam(":registration", $jsonString, PDO::PARAM_STR);
-
-                    $result = $statement->execute();
+                    
+                    $result = $this->updateSessionRegistration($registrantData['id'], $data->sessionId, $jsonString);
                 }
                 
             }
@@ -238,7 +288,6 @@ class RegisterConferenceMember extends Membership implements iRegistration {
 
         return $result;
     }
-
     /**
      * Sets the license type for a specific registrant based on their member ID.
      *
@@ -251,14 +300,8 @@ class RegisterConferenceMember extends Membership implements iRegistration {
         $data = json_decode(json_encode($attendingData), FALSE);
 
         try {
-
-            $connection = Configuration::openConnection();
-
-            $statement = $connection->prepare("SELECT * FROM userSessions WHERE sessionId=:id");
-            $statement->bindParam(":id", $data->sessionId);
-            $statement->execute();
-
-            $registrants = $statement->fetchAll(PDO::FETCH_ASSOC);
+            
+            $registrants = $this->getRegistrations($data->sessionId);
 
             foreach ($registrants as $registrantData) {
 
@@ -274,13 +317,8 @@ class RegisterConferenceMember extends Membership implements iRegistration {
                     $registrant->conference->licenseType = isset($data->licenseType) ? $data->licenseType : '';
 
                     $jsonString = json_encode($registrant);
-
-                    $statement = $connection->prepare("UPDATE `userSessions` SET `registration`=:registration WHERE `id`=:id AND `sessionId`=:sessionId");
-                    $statement->bindParam(":id", $registrantData['id'], PDO::PARAM_INT);
-                    $statement->bindParam(":sessionId", $data->sessionId, PDO::PARAM_STR);
-                    $statement->bindParam(":registration", $jsonString, PDO::PARAM_STR);
-
-                    $result = $statement->execute();
+                    
+                    $result = $this->updateSessionRegistration($registrantData['id'], $data->sessionId, $jsonString);
                 }
                 
             }
@@ -312,13 +350,7 @@ class RegisterConferenceMember extends Membership implements iRegistration {
         
         try {
 
-            $connection = Configuration::openConnection();
-
-            $statement = $connection->prepare("SELECT * FROM userSessions WHERE sessionId=:id");
-            $statement->bindParam(":id", $data->sessionId);
-            $statement->execute();
-
-            $registrants = $statement->fetchAll(PDO::FETCH_ASSOC);
+            $registrants = $this->getRegistrations($data->sessionId);
 
             foreach ($registrants as $registrantData) {
 
@@ -335,13 +367,152 @@ class RegisterConferenceMember extends Membership implements iRegistration {
                     
                     $jsonString = json_encode($registrant);
 
-                    $statement = $connection->prepare("UPDATE `userSessions` SET `registration`=:registration WHERE `id`=:id AND `sessionId`=:sessionId");
-                    $statement->bindParam(":id", $registrantData['id'], PDO::PARAM_INT);
-                    $statement->bindParam(":sessionId", $data->sessionId, PDO::PARAM_STR);
-                    $statement->bindParam(":registration", $jsonString, PDO::PARAM_STR);
+                    $result = $this->updateSessionRegistration($registrantData['id'], $data->sessionId, $jsonString);
+                }
+                
+            }
 
-                    $result = $statement->execute();
+        }
+        catch (PDOException $e) { 
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        catch (Exception $e) {
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+
+        return $result;
+    }
+    /**
+     * Sets the boolean for a specific registrant based on their member ID if they are attending the conference banquet.
+     *
+     * @param array $attendingData
+     * @return boolean
+     */
+    public function setBanquet($attendingData) {
+
+        $result = false;
+        $data = json_decode(json_encode($attendingData), FALSE);
+
+        try {
+            
+            $registrants = $this->getRegistrations($data->sessionId);
+
+            foreach ($registrants as $registrantData) {
+
+                $registrant = json_decode($registrantData['registration'], false);
+
+                if($registrant->emailAddress == $data->emailAddress) {
+
+                    $registrant = json_decode($registrantData['registration'], true);
+                    $registrant['conference']['banquet'] = '';
+                    $registrant = json_encode($registrant);
+                    $registrant = json_decode($registrant, false);
+
+                    $registrant->conference->banquet = isset($data->banquet) ? $data->banquet : false;
+
+                    $jsonString = json_encode($registrant);
                     
+                    $result = $this->updateSessionRegistration($registrantData['id'], $data->sessionId, $jsonString);
+                }
+                
+            }
+
+        }
+        catch (PDOException $e) { 
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        catch (Exception $e) {
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+
+        return $result;
+    }
+    /**
+     * Sets the boolean for a specific registrant based on their member ID if they are attending the conference vendor night.
+     *
+     * @param array $attendingData
+     * @return boolean
+     */
+    public function setVendorNight($attendingData) {
+
+        $result = false;
+        $data = json_decode(json_encode($attendingData), FALSE);
+
+        try {
+            
+            $registrants = $this->getRegistrations($data->sessionId);
+
+            foreach ($registrants as $registrantData) {
+
+                $registrant = json_decode($registrantData['registration'], false);
+
+                if($registrant->emailAddress == $data->emailAddress) {
+
+                    $registrant = json_decode($registrantData['registration'], true);
+                    $registrant['conference']['vendorNight'] = '';
+                    $registrant = json_encode($registrant);
+                    $registrant = json_decode($registrant, false);
+
+                    $registrant->conference->vendorNight = isset($data->vendorNight) ? $data->vendorNight : false;
+
+                    $jsonString = json_encode($registrant);
+                    
+                    $result = $this->updateSessionRegistration($registrantData['id'], $data->sessionId, $jsonString);
+                }
+                
+            }
+
+        }
+        catch (PDOException $e) { 
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        catch (Exception $e) {
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+
+        return $result;
+    }
+    /**
+     * Sets guest name for the specific attendee.
+     *
+     * @param array $attendingData
+     * @return boolean
+     */
+    public function setGuestName($attendingData) {
+
+        
+        $result = false;
+        $data = json_decode(json_encode($attendingData), FALSE);
+        
+        try {
+
+            $registrants = $this->getRegistrations($data->sessionId);
+
+            foreach ($registrants as $registrantData) {
+
+                $registrant = json_decode($registrantData['registration'], false);
+
+                if($registrant->emailAddress == $data->emailAddress) {
+
+                    $registrant = json_decode($registrantData['registration'], true);
+                    $registrant['conference']['guestName'] = '';
+                    $registrant = json_encode($registrant);
+                    $registrant = json_decode($registrant, false);
+
+                    $registrant->conference->guestName = isset($data->guestName) ? $data->guestName : null;
+                    
+                    $jsonString = json_encode($registrant);
+
+                    $result = $this->updateSessionRegistration($registrantData['id'], $data->sessionId, $jsonString);
                 }
                 
             }
