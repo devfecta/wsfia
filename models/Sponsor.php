@@ -137,10 +137,60 @@ class Sponsor {
             error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
         }
         finally {
-            Configuration::closeConnection();
+            $connection = Configuration::closeConnection();
         }
 
         return $results;
     }
+
+    public function registerSponsor($formData) {
+        
+        $sponsor = json_decode($formData, false);
+
+        $result = false;
+
+        try {
+            $connection = Configuration::openConnection();
+            /*
+            foreach() {
+
+            }
+
+            $statement = $connection->prepare("SELECT * FROM orderOptions WHERE id=:optionId");
+            $statement->bindParam(":optionId", $optionType, PDO::PARAM_STR);
+            $statement->execute();
+            $results = $statement->fetch(PDO::FETCH_ASSOC);
+            */
+
+            $sponsorships = json_encode($sponsor->sponsorships);
+
+            $statement = $connection->prepare("INSERT INTO sponsors (`companyName`, `contactName`, `emailAddress`, `contactPhone`, `streetAddress`, `city`, `state`, `zipcode`, `companyUrl`, `services`, `sponsorships`) 
+            VALUES (:companyName, :contactName, :emailAddress, :contactPhone, :streetAddress, :city, :stateAbbreviation, :zipcode, :companyUrl, :services, :sponsorships)");
+            $statement->bindParam(":companyName", $sponsor->companyName, PDO::PARAM_STR);
+            $statement->bindParam(":contactName", $sponsor->contactName, PDO::PARAM_STR);
+            $statement->bindParam(":emailAddress", $sponsor->emailAddress, PDO::PARAM_STR);
+            $statement->bindParam(":contactPhone", $sponsor->contactPhone, PDO::PARAM_STR);
+            $statement->bindParam(":streetAddress", $sponsor->streetAddress, PDO::PARAM_STR);
+            $statement->bindParam(":city", $sponsor->city, PDO::PARAM_STR);
+            $statement->bindParam(":stateAbbreviation", $sponsor->stateAbbreviation, PDO::PARAM_STR);
+            $statement->bindParam(":zipcode", $sponsor->zipcode, PDO::PARAM_STR);
+            $statement->bindParam(":companyUrl", $sponsor->companyUrl, PDO::PARAM_STR);
+            $statement->bindParam(":services", $sponsor->services, PDO::PARAM_STR);
+            $statement->bindParam(":sponsorships", $sponsorships, PDO::PARAM_STR);
+            $result = $statement->execute();
+        }
+        catch (PDOException $e) { 
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        catch (Exception $e) {
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+
+        return $result;
+    }
+
 }
 ?>

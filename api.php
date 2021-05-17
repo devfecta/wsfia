@@ -148,6 +148,14 @@ switch ($requestMethod) {
                             break;
                     }
                     break;
+                case 'Sponsor':
+                    $Sponsor = new Sponsor(null);
+                    switch ($_POST['method']) {
+                        case "registerSponsor":
+                            echo $Sponsor->registerSponsor($_POST);
+                            break;
+                    }
+                    break;
                 default;
                     echo json_encode(array("error" => 'CLASS ERROR: The '.$_POST['class'].' class does not exist.\n'), JSON_PRETTY_PRINT);
                     break;
