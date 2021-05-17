@@ -57,7 +57,7 @@ class Conference {
             axios.post(process.env.API + '/api.php'
                 , params
             )
-            .then(response => console.log(response.data))
+            .then(response => response.data)
             .catch(error => console.log(error));
             
         }
@@ -161,8 +161,115 @@ class Conference {
             console.error(e);
         }
 
-    }
+    }    
+    /**
+     * Sets the banquet field if the attendee is attending it.
+     * @param {string} data 
+     */
+     setBanquet = (data) => {
 
+        let memberData = JSON.parse(data);
+        //console.log(memberData);
+        try {
+            
+            let params = new URLSearchParams();
+
+            params.append('sessionId', memberData.sessionId);
+            params.append('emailAddress', memberData.emailAddress);
+            params.append('banquet', memberData.banquet);
+            params.append('class', 'RegisterConferenceMember');
+            params.append('method', 'setBanquet');
+            
+            axios.post(process.env.API + '/api.php'
+                , params
+            )
+            .then(response => console.log(response.data))
+            .catch(error => console.log(error));
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
+    /**
+     * Sets the banquet field if the attendee is attending it.
+     * @param {string} data 
+     */
+     setVendorNight = (data) => {
+         
+        let memberData = JSON.parse(data);
+        //console.log(memberData);
+        try {
+            
+            let params = new URLSearchParams();
+
+            params.append('sessionId', memberData.sessionId);
+            params.append('emailAddress', memberData.emailAddress);
+            params.append('vendorNight', memberData.vendorNight);
+            params.append('class', 'RegisterConferenceMember');
+            params.append('method', 'setVendorNight');
+            
+            axios.post(process.env.API + '/api.php'
+                , params
+            )
+            .then(response => console.log(response.data))
+            .catch(error => console.log(error));
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
+    /**
+     * Sets the guest name field for the attendee.
+     * @param {string} data 
+     */
+     setGuestName = (data) => {
+
+        let memberData = JSON.parse(data);
+
+        //console.log(memberData);
+
+        try {
+            
+            let params = new URLSearchParams();
+
+            params.append('sessionId', memberData.sessionId);
+            params.append('emailAddress', memberData.emailAddress);
+            params.append('guestName', memberData.guestName);
+            params.append('class', 'RegisterConferenceMember');
+            params.append('method', 'setGuestName');
+            
+            axios.post(process.env.API + '/api.php'
+                , params
+            )
+            .then(response => console.log(response.data))
+            .catch(error => console.log(error));
+            
+        }
+        catch (e) {
+            console.error(e);
+        }
+
+    }
+    /**
+     * Get order options based on type.
+     * @param {*} inventoryType 
+     * @returns JSON of order options.
+     */
+    getInventory = async (inventoryType) => {
+        try {
+            let parameters = 'class=Sponsor';
+            parameters += '&method=getInventory';
+            parameters += '&type=' + inventoryType;
+
+            return await axios.get(process.env.API + '/api.php?' + parameters)
+            .then(response => response.data)
+            .catch(error => error);
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
+    
 }
 
 module.exports = Conference;

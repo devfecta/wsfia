@@ -1,0 +1,143 @@
+<%- include ('../template/header') -%>
+
+<section id="sponsorInfo">
+    <h1>Sponsor Registration</h1>
+    <p class="text-danger"></p>
+
+    <%- message %>
+
+    <form name="sponsorForm" id="sponsorForm" action="/conference/sponsor/register" method="POST" class="needs-validation" novalidate>
+        <fieldset>
+            <legend>Sponsor Information</legend>
+
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label" for="companyName">Company Name</label>
+                <input type="text" class="col-sm-10 form-control" name="companyName" id="companyName" size="36" maxlength="48" value="" />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label" for="contactName">Contact Name</label>
+                <input type="text" class="col-md-10 form-control" name="contactName" id="contactName" size="20" maxlength="48" value="" required />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label" for="emailAddress">Contact e-Mail Address</label>
+                <input type="email" class="col-md-10 form-control" name="emailAddress" id="emailAddress" size="36" maxlength="128" value="" required />
+                <div id="checkResult" style="margin:0 auto; display:inline-block"></div>
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label" for="contactPhone">Contact Phone Number</label>
+                <input type="text" class="col-md-10 form-control" name="contactPhone" id="contactPhone" size="20" maxlength="14" value="" required />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label" for="streetAddress">Street Address</label>
+                <input type="text" class="col-sm-10 form-control" name="streetAddress" id="streetAddress" size="48" maxlength="64" value="" />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label" for="city">City</label>
+                <input type="text" class="col-md-10 form-control" name="city" id="city" size="18" maxlength="24" value="" />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label" for="state">State Abbreviation</label>
+                <input type="text" class="col-md-10 form-control" name="state" id="state" size="2" maxlength="2" value="" />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label" for="companyUrl">Company URL</label>
+                <input type="text" class="col-md-10 form-control" name="companyUrl" id="companyUrl" size="128" maxlength="256" value="" />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label" for="companyUrl">Company URL</label>
+                <input type="text" class="col-md-10 form-control" name="companyUrl" id="companyUrl" size="128" maxlength="256" value="" />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="services">Services</label>
+                <textarea class="col-md-9 form-control" name="services" id="services" rows="5" maxlength="1024"></textarea>
+            </div>
+        
+        </fieldset>
+
+        <fieldset>
+            <legend>Available Sponsorships</legend>
+
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[0]" value="9" data-value="Conference Sponsor" />
+                <label class="form-check-label ml-1 mr-3" for="sponsorship[0]">Conference Sponsor (include vendor table) - <em>$1,200</em></label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[1]" value="10" data-value="Lanyard Sponsor" />
+                <label class="form-check-label ml-1 mr-3" for="sponsorship[1]">Lanyard Sponsor - <em>$900</em></label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[2]" value="11" data-value="Brochure Sponsor Back Page Ad" />
+                <label class="form-check-label ml-1 mr-3" for="sponsorship[2]">Brochure Sponsor Back Page Ad - <em>$750</em></label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[3]" value="12" data-value="Brochure Sponsor Inside Cover" />
+                <label class="form-check-label ml-1 mr-3" for="sponsorship[3]">Brochure Sponsor Inside Cover 1/2 Page Ad - <em>$450</em></label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[4]" value="13" data-value="Pre-Conference Breaks" />
+                <label class="form-check-label ml-1 mr-3" for="sponsorship[4]">Pre-Conference Breaks - <em>$300</em></label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[5]" value="14" data-value="Main Conference Keynote Speaker" />
+                <label class="form-check-label ml-1 mr-3" for="sponsorship[5]">Main Conference Keynote Speaker - <em>$500</em></label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[6]" value="15" data-value="Main Conference Break" />
+                <label class="form-check-label ml-1 mr-3" for="sponsorship[6]">Main Conference Break - <em>$300</em></label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[7]" value="16" data-value="Vendor Night Sponsor" />
+                <label class="form-check-label ml-1 mr-3" for="sponsorship[7]">Vendor Night Sponsor - <em>$400</em></label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[8]" value="17" data-value="Break Out Sessions" />
+                <label class="form-check-label ml-1 mr-3" for="sponsorship[8]">Break Out Sessions - <em>$100</em></label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" onclick="validateMembershipForm(this.form)" class="form-check-input" name="sponsorships" id="sponsorship[9]" value="18" data-value="Scholarship Sponsor" />
+                <label class="form-check-label ml-1 mr-3" for="sponsorship[9]">Scholarship Sponsor - <em>$100</em></label>
+            </div>
+
+        </fieldset>
+            
+        <div class="form-group row">
+            <div class="col-md-12 p-5 text-right">
+                <a href="/conference" id="cancelButton" style="min-width: 150px; width:25%" class="btn btn-secondary">Cancel</a>
+                <button type="submit" id="registerSponsorButton" style="min-width: 150px; width:25%" class="btn btn-primary">Register</button>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+                }, false);
+            });
+            }, false);
+        })();
+    </script>
+    
+</section>
+
+<%- include ('../template/footer') -%>

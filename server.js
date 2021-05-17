@@ -40,7 +40,7 @@ const controllers = new Controllers();
  * Sets start and end dates for conference registration.
  */
  const startDateConference = Date.parse('2021-03-10');
- const endDateConference = Date.parse('2021-05-30');
+ const endDateConference = Date.parse('2021-06-30');
 /**
  * EJS templating library.
  */
@@ -170,6 +170,7 @@ app.get('/register/member/registrants', async (request, response) => {
     //console.log("Registrants");
     request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
     //console.log(request.session.registrants);
+    //console.log(request.session);
     response.render('./registration/registrantsInfo.ejs', { session: request.session, message: '' });
 });
 /**
@@ -204,6 +205,30 @@ app.post('/setAttendingDate', async (request, response) => {
     let confirm = await controllers.conference.setLicenseNumber(JSON.stringify(request.body));
     response.end();
 });
+/**
+ * 
+ */
+ app.post('/setGuestName', async (request, response) => {
+    //console.log(request.body);
+    let confirm = await controllers.conference.setGuestName(JSON.stringify(request.body));
+    response.end();
+});
+/**
+ * 
+ */
+ app.post('/setBanquet', async (request, response) => {
+    //console.log(request.body);
+    let confirm = await controllers.conference.setBanquet(JSON.stringify(request.body));
+    response.end();
+});
+/**
+ * 
+ */
+ app.post('/setVendorNight', async (request, response) => {
+    //console.log(request.body);
+    let confirm = await controllers.conference.setVendorNight(JSON.stringify(request.body));
+    response.end();
+});
 
 
 /**
@@ -218,6 +243,9 @@ app.post('/register/process', async (request, response) => {
     delete request.body.ceu;
     delete request.body.licenseType;
     delete request.body.licenseNumber;
+    delete request.body.banquet;
+    delete request.body.vendorNight;
+    delete request.body.guestName;
     //console.log(request.body);
     let result = await controllers.membership.registerMember(JSON.stringify(request.body));
     //console.log("Registration Session");
@@ -225,6 +253,7 @@ app.post('/register/process', async (request, response) => {
 
     request.session.errorMessage = "";
 
+    
     if (result) {
         request.session.registration = result;
         response.redirect('/register/confirm');
@@ -471,6 +500,57 @@ app.post('/addConferenceRegistrants', async (request, response) => {
     //console.log(request.body);
     let results = await controllers.conference.addConferenceRegistrants(JSON.stringify(request.body));
     //response.json(results);
+});
+// SPONSOR START
+/**
+ * Renders the conference sponsor registration form.
+ */
+ app.get('/conference/sponsor', async (request, response) => {
+    request.body.inventory = await controllers.conference.getInventory("Sponsor");
+    console.log(request.body.inventory);
+    response.render('./registration/sponsorInfo.ejs', { session: request.session, message: '' });
+});
+/**
+ * Calls the registerSponsor method to add the sponsor to the database, 
+ * calls to the PayPal API to create and send an invoice, 
+ * then redirects to the confirmation page.
+ */
+ app.post('/conference/sponsor/register', async (request, response) => {
+    //console.log(request.body);
+    
+    let result = await controllers.conference.registerSponsor(JSON.stringify(request.body));
+    request.session.errorMessage = "";
+
+    if (result) {
+        // result is line items
+        request.session.registration = result;
+        response.redirect('/conference/sponsor/confirm');
+    }
+    else {
+        //console.log(result);
+        request.session.errorMessage = 'There was an error with PayPal. Please contact us at <a href="mailto:treasurer@wsfia.org">treasurer@wsfia.org</a> to finish your registration.';
+        response.redirect('/conference/sponsor/register');
+    }
+});
+/**
+ * Renders the sponsor registration confirmation, after the registration has been processed.
+ */
+ app.get('/conference/sponsor/confirm', (request, response) => {
+    //console.log(request.session.registration);
+    response.render('./registration/confirmSponsor.ejs', { session: request.session, message: '' });
+});
+// SPONSOR END
+/**
+ * Renders the conference vendor registration form.
+ */
+ app.get('/conference/vendor', (request, response) => {
+    response.render('./registration/vendorInfo.ejs', { session: request.session });
+});
+/**
+ * Renders the conference sponsor registration form.
+ */
+ app.get('/conference/speaker', (request, response) => {
+    response.render('./registration/speakerInfo.ejs', { session: request.session });
 });
 
 // CONFERENCE END

@@ -46,6 +46,9 @@
                 ceu = '';
                 licenseType = '';
                 licenseNumber = '';
+                banquet = '';
+                vendorNight = '';
+                guestName = '';
 
                 if (typeof registrant.conference !== 'undefined') {
                     if (typeof registrant.conference.attending !== 'undefined') {
@@ -59,6 +62,9 @@
                     ceu = ((typeof registrant.conference.ceu !== 'undefined') && registrant.conference.ceu === 'true') ? 'checked=true' : '';
                     licenseType = (typeof registrant.conference.licenseType !== 'undefined') ? registrant.conference.licenseType : '';
                     licenseNumber = (typeof registrant.conference.licenseNumber !== 'undefined') ? registrant.conference.licenseNumber : '';
+                    banquet = ((typeof registrant.conference.banquet !== 'undefined') && registrant.conference.banquet === 'true') ? 'checked=true' : '';
+                    vendorNight = ((typeof registrant.conference.vendorNight !== 'undefined') && registrant.conference.vendorNight === 'true') ? 'checked=true' : '';
+                    guestName = (typeof registrant.conference.guestName !== 'undefined') ? registrant.conference.guestName : '';
                 }
                 
                 
@@ -90,11 +96,11 @@
                     </td>
                 </tr>
                 <% if (session.conference) { %>
-                <tr class="userRow<%= index %>">
+                <tr class="userRow<%= index %>" style="background-color: rgba(150, 10, 10, 0.1);">
 
                     <td style="border-bottom: solid 1px #aaa"></td>
                     <td class="p-0" style="border-bottom: solid 1px #aaa" colspan="4">
-                        <div class="table">
+                        <div class="table my-2">
                             <table class="table w-100">
                                 <tr>
                                     <thead><strong>Conference Registration Information</strong></thead>
@@ -139,6 +145,25 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <input type="text" onblur="setLicenseNumber('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.value)" value="<%= licenseNumber %>" class="form-control" maxlength="24" name="licenseNumber" id="licenseNumber<%= index %>" placeholder="License Number" aria-label="License Number">
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="bg-transparent">
+                                    <td>
+                                        <div>
+                                            <div class="col-md-6 form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" onclick="setBanquet('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.checked)" <%= banquet %> name="banquet" id="banquet<%= index %>" />
+                                                <label class="form-check-label" for="banquet<%= index %>">Attending Banquet?</label>
+                                            </div>
+                                            <div class="col-md-6 form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" onclick="setVendorNight('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.checked)" <%= vendorNight %> name="vendorNight" id="vendorNight<%= index %>" />
+                                                <label class="form-check-label" for="vendorNight<%= index %>">Attending Vendor Night?</label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <input type="text" onblur="setGuestName('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.value)" value="<%= guestName %>" class="form-control" maxlength="32" name="guestName" id="guestName<%= index %>" placeholder="Attendee's Guest" aria-label="Attendee's Guest">
                                             </div>
                                         </div>
                                     </td>
@@ -197,6 +222,7 @@
 
     <fieldset class="px-4">
         <legend>Billing Information</legend>
+        <p class="my-2"><strong>To finish your registration select a billing e-mail and mailing address.</strong></p>
         <p class="mb-2">Select a billing e-mail address:</p>
 
         <% emailAddresses.forEach(function(emailAddress, index) { %>
@@ -208,13 +234,13 @@
         
         <% }) %>
 
-        <p class="mt-4 mb-2">Select a billing address:</p>
+        <p class="mt-4 mb-2">Select a billing mailing address:</p>
         
         <% businesses.forEach(function(business, index) { %>
 
             <div class="form-check mb-1">
                 <input type="radio" onclick="validateRegistrationForm(this.form)" class="form-check-input" name="business" id="business<%= index %>" value="<%= business.id %>">
-                <label class="form-check-label" for="business<%= index %>"><%= business.name %></label>
+                <label class="form-check-label" for="business<%= index %>"><%= business.name %><br/><em style="font-size: 85%;"><%= business.streetAddress %>, <%= business.city %></em></label>
             </div>
 
         <% }) %>

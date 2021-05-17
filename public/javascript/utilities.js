@@ -534,7 +534,7 @@ const validateMembershipForm = (form) => {
 
  const setCEU = (sessionId, emailAddress, checked) => {
 
-    console.log(sessionId, emailAddress, checked);
+    //console.log(sessionId, emailAddress, checked);
     
     fetch('/setCEU', {
         method: 'POST', 
@@ -555,7 +555,7 @@ const validateMembershipForm = (form) => {
 
  const setLicenseType = (sessionId, emailAddress, licenseType) => {
 
-    console.log(sessionId, emailAddress, licenseType);
+    //console.log(sessionId, emailAddress, licenseType);
     
     fetch('/setLicenseType', {
         method: 'POST', 
@@ -576,11 +576,73 @@ const validateMembershipForm = (form) => {
 
  const setLicenseNumber = (sessionId, emailAddress, licenseNumber) => {
 
-    console.log(sessionId, emailAddress, licenseNumber);
+    //console.log(sessionId, emailAddress, licenseNumber);
     
     fetch('/setLicenseNumber', {
         method: 'POST', 
         body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "licenseNumber": licenseNumber}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+    
+}
+
+/**
+ * Sets the license type field for the attendee.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} guestName 
+ */
+
+ const setGuestName = (sessionId, emailAddress, guestName) => {
+
+    //console.log(sessionId, emailAddress, guestName);
+    
+    fetch('/setGuestName', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "guestName": guestName}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+    
+}
+
+/**
+ * Sets the CEU field if the attendee requires it.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} checked 
+ */
+
+ const setBanquet = (sessionId, emailAddress, checked) => {
+
+    //console.log(sessionId, emailAddress, checked);
+    
+    fetch('/setBanquet', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "banquet": checked}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+    
+}
+/**
+ * Sets the CEU field if the attendee requires it.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} checked 
+ */
+
+ const setVendorNight = (sessionId, emailAddress, checked) => {
+
+    //console.log(sessionId, emailAddress, checked);
+    
+    fetch('/setVendorNight', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "vendorNight": checked}), 
         headers: { 'Content-Type': 'application/json' },
     })
     .then(response => response)

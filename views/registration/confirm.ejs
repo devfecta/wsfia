@@ -61,7 +61,7 @@
                         <%= registrant.quantity %>                     
                     </td>
                     <td class="text-right">
-                        $<%= registrant.price %>
+                        $<%= parseFloat(registrant.price).toFixed(2) %>
                     </td>
                 </tr>
             <% }); %>
@@ -71,7 +71,7 @@
                     <strong>Total Price:</strong>                    
                 </td>
                 <td>
-                    $ <%= totalPrice.toFixed(2) %>
+                    $<%= totalPrice.toFixed(2) %>
                 </td>
             </tr>
         </tbody>
