@@ -347,7 +347,7 @@ class Membership {
             })
             .catch(error => console.log(error));
             
-            return confirmation;
+            //return confirmation;
             
         }
         catch (e) {
@@ -427,6 +427,18 @@ class Membership {
         catch(e) {
             console.error(e);
         }
+    }
+
+    getMembers = async () => {
+
+        let parameters = 'class=Membership';
+            parameters += '&method=getMembers';
+
+        return await axios.get(process.env.API + '/api.php?' + parameters)
+        .then(response => response.data)
+        .then(json => json)
+        .catch(error => error);
+
     }
 
 }

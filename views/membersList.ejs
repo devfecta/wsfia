@@ -1,0 +1,17 @@
+<%- include ('template/header') -%>
+
+<section id="membershipInfo">
+    <h1>WSFIA Members</h1>
+
+    <% JSON.parse(session.members).forEach( member => { %>
+
+        <div class="form-check">
+            <input type="checkbox" id="business[<%= department.id %>]" onclick="validateMembershipForm(this.form)" data-value="<%= department.name %> (Station <%= department.station %>)" name="businesses" class="form-check-input" value="<%= department.id %>" checked />
+            <label for="business[<%= department.id %>]" class="form-check-label ml-1 mr-3"><%= department.name %> (Station <%= department.station %>)</label>
+        </div>
+
+    <% }); %>
+    
+</section>
+
+<%- include ('template/footer') -%>

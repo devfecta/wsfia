@@ -39,8 +39,8 @@ const controllers = new Controllers();
 /**
  * Sets start and end dates for conference registration.
  */
- const startDateConference = Date.parse('2021-03-10');
- const endDateConference = Date.parse('2021-06-30');
+ const startDateConference = Date.parse('2021-05-10');
+ const endDateConference = Date.parse('2021-10-30');
 /**
  * EJS templating library.
  */
@@ -380,6 +380,15 @@ app.post('/account', authenticateUser, async (request, response) => {
     response.redirect('/account');
 });
 /**
+ * If the user is authenticated then renders a listing of all the members.
+ */
+ app.get('/member-list', authenticateUser, async (request, response) => {
+    let members = await controllers.membership.getMembers();
+    response.send(members);
+    //request.session.members = members;
+    //response.render('./membersList.ejs', { session: request.session, message: '' });
+});
+/**
  * If the user is authenticated then renders the documents page.
  */
 app.get('/documents', authenticateUser, (request, response) => {
@@ -512,48 +521,43 @@ app.post('/addConferenceRegistrants', async (request, response) => {
 /**
  * Calls the registerSponsor method to add the sponsor to the database, 
  * calls to the PayPal API to create and send an invoice, 
- * then redirects to the confirmation page.
+ * then redirects back to the registration page with a confirmation message.
  */
  app.post('/conference/sponsor/register', async (request, response) => {
     let formData = Object.assign({}, request.body);
     let result = await controllers.conference.registerSponsor(JSON.stringify(formData));
-    response.send(result);
-
-    request.session.errorMessage = "";
-    /*
-    if (result) {
-        // result is line items
-        request.session.registration = result;
-        response.redirect('/conference/sponsor/confirm');
-    }
-    else {
-        //console.log(result);
-        request.session.errorMessage = 'There was an error with PayPal. Please contact us at <a href="mailto:treasurer@wsfia.org">treasurer@wsfia.org</a> to finish your registration.';
-        response.redirect('/conference/sponsor/register');
-    }
-    */
-});
-/**
- * Renders the sponsor registration confirmation, after the registration has been processed.
- */
- app.get('/conference/sponsor/confirm', (request, response) => {
-    //console.log(request.session.registration);
-    response.render('./registration/confirmSponsor.ejs', { session: request.session, message: '' });
+    request.session.message = result;
+    response.redirect('/conference/sponsor');
 });
 // SPONSOR END
+// VENDOR START
 /**
  * Renders the conference vendor registration form.
  */
- app.get('/conference/vendor', (request, response) => {
-    response.render('./registration/vendorInfo.ejs', { session: request.session });
+ app.get('/conference/vendor', async (request, response) => {
+    request.session.inventory = await controllers.conference.getInventory("Vendor");
+    response.render('./registration/vendorInfo.ejs', { session: request.session, message: '' });
 });
 /**
- * Renders the conference sponsor registration form.
+ * Calls the registerVendor method to add the vendor to the database, 
+ * calls to the PayPal API to create and send an invoice, 
+ * then redirects back to the registration page with a confirmation message.
+ */
+ app.post('/conference/vendor/register', async (request, response) => {
+    let formData = Object.assign({}, request.body);
+    let result = await controllers.conference.registerVendor(JSON.stringify(formData));
+    request.session.message = result;
+    response.redirect('/conference/vendor');
+});
+// VENDOR END
+// SPEAKER START
+/**
+ * Renders the conference speaker registration information.
  */
  app.get('/conference/speaker', (request, response) => {
     response.render('./registration/speakerInfo.ejs', { session: request.session });
 });
-
+// SPEAKER END
 // CONFERENCE END
 /*
 app.post('/register', async (request, response) => {

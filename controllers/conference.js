@@ -273,9 +273,65 @@ class Conference {
     registerSponsor = async (formData) => {
         let data = JSON.parse(formData);
 
-        console.log(data);
+        try {
+            
+            let params = new URLSearchParams();
 
+            params.append('companyName', data.companyName);
+            params.append('contactName', data.contactName);
+            params.append('emailAddress', data.emailAddress);
+            params.append('contactPhone', data.contactPhone);
+            params.append('streetAddress', data.streetAddress);
+            params.append('city', data.city);
+            params.append('state', data.state);
+            params.append('zipcode', data.zipcode);
+            params.append('companyUrl', data.companyUrl);
+            params.append('services', data.services);
+            params.append('sponsorships', JSON.stringify(data.sponsorships));
+            params.append('class', 'Sponsor');
+            params.append('method', 'registerSponsor');
+            
+            return await axios.post(process.env.API + '/api.php'
+                , params
+            )
+            .then(response => {
 
+                params.append('lineItems', JSON.stringify(response.data));
+                
+                return axios.post(process.env.API + '/PayPal-PHP-SDK/SendInvoice.php'
+                    , params
+                )
+                .then(response => {
+                    
+                    if(response.data) {
+                        return '<div class="alert alert-danger m-1" role="alert">There was an error with PayPal. Please contact us at <a href="mailto:treasurer@wsfia.org">treasurer@wsfia.org</a> to finish your registration.</div>';
+                    }
+                    else {
+
+                        params.append('method', 'updateInventory');
+
+                        axios.post(process.env.API + '/api.php'
+                            , params
+                        )
+                        .then(response => response.data)
+                        .catch(error => console.log(error));
+
+                        return '<div class="alert alert-success m-1" role="alert">Thank you for registering as a sponsor for our conference. You should get an invoice from PayPal in a couple minutes for the options you selected below.</div>';
+                    }
+                    
+                })
+                .catch(error => console.log(error));
+            })
+            .catch(error => console.log(error));
+            
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
+
+    registerVendor = async (formData) => {
+        let data = JSON.parse(formData);
 
         try {
             
@@ -291,14 +347,34 @@ class Conference {
             params.append('zipcode', data.zipcode);
             params.append('companyUrl', data.companyUrl);
             params.append('services', data.services);
-            params.append('sponsorships', data.sponsorships);
-            params.append('class', 'Sponsor');
-            params.append('method', 'registerSponsor');
+            params.append('representativeOne', data.representative1Name);
+            params.append('representativeTwo', data.representative2Name);
+            params.append('booths', JSON.stringify(data.booths));
+            params.append('class', 'Vendor');
+            params.append('method', 'registerVendor');
             
-            axios.post(process.env.API + '/api.php'
+            return await axios.post(process.env.API + '/api.php'
                 , params
             )
-            .then(response => console.log(response.data))
+            .then(response => {
+
+                params.append('lineItems', JSON.stringify(response.data));
+                
+                return axios.post(process.env.API + '/PayPal-PHP-SDK/SendInvoice.php'
+                    , params
+                )
+                .then(response => {
+                    
+                    if(response.data) {
+                        return '<div class="alert alert-danger m-1" role="alert">There was an error with PayPal. Please contact us at <a href="mailto:treasurer@wsfia.org">treasurer@wsfia.org</a> to finish your registration.</div>';
+                    }
+                    else {
+                        return '<div class="alert alert-success m-1" role="alert">Thank you for registering as a vendor for our conference. You should get an invoice from PayPal in a couple minutes for the options you selected below.</div>';
+                    }
+                    
+                })
+                .catch(error => console.log(error));
+            })
             .catch(error => console.log(error));
             
         }
