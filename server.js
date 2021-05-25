@@ -384,9 +384,8 @@ app.post('/account', authenticateUser, async (request, response) => {
  */
  app.get('/member-list', authenticateUser, async (request, response) => {
     let members = await controllers.membership.getMembers();
-    response.send(members);
-    //request.session.members = members;
-    //response.render('./membersList.ejs', { session: request.session, message: '' });
+    request.session.members = members;
+    response.render('./membersList.ejs', { session: request.session, message: '' });
 });
 /**
  * If the user is authenticated then renders the documents page.
