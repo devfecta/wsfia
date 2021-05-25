@@ -1231,128 +1231,24 @@ class Membership extends Member implements iRegistration {
 
     public function getMembers() {
 
+        $memberList = array();
+
         try {
             $connection = Configuration::openConnection();
             $statement = $connection->prepare("SELECT users.firstName, users.lastName, users.emailAddress, users.type, members.* FROM users INNER JOIN members ON users.id=members.userId");
             $statement->execute();
 
-            return json_encode($statement->fetchAll(PDO::FETCH_ASSOC));
-            exit();
-
             $members = $statement->fetchAll(PDO::FETCH_ASSOC);
 
             foreach($members as $member) {
 
-                $columnLetter = 'A';
-                $rowCount++;
-                
-                for ($c = 0; $c < $statement->columnCount(); $c++) {
-                    
-                    $value = '';
+                $member['type'] = json_decode($member['type'], false);
+                $member['departments'] = json_decode($member['departments'], false);
+                $member['areas'] = json_decode($member['areas'], true);
 
-                    switch($statement->getColumnMeta($c)['name']) {
-                        case 'type':
-                            // Adds multiple membership types to the one Excel cell for a specific member.
-                            $types = json_decode($member[$statement->getColumnMeta($c)['name']]);
-                            $lastKey = array_key_last($types);
-                            foreach($types as $key => $type) {
-                                $value .=  ($lastKey == $key) ? json_decode(json_encode($type))->name : json_decode(json_encode($type))->name . "\n";
-                            }
-                            /*
-                            $types = array();
-                            array_push($types, json_decode($member[$statement->getColumnMeta($c)['name']]));
-                            foreach($types as $type) {
-                                $value .= $type->{key($type)} . "\n";
-                            }
-                            */
-                            break;
-                        case 'departments':
-                            // Adds multiple department/business names to the one Excel cell for a specific member.
-                            $departments = json_decode($member[$statement->getColumnMeta($c)['name']]);
-                            $lastKey = array_key_last($departments);
-                            foreach($departments as $key => $department) {
-
-                                $departmentInfo = json_decode(json_encode($department));
-
-                                $stateId = $departmentInfo->state;
-                                $statementDepartment = $connection->prepare("SELECT stateAbbreviation FROM states WHERE stateId=:id");
-                                $statementDepartment->bindParam(":id", $stateId, PDO::PARAM_INT);
-                                $statementDepartment->execute();
-                                $state = $statementDepartment->fetch();
-
-                                // If there is more than one department/business add a new line to the end of the department name.
-                                if ($lastKey == $key) {
-                                    $value .= $departmentInfo->name . "\n";
-                                    $value .= $departmentInfo->streetAddress . "\n";
-                                    $value .= $departmentInfo->city . ", ";
-                                    $value .= $state['stateAbbreviation'] . " ";
-                                    $value .= $departmentInfo->zipcode;
-                                }
-                                else {
-                                    $value .= $departmentInfo->name . "\n";
-                                    $value .= $departmentInfo->streetAddress . "\n";
-                                    $value .= $departmentInfo->city . ", ";
-                                    $value .= $state['stateAbbreviation'] . " ";
-                                    $value .= $departmentInfo->zipcode . "\n";
-                                }
-                                //$value .=  ($lastKey == $key) ? json_decode(json_encode($department))->name : json_decode(json_encode($department))->name . "\n";
-                            }
-                            break;
-                        case 'areas':
-                            // Adds multiple areas to the one Excel cell for a specific member.
-                            $areas = json_decode($member[$statement->getColumnMeta($c)['name']]);
-                            $lastKey = array_key_last($areas);
-                            foreach($areas as $key=> $area) {
-                                $value .=  ($lastKey == $key) ? $area : $area . "\n";
-                            }
-                            break;
-                        default:
-                            // Adds a standard value to the Excel file cell.
-                            $value = $member[$statement->getColumnMeta($c)['name']];
-                            break;
-                    }
-
-                    $spreadsheet->getActiveSheet()->setCellValue($columnLetter.($rowCount), $value);
-                    
-                    $columnLetter++;
-                }
-                
+                array_push($memberList, $member);
             }
 
-            $fileName = 'MemberReport_'. date("Y-m-d", time());
-
-            try{
-                // Sets the document type for the file on Google Drive.
-                $file->setMimeType("application/vnd.ms-excel");
-                // Sets the file name for the file on Google Drive.
-                $file->setName($fileName);
-                // Sets the folder to which the file should be placed on Google Drive.
-                $file->setParents(array("1rxYn-ekD7zoTiXEv2DsgxigVqHJTiZIM"));
-                // Creates the file.
-                $objWriter = IOFactory::createWriter($spreadsheet, 'Xlsx');
-                // Saves the file to a location on the server.
-                $objWriter->save("./downloads/".$fileName.".xlsx");
-                // Prepares to get the file type information from the server file.
-                $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                // Gets the file type.
-                $mime_type = finfo_file($finfo, $objWriter);
-
-                error_log(date('Y-m-d H:i:s') . " Creating file type: " . $mime_type . "\n", 3, "/var/www/html/php-errors.log");
-
-                $result = $service->files->create(
-                    $file,
-                    array(
-                    'data' => file_get_contents("./downloads/".$fileName.".xlsx"),
-                    'mimeType' => $mime_type,
-                    'uploadType' => 'multipart'
-                    )
-                );
-            }
-            catch(Exception $e) {
-                error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
-            }
-
-            
         }
         catch (PDOException $e) {
             error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
@@ -1360,18 +1256,8 @@ class Membership extends Member implements iRegistration {
         finally {
             $connection = Configuration::closeConnection();
         }
-        /*
-        $fileName = 'MemberReport_'. date("Y-m-d", time());
-		header("Pragma: public");
-		header("Expires: 0");
-		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-		header("Content-type: application/vnd.ms-excel");
-		header("Content-Disposition: attachment;filename=".$fileName.".xlsx");
-		header("Content-Transfer-Encoding: binary");
-		$objWriter = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $objWriter->save('php://output');
-        */
-        return $result;
+        
+        return json_encode($memberList);
     }
     
 }
