@@ -143,27 +143,51 @@ class Sponsor {
         return $results;
     }
 
+    public function updateInventory($options) {
+
+        $options = json_decode($options, true);
+        // Converts options to an array if only 1 option was selected.
+        $options = is_array($options) ? $options : array($options);
+        
+        $result = false;
+
+        try {
+
+            $connection = Configuration::openConnection();
+
+            foreach ($options as $option) {
+                $statement = $connection->prepare("UPDATE orderOptions SET inventory=(inventory-1) WHERE id=:optionId");
+                $statement->bindParam(":optionId", $option, PDO::PARAM_INT);
+                $result = $statement->execute();
+            }
+        }
+        catch (PDOException $e) { 
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        catch (Exception $e) {
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+        
+
+        return $result;
+    }
+
     public function registerSponsor($formData) {
         
         $sponsor = json_decode($formData, false);
 
         $result = false;
+        $lineItems = array();
 
         try {
             $connection = Configuration::openConnection();
-            /*
-            foreach() {
 
-            }
-
-            $statement = $connection->prepare("SELECT * FROM orderOptions WHERE id=:optionId");
-            $statement->bindParam(":optionId", $optionType, PDO::PARAM_STR);
-            $statement->execute();
-            $results = $statement->fetch(PDO::FETCH_ASSOC);
-            */
-
-            $sponsorships = json_encode($sponsor->sponsorships);
-
+            $sponsorships = is_array($sponsor->sponsorships) ? $sponsor->sponsorships : array($sponsor->sponsorships);
+            $sponsorships = json_encode($sponsorships);
+            
             $statement = $connection->prepare("INSERT INTO sponsors (`companyName`, `contactName`, `emailAddress`, `contactPhone`, `streetAddress`, `city`, `state`, `zipcode`, `companyUrl`, `services`, `sponsorships`) 
             VALUES (:companyName, :contactName, :emailAddress, :contactPhone, :streetAddress, :city, :stateAbbreviation, :zipcode, :companyUrl, :services, :sponsorships)");
             $statement->bindParam(":companyName", $sponsor->companyName, PDO::PARAM_STR);
@@ -172,12 +196,40 @@ class Sponsor {
             $statement->bindParam(":contactPhone", $sponsor->contactPhone, PDO::PARAM_STR);
             $statement->bindParam(":streetAddress", $sponsor->streetAddress, PDO::PARAM_STR);
             $statement->bindParam(":city", $sponsor->city, PDO::PARAM_STR);
-            $statement->bindParam(":stateAbbreviation", $sponsor->stateAbbreviation, PDO::PARAM_STR);
+            $statement->bindParam(":stateAbbreviation", $sponsor->state, PDO::PARAM_STR);
             $statement->bindParam(":zipcode", $sponsor->zipcode, PDO::PARAM_STR);
             $statement->bindParam(":companyUrl", $sponsor->companyUrl, PDO::PARAM_STR);
             $statement->bindParam(":services", $sponsor->services, PDO::PARAM_STR);
             $statement->bindParam(":sponsorships", $sponsorships, PDO::PARAM_STR);
             $result = $statement->execute();
+            // Billing Information
+            $billingBusiness = array();
+            $billingBusiness['name'] = $sponsor->companyName;
+            $billingBusiness['streetAddress'] = $sponsor->streetAddress;
+            $billingBusiness['city'] = $sponsor->city;
+            $billingBusiness['stateAbbreviation'] = $sponsor->state;
+            $billingBusiness['zipcode'] = $sponsor->zipcode;
+
+            $lineItems['billing'] = array("billingEmailAddress" => $sponsor->emailAddress, "billingBusiness" => $billingBusiness);
+
+            $options = json_decode($sponsor->sponsorships, false);
+            // Converts options to an array if only 1 option was selected.
+            $options = is_array($options) ? $options : array($options);
+
+            $lineItems['lineItems'] = array();
+            foreach ($options as $option) {
+
+                $statement = $connection->prepare("SELECT * FROM orderOptions WHERE id=:optionId");
+                $statement->bindParam(":optionId", $option, PDO::PARAM_INT);
+                $statement->execute();
+                $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+                error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " option " . $result['description'] . "\n", 3, "/var/www/html/php-errors.log");
+
+                $itemDescription = "Contact Name: " . $sponsor->contactName;    
+                array_push($lineItems['lineItems'], array("quantity" => 1, "itemId" => $result['id'], "itemName" => $result['description'], "itemDescription" => $itemDescription, "price" => $result['price']));
+            }
+
         }
         catch (PDOException $e) { 
             error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
@@ -189,7 +241,7 @@ class Sponsor {
             $connection = Configuration::closeConnection();
         }
 
-        return $result;
+        return json_encode($lineItems, JSON_PRETTY_PRINT);
     }
 
 }

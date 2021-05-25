@@ -345,7 +345,10 @@ class Membership extends Member implements iRegistration {
             // $connection is lets you use the same connection for multiple statements.
             $connection = Configuration::openConnection();
 
-            
+            // Gets the date from the database to use in the member ID.
+            $statement = $connection->prepare("SELECT DATE_FORMAT(CURDATE(), '%Y-%m-%d')");
+            $statement->execute();
+            $dateCurrent = $statement->fetch(PDO::FETCH_COLUMN);
 
             $memberId = '';
             $lineItem = array();
@@ -376,10 +379,7 @@ class Membership extends Member implements iRegistration {
                     $statement->execute();
                     // Create member ID
                     $newUserId = $connection->lastInsertId();
-                    // Gets the date from the database to use in the member ID.
-                    $statement = $connection->prepare("SELECT DATE_FORMAT(CURDATE(), '%Y-%m-%d')");
-                    $statement->execute();
-                    $dateCurrent = $statement->fetch(PDO::FETCH_COLUMN);
+                    
                     $memberId = 'WSFIA-' . $newUserId . date('ynj', strtotime($dateCurrent));
                     // Converts array into a string for the database.
                     $businesses = json_encode($registrant->businesses);
@@ -481,6 +481,12 @@ class Membership extends Member implements iRegistration {
                         $itemDescription = "Conference Registration\nMember Name: " . $registrant->firstName . " " . $registrant->lastName . "\nMember ID: " . $memberId;    
                         array_push($lineItem, array("emailAddress" => $registrant->emailAddress, "quantity" => 1, "itemId" => $results['id'], "itemName" => $results['description'], "itemDescription" => $itemDescription, "price" => $results['price']));
 
+                        // Create a invoice line item for the late fee.
+                        if (strtotime($dateCurrent) >= strtotime(date('Y-10-1')) && strtotime($dateCurrent) < strtotime(date('Y-11-1'))) {
+                            $itemDescription = "Conference Registration Late Fee is for registrations after September 30th";    
+                            array_push($lineItem, array("emailAddress" => $registrant->emailAddress, "quantity" => 1, "itemId" => $results['id'], "itemName" => "Registration Late Fee", "itemDescription" => $itemDescription, "price" => 50.00));
+                        }
+
                         $ceu = filter_var($registrant->conference->ceu, FILTER_VALIDATE_BOOLEAN);
                         $ceu = $ceu ? 1 : 0;
                         $licenseType = isset($registrant->conference->licenseType) ? $registrant->conference->licenseType : '';
@@ -539,7 +545,6 @@ class Membership extends Member implements iRegistration {
                         $statement->bindParam(":guestName", $guestName, PDO::PARAM_STR);
                         $statement->execute();
                     }
-
                 }
                 // Needs to reset the array completely.
                 unset($datesAttending);
@@ -1222,6 +1227,151 @@ class Membership extends Member implements iRegistration {
         }
         
         return $pdf->Output('membershipcard.pdf', 'I');
+    }
+
+    public function getMembers() {
+
+        try {
+            $connection = Configuration::openConnection();
+            $statement = $connection->prepare("SELECT users.firstName, users.lastName, users.emailAddress, users.type, members.* FROM users INNER JOIN members ON users.id=members.userId");
+            $statement->execute();
+
+            return json_encode($statement->fetchAll(PDO::FETCH_ASSOC));
+            exit();
+
+            $members = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach($members as $member) {
+
+                $columnLetter = 'A';
+                $rowCount++;
+                
+                for ($c = 0; $c < $statement->columnCount(); $c++) {
+                    
+                    $value = '';
+
+                    switch($statement->getColumnMeta($c)['name']) {
+                        case 'type':
+                            // Adds multiple membership types to the one Excel cell for a specific member.
+                            $types = json_decode($member[$statement->getColumnMeta($c)['name']]);
+                            $lastKey = array_key_last($types);
+                            foreach($types as $key => $type) {
+                                $value .=  ($lastKey == $key) ? json_decode(json_encode($type))->name : json_decode(json_encode($type))->name . "\n";
+                            }
+                            /*
+                            $types = array();
+                            array_push($types, json_decode($member[$statement->getColumnMeta($c)['name']]));
+                            foreach($types as $type) {
+                                $value .= $type->{key($type)} . "\n";
+                            }
+                            */
+                            break;
+                        case 'departments':
+                            // Adds multiple department/business names to the one Excel cell for a specific member.
+                            $departments = json_decode($member[$statement->getColumnMeta($c)['name']]);
+                            $lastKey = array_key_last($departments);
+                            foreach($departments as $key => $department) {
+
+                                $departmentInfo = json_decode(json_encode($department));
+
+                                $stateId = $departmentInfo->state;
+                                $statementDepartment = $connection->prepare("SELECT stateAbbreviation FROM states WHERE stateId=:id");
+                                $statementDepartment->bindParam(":id", $stateId, PDO::PARAM_INT);
+                                $statementDepartment->execute();
+                                $state = $statementDepartment->fetch();
+
+                                // If there is more than one department/business add a new line to the end of the department name.
+                                if ($lastKey == $key) {
+                                    $value .= $departmentInfo->name . "\n";
+                                    $value .= $departmentInfo->streetAddress . "\n";
+                                    $value .= $departmentInfo->city . ", ";
+                                    $value .= $state['stateAbbreviation'] . " ";
+                                    $value .= $departmentInfo->zipcode;
+                                }
+                                else {
+                                    $value .= $departmentInfo->name . "\n";
+                                    $value .= $departmentInfo->streetAddress . "\n";
+                                    $value .= $departmentInfo->city . ", ";
+                                    $value .= $state['stateAbbreviation'] . " ";
+                                    $value .= $departmentInfo->zipcode . "\n";
+                                }
+                                //$value .=  ($lastKey == $key) ? json_decode(json_encode($department))->name : json_decode(json_encode($department))->name . "\n";
+                            }
+                            break;
+                        case 'areas':
+                            // Adds multiple areas to the one Excel cell for a specific member.
+                            $areas = json_decode($member[$statement->getColumnMeta($c)['name']]);
+                            $lastKey = array_key_last($areas);
+                            foreach($areas as $key=> $area) {
+                                $value .=  ($lastKey == $key) ? $area : $area . "\n";
+                            }
+                            break;
+                        default:
+                            // Adds a standard value to the Excel file cell.
+                            $value = $member[$statement->getColumnMeta($c)['name']];
+                            break;
+                    }
+
+                    $spreadsheet->getActiveSheet()->setCellValue($columnLetter.($rowCount), $value);
+                    
+                    $columnLetter++;
+                }
+                
+            }
+
+            $fileName = 'MemberReport_'. date("Y-m-d", time());
+
+            try{
+                // Sets the document type for the file on Google Drive.
+                $file->setMimeType("application/vnd.ms-excel");
+                // Sets the file name for the file on Google Drive.
+                $file->setName($fileName);
+                // Sets the folder to which the file should be placed on Google Drive.
+                $file->setParents(array("1rxYn-ekD7zoTiXEv2DsgxigVqHJTiZIM"));
+                // Creates the file.
+                $objWriter = IOFactory::createWriter($spreadsheet, 'Xlsx');
+                // Saves the file to a location on the server.
+                $objWriter->save("./downloads/".$fileName.".xlsx");
+                // Prepares to get the file type information from the server file.
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                // Gets the file type.
+                $mime_type = finfo_file($finfo, $objWriter);
+
+                error_log(date('Y-m-d H:i:s') . " Creating file type: " . $mime_type . "\n", 3, "/var/www/html/php-errors.log");
+
+                $result = $service->files->create(
+                    $file,
+                    array(
+                    'data' => file_get_contents("./downloads/".$fileName.".xlsx"),
+                    'mimeType' => $mime_type,
+                    'uploadType' => 'multipart'
+                    )
+                );
+            }
+            catch(Exception $e) {
+                error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+            }
+
+            
+        }
+        catch (PDOException $e) {
+            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+        /*
+        $fileName = 'MemberReport_'. date("Y-m-d", time());
+		header("Pragma: public");
+		header("Expires: 0");
+		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+		header("Content-type: application/vnd.ms-excel");
+		header("Content-Disposition: attachment;filename=".$fileName.".xlsx");
+		header("Content-Transfer-Encoding: binary");
+		$objWriter = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $objWriter->save('php://output');
+        */
+        return $result;
     }
     
 }
