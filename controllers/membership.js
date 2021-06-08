@@ -191,6 +191,7 @@ class Membership {
             )
             .then(response => {
                 // returns line items for invoice.
+                console.log("membership.js: ", response.data);
                 const lineItems = response.data;
                 params = new URLSearchParams();
                 params.append('lineItems', JSON.stringify(response.data));
@@ -347,7 +348,7 @@ class Membership {
             })
             .catch(error => console.log(error));
             
-            return confirmation;
+            //return confirmation;
             
         }
         catch (e) {
@@ -427,6 +428,18 @@ class Membership {
         catch(e) {
             console.error(e);
         }
+    }
+
+    getMembers = async () => {
+
+        let parameters = 'class=Membership';
+            parameters += '&method=getMembers';
+
+        return await axios.get(process.env.API + '/api.php?' + parameters)
+        .then(response => response.data)
+        .then(json => json)
+        .catch(error => error);
+
     }
 
 }

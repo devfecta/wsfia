@@ -108,10 +108,12 @@
                                 <tr class="bg-transparent">
                                     <td>
                                         <p class="m-0">Select the day(s) <%= registrant.firstName + ' ' + registrant.lastName %> will be attending the conference:</p>
+                                       <!--
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Monday', this.checked)" <%= attendingMonday %> name="attendingDates" id="attendingMonday<%= index %>" value="<%= index %>-Monday">
                                             <label class="form-check-label" for="attendingMonday<%= index %>">Monday</label>
                                         </div>
+                                        -->
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Tuesday', this.checked)" <%= attendingTuesday %> name="attendingDates" id="attendingTuesday<%= index %>" value="<%= index %>-Tuesday">
                                             <label class="form-check-label" for="attendingTuesday<%= index %>">Tuesday</label>
