@@ -337,6 +337,8 @@ class Membership extends Member implements iRegistration {
 
         $businessId = $data->businessId;
         $emailAddress = $data->emailAddress;
+
+        $lineItems = array();
         
         try {
             // Get registrants from the userSessions table using the session ID.
@@ -345,7 +347,10 @@ class Membership extends Member implements iRegistration {
             // $connection is lets you use the same connection for multiple statements.
             $connection = Configuration::openConnection();
 
-            
+            // Gets the date from the database to use in the member ID.
+            $statement = $connection->prepare("SELECT DATE_FORMAT(CURDATE(), '%Y-%m-%d')");
+            $statement->execute();
+            $dateCurrent = $statement->fetch(PDO::FETCH_COLUMN);
 
             $memberId = '';
             $lineItem = array();
@@ -376,10 +381,7 @@ class Membership extends Member implements iRegistration {
                     $statement->execute();
                     // Create member ID
                     $newUserId = $connection->lastInsertId();
-                    // Gets the date from the database to use in the member ID.
-                    $statement = $connection->prepare("SELECT DATE_FORMAT(CURDATE(), '%Y-%m-%d')");
-                    $statement->execute();
-                    $dateCurrent = $statement->fetch(PDO::FETCH_COLUMN);
+                    
                     $memberId = 'WSFIA-' . $newUserId . date('ynj', strtotime($dateCurrent));
                     // Converts array into a string for the database.
                     $businesses = json_encode($registrant->businesses);
@@ -476,10 +478,16 @@ class Membership extends Member implements iRegistration {
                         $statement->execute();
                         $results = $statement->fetch(PDO::FETCH_ASSOC);
                         // Adds $40 to the conference pricing for a new member.
-                        $results['price'] = ($newMember) ? $results['price'] + 40 : $results['price'];
+                        //$results['price'] = ($newMember) ? $results['price'] + 40 : $results['price'];
                         // Create a invoice line item for the new membership.
                         $itemDescription = "Conference Registration\nMember Name: " . $registrant->firstName . " " . $registrant->lastName . "\nMember ID: " . $memberId;    
                         array_push($lineItem, array("emailAddress" => $registrant->emailAddress, "quantity" => 1, "itemId" => $results['id'], "itemName" => $results['description'], "itemDescription" => $itemDescription, "price" => $results['price']));
+
+                        // Create a invoice line item for the late fee.
+                        if (strtotime($dateCurrent) >= strtotime(date('Y-5-1')) && strtotime($dateCurrent) < strtotime(date('Y-11-1'))) {
+                            $itemDescription = "Conference Registration Late Fee is for registrations after September 30th";    
+                            array_push($lineItem, array("emailAddress" => $registrant->emailAddress, "quantity" => 1, "itemId" => $results['id'], "itemName" => "Registration Late Fee", "itemDescription" => $itemDescription, "price" => 50.00));
+                        }
 
                         $ceu = filter_var($registrant->conference->ceu, FILTER_VALIDATE_BOOLEAN);
                         $ceu = $ceu ? 1 : 0;
@@ -494,6 +502,7 @@ class Membership extends Member implements iRegistration {
                             $statement = $connection->prepare("SELECT * FROM orderOptions WHERE id=6");
                             $statement->execute();
                             $results = $statement->fetch(PDO::FETCH_ASSOC);
+                            // If attending 3 or more days the banquet cost is included.
                             $results['price'] = ($daysAttending >= 3) ? 0 : $results['price'];
                             // Create a invoice line item for the banquet registration.
                             $itemDescription = "Banquet Registration\nMember Name: " . $registrant->firstName . " " . $registrant->lastName;    
@@ -507,6 +516,7 @@ class Membership extends Member implements iRegistration {
                             $statement = $connection->prepare("SELECT * FROM orderOptions WHERE id=5");
                             $statement->execute();
                             $results = $statement->fetch(PDO::FETCH_ASSOC);
+                            // If attending 3 or more days the vendor night cost is included.
                             $results['price'] = ($daysAttending >= 3) ? 0 : $results['price'];
                             // Create a invoice line item for the vendor night registration.
                             $itemDescription = "Vendor Registration\nMember Name: " . $registrant->firstName . " " . $registrant->lastName;    
@@ -539,7 +549,6 @@ class Membership extends Member implements iRegistration {
                         $statement->bindParam(":guestName", $guestName, PDO::PARAM_STR);
                         $statement->execute();
                     }
-
                 }
                 // Needs to reset the array completely.
                 unset($datesAttending);
@@ -564,9 +573,6 @@ class Membership extends Member implements iRegistration {
             $statement->execute();
 
             //error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . json_encode($lineItems, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
-                        
-            return json_encode($lineItems, JSON_PRETTY_PRINT);
-            
         }
         catch (PDOException $e) { 
             error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
@@ -577,6 +583,8 @@ class Membership extends Member implements iRegistration {
         finally {
             $connection = Configuration::closeConnection();
         }
+
+        return json_encode($lineItems, JSON_PRETTY_PRINT);
 
     }
 
@@ -1024,6 +1032,7 @@ class Membership extends Member implements iRegistration {
                             */
                             break;
                         case 'departments':
+                            $originalRowCount = $rowCount;
                             // Adds multiple department/business names to the one Excel cell for a specific member.
                             $departments = json_decode($member[$statement->getColumnMeta($c)['name']]);
                             $lastKey = array_key_last($departments);
@@ -1222,6 +1231,37 @@ class Membership extends Member implements iRegistration {
         }
         
         return $pdf->Output('membershipcard.pdf', 'I');
+    }
+
+    public function getMembers() {
+
+        $memberList = array();
+
+        try {
+            $connection = Configuration::openConnection();
+            $statement = $connection->prepare("SELECT users.firstName, users.lastName, users.emailAddress, users.type, members.* FROM users INNER JOIN members ON users.id=members.userId");
+            $statement->execute();
+
+            $members = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach($members as $member) {
+
+                $member['type'] = json_decode($member['type'], false);
+                $member['departments'] = json_decode($member['departments'], false);
+                $member['areas'] = json_decode($member['areas'], true);
+
+                array_push($memberList, $member);
+            }
+
+        }
+        catch (PDOException $e) {
+            error_log(date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+        
+        return json_encode($memberList);
     }
     
 }

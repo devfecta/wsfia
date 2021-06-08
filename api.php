@@ -34,7 +34,7 @@ require_once("models/RegisterConferenceMember.php");
 require_once("./models/Sponsor.php");
 //require_once("./models/Speaker.php");
 //require_once("./models/User.php");
-//require_once("./models/Vendor.php");
+require_once("./models/Vendor.php");
 
 require './vendor/autoload.php';
 //require_once('./PhpSpreadsheet/IOFactory.php');
@@ -152,12 +152,32 @@ switch ($requestMethod) {
                     $Sponsor = new Sponsor(null);
                     switch ($_POST['method']) {
                         case "registerSponsor":
-                            echo $Sponsor->registerSponsor($_POST);
+                            $returnValue = $Sponsor->registerSponsor(json_encode($_POST, JSON_PRETTY_PRINT));
+                            echo $returnValue;
+                            break;
+                        case "updateInventory":
+                            $returnValue = $Sponsor->updateInventory($_POST['sponsorships']);
+                            echo $returnValue;
+                            break;
+                        default:
+                            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . "METHOD ERROR: The " . $_POST['method'] . " method does not exist.\n", 3, "/var/www/html/php-errors.log");
                             break;
                     }
                     break;
-                default;
-                    echo json_encode(array("error" => 'CLASS ERROR: The '.$_POST['class'].' class does not exist.\n'), JSON_PRETTY_PRINT);
+                case 'Vendor':
+                    $Vendor = new Vendor(null);
+                    switch ($_POST['method']) {
+                        case "registerVendor":
+                            $returnValue = $Vendor->registerVendor(json_encode($_POST, JSON_PRETTY_PRINT));
+                            echo $returnValue;
+                            break;
+                        default:
+                            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . "METHOD ERROR: The " . $_POST['method'] . " method does not exist.\n", 3, "/var/www/html/php-errors.log");
+                            break;
+                    }
+                    break;
+                default:
+                    error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . "CLASS ERROR: The " . $_POST['class'] . " class does not exist.\n", 3, "/var/www/html/php-errors.log");
                     break;
             }
         }
@@ -226,8 +246,7 @@ switch ($requestMethod) {
 
                             }
                             catch(Exception $e) {
-                                //echo $e->getMessage();
-                                //exit();
+                                error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . "GET METHOD ERROR: The " . $e->getMessage() . " method does not exist.\n", 3, "/var/www/html/php-errors.log");
                             }
                             
                             
@@ -259,8 +278,11 @@ switch ($requestMethod) {
                             //echo $_GET['memberId'];
                             return $Membership->getMembershipCard($_GET['memberId']);
                             break;
+                        case "getMembers":
+                            echo $Membership->getMembers();
+                            break;
                         default:
-                            echo json_encode(array("error" => 'GET METHOD ERROR: The '.$_GET['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);
+                            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . "GET METHOD ERROR: The " . $_GET['method'] . " method does not exist.\n", 3, "/var/www/html/php-errors.log");
                             break;
                     }
                     break;
@@ -271,7 +293,7 @@ switch ($requestMethod) {
                             echo $member->getMembersByBusiness($_GET['businessId']);
                             break;
                         default:
-                            echo json_encode(array("error" => 'GET METHOD ERROR: The '.$_GET['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);
+                            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . "GET METHOD ERROR: The " . $_GET['method'] . " method does not exist.\n", 3, "/var/www/html/php-errors.log");
                             break;
                     }
                     break;
@@ -289,7 +311,7 @@ switch ($requestMethod) {
                             echo $business->searchBusinessesByName($_GET['searchBusinesses']);
                             break;
                         default:
-                            echo json_encode(array("error" => 'GET METHOD ERROR: The '.$_GET['method'].' method does not exist.\n'), JSON_PRETTY_PRINT);
+                            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . "GET METHOD ERROR: The " . $_GET['method'] . " method does not exist.\n", 3, "/var/www/html/php-errors.log");
                             break;
                     }
                     break;
@@ -299,10 +321,13 @@ switch ($requestMethod) {
                         case "getInventory":
                             echo $Sponsor->getInventory($_GET['type']);
                             break;
+                        default:
+                            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . "GET METHOD ERROR: The " . $_GET['method'] . " method does not exist.\n", 3, "/var/www/html/php-errors.log");
+                            break;
                     }
                     break;
-                default;
-                    echo json_encode(array("error" => 'GET CLASS ERROR: The '.$_GET['class'].' class does not exist.\n'), JSON_PRETTY_PRINT);
+                default:
+                    error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . "GET CLASS ERROR: The " . $_GET['class'] . " method does not exist.\n", 3, "/var/www/html/php-errors.log");
                     break;
             }
         }

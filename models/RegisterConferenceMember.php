@@ -111,7 +111,7 @@ class RegisterConferenceMember extends Membership implements iRegistration {
 
         $result = false;
 
-        error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $sessionId . "\n", 3, "/var/www/html/php-errors.log");
+        //error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $sessionId . "\n", 3, "/var/www/html/php-errors.log");
 
         try {
 
@@ -187,7 +187,7 @@ class RegisterConferenceMember extends Membership implements iRegistration {
             
             $registrants = $this->getRegistrations($data->sessionId);
 
-            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $registrants . "\n", 3, "/var/www/html/php-errors.log");
+            //error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $registrants . "\n", 3, "/var/www/html/php-errors.log");
 
             foreach ($registrants as $registrantData) {
 
