@@ -116,5 +116,50 @@ class Speaker extends User {
 
         return $this;
     }
+
+
+    public function registerSpeaker($formData) {
+        
+        $speaker = json_decode($formData, false);
+
+        $result = false;
+
+        try {
+            $connection = Configuration::openConnection();
+            
+            $statement = $connection->prepare("INSERT INTO speakers (`fullName`, `phoneNumber`, `emailAddress`, `streetAddress`, `city`, `stateAbbreviation`, `zipcode`, `shortBio`, `classTitle`, `classDescription`, `specialEquipment`, `speakerFee`, `travelExpenses`, `hotelNights`, `meals`, `miscExpenses`) 
+            VALUES (:fullName, :phoneNumber, :emailAddress, :streetAddress, :city, :stateAbbreviation, :zipcode, :shortBio, :classTitle, :classDescription, :specialEquipment, :speakerFee, :travelExpenses, :hotelNights, :meals, :miscExpenses)");
+            $statement->bindParam(":fullName", $speaker->fullName, PDO::PARAM_STR);
+            $statement->bindParam(":phoneNumber", $speaker->phoneNumber, PDO::PARAM_STR);
+            $statement->bindParam(":emailAddress", $speaker->emailAddress, PDO::PARAM_STR);
+            $statement->bindParam(":streetAddress", $speaker->streetAddress, PDO::PARAM_STR);
+            $statement->bindParam(":city", $speaker->city, PDO::PARAM_STR);
+            $statement->bindParam(":stateAbbreviation", $speaker->stateAbbreviation, PDO::PARAM_STR);
+            $statement->bindParam(":zipcode", $speaker->zipcode, PDO::PARAM_STR);
+            $statement->bindParam(":shortBio", $speaker->shortBio, PDO::PARAM_STR);
+            $statement->bindParam(":classTitle", $speaker->classTitle, PDO::PARAM_STR);
+            $statement->bindParam(":classDescription", $speaker->classDescription, PDO::PARAM_STR);
+            $statement->bindParam(":specialEquipment", $speaker->specialEquipment, PDO::PARAM_STR);
+            $statement->bindParam(":speakerFee", $speaker->speakerFee, PDO::PARAM_STR);
+            $statement->bindParam(":travelExpenses", $speaker->travelExpenses, PDO::PARAM_STR);
+            $statement->bindParam(":hotelNights", $speaker->hotelNights, PDO::PARAM_STR);
+            $statement->bindParam(":meals", $speaker->meals, PDO::PARAM_STR);
+            $statement->bindParam(":miscExpenses", $speaker->miscExpenses, PDO::PARAM_STR);
+            $result = $statement->execute();
+            
+
+        }
+        catch (PDOException $e) { 
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        catch (Exception $e) {
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+
+        return $result;
+    }
 }
 ?>

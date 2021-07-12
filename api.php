@@ -32,7 +32,7 @@ require_once("models/RegisterConferenceMember.php");
 //require_once("./models/RegisterConferenceSpeaker.php");
 //require_once("./models/RegisterConferenceVendor.php");
 require_once("./models/Sponsor.php");
-//require_once("./models/Speaker.php");
+require_once("./models/Speaker.php");
 //require_once("./models/User.php");
 require_once("./models/Vendor.php");
 
@@ -87,6 +87,7 @@ switch ($requestMethod) {
                         case "renew":
                             // Return JSON of the renewed members
                             //echo json_encode(array("type" => "API POST", "method" => $requestMethod, "data" => $_POST));
+                            //error_log(__FILE__ . " Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . json_encode($_POST, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
                             echo $Membership->renew($_POST);
                             break;
                         case "updateAccountInfo":
@@ -140,6 +141,18 @@ switch ($requestMethod) {
                         case "setVendorNight":
                             echo $RegisterConferenceMember->setVendorNight($_POST);
                             break;
+                        case "setVegetarianMeal":
+                            echo $RegisterConferenceMember->setVegetarianMeal($_POST);
+                            break;
+                        case "setBanquetGuest":
+                            echo $RegisterConferenceMember->setBanquetGuest($_POST);
+                            break;
+                        case "setVendorNightGuest":
+                            echo $RegisterConferenceMember->setVendorNightGuest($_POST);
+                            break;
+                        case "setVegetarianMealGuest":
+                            echo $RegisterConferenceMember->setVegetarianMealGuest($_POST);
+                            break;
                         case "setGuestName":
                             echo $RegisterConferenceMember->setGuestName($_POST);
                             break;
@@ -169,6 +182,18 @@ switch ($requestMethod) {
                     switch ($_POST['method']) {
                         case "registerVendor":
                             $returnValue = $Vendor->registerVendor(json_encode($_POST, JSON_PRETTY_PRINT));
+                            echo $returnValue;
+                            break;
+                        default:
+                            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . "METHOD ERROR: The " . $_POST['method'] . " method does not exist.\n", 3, "/var/www/html/php-errors.log");
+                            break;
+                    }
+                    break;
+                case 'Speaker':
+                    $Speaker = new Speaker(null);
+                    switch ($_POST['method']) {
+                        case "registerSpeaker":
+                            $returnValue = $Speaker->registerSpeaker(json_encode($_POST, JSON_PRETTY_PRINT));
                             echo $returnValue;
                             break;
                         default:

@@ -481,6 +481,266 @@ class RegisterConferenceMember extends Membership implements iRegistration {
 
         return $result;
     }
+
+    
+    /**
+     * Sets the boolean for a specific registrant based on their member ID if they want a vegetarian meal.
+     *
+     * @param array $attendingData
+     * @return boolean
+     */
+    public function setVegetarianMeal($attendingData) {
+
+        $result = false;
+        $data = json_decode(json_encode($attendingData), FALSE);
+
+        try {
+            
+            $registrants = $this->getRegistrations($data->sessionId);
+
+            foreach ($registrants as $registrantData) {
+
+                $registrant = json_decode($registrantData['registration'], false);
+
+                
+
+                if($registrant->emailAddress == $data->emailAddress) {
+
+                    $registrant = json_decode($registrantData['registration'], true);
+                    $registrant['conference']['vegetarianMeal'] = '';
+                    $registrant = json_encode($registrant);
+                    $registrant = json_decode($registrant, false);
+
+                    //error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . json_encode($data->vegetarianMeal, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
+
+                    $registrant->conference->vegetarianMeal = isset($data->vegetarianMeal) ? $data->vegetarianMeal : false;
+
+                    $jsonString = json_encode($registrant);
+                    
+                    $result = $this->updateSessionRegistration($registrantData['id'], $data->sessionId, $jsonString);
+                }
+                
+            }
+
+        }
+        catch (PDOException $e) { 
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        catch (Exception $e) {
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+
+        return $result;
+    }
+
+
+
+
+
+
+
+
+
+    /**
+     * Sets the boolean for a specific registrant based on their member ID if they are attending the conference banquet.
+     *
+     * @param array $attendingData
+     * @return boolean
+     */
+    public function setBanquetGuest($attendingData) {
+
+        $result = false;
+        $data = json_decode(json_encode($attendingData), FALSE);
+
+        try {
+            
+            $registrants = $this->getRegistrations($data->sessionId);
+
+            foreach ($registrants as $registrantData) {
+
+                $registrant = json_decode($registrantData['registration'], false);
+
+                if($registrant->emailAddress == $data->emailAddress) {
+
+                    $registrant = json_decode($registrantData['registration'], true);
+                    
+                    if (sizeof($registrant['conference']['guests']) > 0) {
+
+                        $foundIndex = array_search($data->guestId, array_column($registrant['conference']['guests'], 'id'));
+
+                        if ($foundIndex > -1) {
+                            $registrant['conference']['guests'][$foundIndex]['id'] = $data->guestId;
+                            $registrant['conference']['guests'][$foundIndex]['banquet'] = isset($data->banquet) ? $data->banquet : null;
+                        }
+                        else {
+                            array_push($registrant['conference']['guests'], ["id" => $data->guestId, "banquet" => isset($data->banquet) ? $data->banquet : null]);
+                        }
+                    }
+                    else {
+
+                        $index = 0;
+                        $registrant['conference']['guests'] = array();
+                        $registrant['conference']['guests'][0]['id'] = '';
+                        $registrant['conference']['guests'][0]['banquet'] = '';
+                        $registrant['conference']['guests'][0]['id'] = $data->guestId;
+                        $registrant['conference']['guests'][0]['banquet'] = isset($data->banquet) ? $data->banquet : null;
+                    }
+
+                    $jsonString = json_encode($registrant);
+                    
+                    $result = $this->updateSessionRegistration($registrantData['id'], $data->sessionId, $jsonString);
+                }
+                
+            }
+
+        }
+        catch (PDOException $e) { 
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        catch (Exception $e) {
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+
+        return $result;
+    }
+    /**
+     * Sets the boolean for a specific registrant based on their member ID if they are attending the conference vendor night.
+     *
+     * @param array $attendingData
+     * @return boolean
+     */
+    public function setVendorNightGuest($attendingData) {
+
+        $result = false;
+        $data = json_decode(json_encode($attendingData), FALSE);
+
+        try {
+            
+            $registrants = $this->getRegistrations($data->sessionId);
+
+            foreach ($registrants as $registrantData) {
+
+                $registrant = json_decode($registrantData['registration'], false);
+
+                if($registrant->emailAddress == $data->emailAddress) {
+
+                    $registrant = json_decode($registrantData['registration'], true);
+
+                    if (sizeof($registrant['conference']['guests']) > 0) {
+
+                        $foundIndex = array_search($data->guestId, array_column($registrant['conference']['guests'], 'id'));
+
+                        if ($foundIndex > -1) {
+                            $registrant['conference']['guests'][$foundIndex]['id'] = $data->guestId;
+                            $registrant['conference']['guests'][$foundIndex]['vendorNight'] = isset($data->vendorNight) ? $data->vendorNight : null;
+                        }
+                        else {
+                            array_push($registrant['conference']['guests'], ["id" => $data->guestId, "vendorNight" => isset($data->vendorNight) ? $data->vendorNight : null]);
+                        }
+                    }
+                    else {
+
+                        $index = 0;
+                        $registrant['conference']['guests'] = array();
+                        $registrant['conference']['guests'][0]['id'] = '';
+                        $registrant['conference']['guests'][0]['vendorNight'] = '';
+                        $registrant['conference']['guests'][0]['id'] = $data->guestId;
+                        $registrant['conference']['guests'][0]['vendorNight'] = isset($data->vendorNight) ? $data->vendorNight : null;
+                    }
+
+                    $jsonString = json_encode($registrant);
+                    
+                    $result = $this->updateSessionRegistration($registrantData['id'], $data->sessionId, $jsonString);
+                }
+                
+            }
+
+        }
+        catch (PDOException $e) { 
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        catch (Exception $e) {
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+
+        return $result;
+    }
+
+    
+    /**
+     * Sets the boolean for a specific registrant based on their member ID if they want a vegetarian meal.
+     *
+     * @param array $attendingData
+     * @return boolean
+     */
+    public function setVegetarianMealGuest($attendingData) {
+
+        $result = false;
+        $data = json_decode(json_encode($attendingData), FALSE);
+
+        try {
+            
+            $registrants = $this->getRegistrations($data->sessionId);
+
+            foreach ($registrants as $registrantData) {
+
+                $registrant = json_decode($registrantData['registration'], false);
+
+                if($registrant->emailAddress == $data->emailAddress) {
+
+                    $registrant = json_decode($registrantData['registration'], true);
+                
+                    if (sizeof($registrant['conference']['guests']) > 0) {
+
+                        $foundIndex = array_search($data->guestId, array_column($registrant['conference']['guests'], 'id'));
+
+                        if ($foundIndex > -1) {
+                            $registrant['conference']['guests'][$foundIndex]['id'] = $data->guestId;
+                            $registrant['conference']['guests'][$foundIndex]['vegetarianMeal'] = isset($data->vegetarianMeal) ? $data->vegetarianMeal : null;
+                        }
+                        else {
+                            array_push($registrant['conference']['guests'], ["id" => $data->guestId, "vegetarianMeal" => isset($data->vegetarianMeal) ? $data->vegetarianMeal : null]);
+                        }
+                    }
+                    else {
+
+                        $index = 0;
+                        $registrant['conference']['guests'] = array();
+                        $registrant['conference']['guests'][0]['id'] = '';
+                        $registrant['conference']['guests'][0]['vegetarianMeal'] = '';
+                        $registrant['conference']['guests'][0]['id'] = $data->guestId;
+                        $registrant['conference']['guests'][0]['vegetarianMeal'] = isset($data->vegetarianMeal) ? $data->vegetarianMeal : null;
+                    }
+
+                    $jsonString = json_encode($registrant);
+                    
+                    $result = $this->updateSessionRegistration($registrantData['id'], $data->sessionId, $jsonString);
+                }
+                
+            }
+
+        }
+        catch (PDOException $e) { 
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        catch (Exception $e) {
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . $e->getMessage() . "\n", 3, "/var/www/html/php-errors.log");
+        }
+        finally {
+            $connection = Configuration::closeConnection();
+        }
+
+        return $result;
+    }
     /**
      * Sets guest name for the specific attendee.
      *
@@ -504,11 +764,28 @@ class RegisterConferenceMember extends Membership implements iRegistration {
                 if($registrant->emailAddress == $data->emailAddress) {
 
                     $registrant = json_decode($registrantData['registration'], true);
-                    $registrant['conference']['guestName'] = '';
-                    $registrant = json_encode($registrant);
-                    $registrant = json_decode($registrant, false);
 
-                    $registrant->conference->guestName = isset($data->guestName) ? $data->guestName : null;
+                    if (sizeof($registrant['conference']['guests']) > 0) {
+
+                        $foundIndex = array_search($data->guestId, array_column($registrant['conference']['guests'], 'id'));
+
+                        if ($foundIndex > -1) {
+                            $registrant['conference']['guests'][$foundIndex]['id'] = $data->guestId;
+                            $registrant['conference']['guests'][$foundIndex]['guestName'] = isset($data->guestName) ? $data->guestName : null;
+                        }
+                        else {
+                            array_push($registrant['conference']['guests'], ["id" => $data->guestId, "guestName" => isset($data->guestName) ? $data->guestName : null]);
+                        }
+                    }
+                    else {
+
+                        $index = 0;
+                        $registrant['conference']['guests'] = array();
+                        $registrant['conference']['guests'][0]['id'] = '';
+                        $registrant['conference']['guests'][0]['guestName'] = '';
+                        $registrant['conference']['guests'][0]['id'] = $data->guestId;
+                        $registrant['conference']['guests'][0]['guestName'] = isset($data->guestName) ? $data->guestName : null;
+                    }
                     
                     $jsonString = json_encode($registrant);
 

@@ -484,7 +484,7 @@ class Membership extends Member implements iRegistration {
                         array_push($lineItem, array("emailAddress" => $registrant->emailAddress, "quantity" => 1, "itemId" => $results['id'], "itemName" => $results['description'], "itemDescription" => $itemDescription, "price" => $results['price']));
 
                         // Create a invoice line item for the late fee.
-                        if (strtotime($dateCurrent) >= strtotime(date('Y-5-1')) && strtotime($dateCurrent) < strtotime(date('Y-11-1'))) {
+                        if (strtotime($dateCurrent) <= strtotime(date('Y-5-1')) && strtotime($dateCurrent) > strtotime(date('Y-9-30'))) {
                             $itemDescription = "Conference Registration Late Fee is for registrations after September 30th";    
                             array_push($lineItem, array("emailAddress" => $registrant->emailAddress, "quantity" => 1, "itemId" => $results['id'], "itemName" => "Registration Late Fee", "itemDescription" => $itemDescription, "price" => 50.00));
                         }
@@ -494,6 +494,7 @@ class Membership extends Member implements iRegistration {
                         $licenseType = isset($registrant->conference->licenseType) ? $registrant->conference->licenseType : '';
                         $licenseNumber = isset($registrant->conference->licenseNumber) ? $registrant->conference->licenseNumber : '';
 
+                        
                         // Banquet Registration
                         $banquet = filter_var($registrant->conference->banquet, FILTER_VALIDATE_BOOLEAN);
                         $banquet = $banquet ? 1 : 0;
@@ -519,10 +520,50 @@ class Membership extends Member implements iRegistration {
                             // If attending 3 or more days the vendor night cost is included.
                             $results['price'] = ($daysAttending >= 3) ? 0 : $results['price'];
                             // Create a invoice line item for the vendor night registration.
-                            $itemDescription = "Vendor Registration\nMember Name: " . $registrant->firstName . " " . $registrant->lastName;    
+                            $itemDescription = "Vendor Night Registration\nMember Name: " . $registrant->firstName . " " . $registrant->lastName;    
                             array_push($lineItem, array("emailAddress" => $registrant->emailAddress, "quantity" => 1, "itemId" => $results['id'], "itemName" => $results['description'], "itemDescription" => $itemDescription, "price" => $results['price']));
                         }
+                        // Vegetarian Meal
+                        $vegetarianMeal = filter_var($registrant->conference->vegetarianMeal, FILTER_VALIDATE_BOOLEAN);
+                        $vegetarianMeal = $vegetarianMeal ? 1 : 0;
 
+
+
+                        $guests = isset($registrant->conference->guests) ? json_encode($registrant->conference->guests) : null;
+
+                        //error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . json_encode($guests, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
+
+                        if (isset($registrant->conference->guests)) {
+                            foreach ($registrant->conference->guests as $guest) {
+                                if (isset($guest->banquet) && isset($guest->guestName)) {
+                                    $banquetGuest = filter_var($guest->banquet, FILTER_VALIDATE_BOOLEAN);
+                                    $banquetGuest = $banquetGuest ? 1 : 0;
+                                    if ($banquetGuest > 0) {
+                                        // Gets the banquet pricing for the registrant.
+                                        $statement = $connection->prepare("SELECT * FROM orderOptions WHERE id=6");
+                                        $statement->execute();
+                                        $results = $statement->fetch(PDO::FETCH_ASSOC);
+                                        $itemDescription = $registrant->firstName . " " . $registrant->lastName . "'s Guest: " . $guest->guestName . "'s Banquet Registration";    
+                                        array_push($lineItem, array("emailAddress" => $registrant->emailAddress, "quantity" => 1, "itemId" => 0, "itemName" => "Attendee Guest", "itemDescription" => $itemDescription, "price" => $results['price']));
+                                    }
+                                }
+
+                                if (isset($guest->vendorNight) && isset($guest->guestName)) {
+                                    $vendorNightGuest = filter_var($guest->vendorNight, FILTER_VALIDATE_BOOLEAN);
+                                    $vendorNightGuest = $vendorNightGuest ? 1 : 0;
+                                    if ($vendorNight > 0) {
+                                        // Gets the banquet pricing for the registrant.
+                                        $statement = $connection->prepare("SELECT * FROM orderOptions WHERE id=5");
+                                        $statement->execute();
+                                        $results = $statement->fetch(PDO::FETCH_ASSOC);
+                                        $itemDescription = $registrant->firstName . " " . $registrant->lastName . "'s Guest: " . $guest->guestName . "'s Vendor Night Registration";    
+                                        array_push($lineItem, array("emailAddress" => $registrant->emailAddress, "quantity" => 1, "itemId" => 0, "itemName" => "Attendee Guest", "itemDescription" => $itemDescription, "price" => $results['price']));
+                                    }
+                                }
+                            }
+                        }
+
+                        /*
                         $guestName = isset($registrant->conference->guestName) ? $registrant->conference->guestName : '';
 
                         if (isset($registrant->conference->guestName)) {
@@ -534,11 +575,14 @@ class Membership extends Member implements iRegistration {
                         else {
                             $guestName = '';
                         }
+                        */
+
+
 
                         // Converts array into a string for the database.
                         $datesAttending = json_encode($datesAttending);
                         // Conference Information
-                        $statement = $connection->prepare("INSERT INTO attendees (`memberId`, `datesAttending`, `ceu`, `licenseType`, `licenseNumber`, `banquet`, `vendorNight`, `guestName`) VALUES (:memberId, :datesAttending, :ceu, :licenseType, :licenseNumber, :banquet, :vendorNight, :guestName)");
+                        $statement = $connection->prepare("INSERT INTO attendees (`memberId`, `datesAttending`, `ceu`, `licenseType`, `licenseNumber`, `banquet`, `vendorNight`, `vegetarianMeal`, `guests`) VALUES (:memberId, :datesAttending, :ceu, :licenseType, :licenseNumber, :banquet, :vendorNight, :vegetarianMeal, :guests)");
                         $statement->bindParam(":memberId", $memberId, PDO::PARAM_STR);
                         $statement->bindParam(":datesAttending", $datesAttending, PDO::PARAM_STR);
                         $statement->bindParam(":ceu", $ceu, PDO::PARAM_INT);
@@ -546,7 +590,8 @@ class Membership extends Member implements iRegistration {
                         $statement->bindParam(":licenseNumber", $licenseNumber, PDO::PARAM_STR);
                         $statement->bindParam(":banquet", $banquet, PDO::PARAM_INT);
                         $statement->bindParam(":vendorNight", $vendorNight, PDO::PARAM_INT);
-                        $statement->bindParam(":guestName", $guestName, PDO::PARAM_STR);
+                        $statement->bindParam(":vegetarianMeal", $vegetarianMeal, PDO::PARAM_INT);
+                        $statement->bindParam(":guests", $guests, PDO::PARAM_STR);
                         $statement->execute();
                     }
                 }
@@ -559,13 +604,30 @@ class Membership extends Member implements iRegistration {
             $lineItems['lineItems'] = $lineItem;
 
             // Get Billing Business Information
-            $statement = $connection->prepare("SELECT * FROM businesses as b, states as s WHERE b.id=:id AND s.stateId=b.state");
-            $statement->bindParam(":id", $data->businessId, PDO::PARAM_INT);
-            $statement->execute();
-            $billingBusiness = $statement->fetch(PDO::FETCH_ASSOC);
+            if ($data->businessId > 0) {
+                $statement = $connection->prepare("SELECT * FROM businesses as b, states as s WHERE b.id=:id AND s.stateId=b.state");
+                $statement->bindParam(":id", $data->businessId, PDO::PARAM_INT);
+                $statement->execute();
+                $billingBusiness = $statement->fetch(PDO::FETCH_ASSOC);
+            }
+            else {
+                $billingBusiness = array("id" => "0", 
+                "name" => $data->otherBillingName, 
+                "station" => "", 
+                "streetAddress" => $data->otherBillingStreetAddress, 
+                "city" => $data->otherBillingCity, 
+                "stateAbbreviation" => $data->otherBillingState, 
+                "zipcode" => $data->otherBillingZipcode, 
+                "phone" => "", 
+                "url" => "", 
+                "services" => "", 
+                "type" => "");
+            }
+
+            $billingEmailAddress = ($data->emailAddress != "0") ? $data->emailAddress : $data->otherBillingEmailAddress;
 
             // Adds billing information to the line items for the invoice.
-            $lineItems['billing'] = array("billingEmailAddress" => $data->emailAddress, "billingBusiness" => $billingBusiness);
+            $lineItems['billing'] = array("billingEmailAddress" => $billingEmailAddress, "billingBusiness" => $billingBusiness);
 
             // Removes session data from the database to clean up the userSessions table.
             $statement = Configuration::openConnection()->prepare("DELETE FROM `userSessions` WHERE `sessionId`=:sessionId");
@@ -688,12 +750,12 @@ class Membership extends Member implements iRegistration {
         /**
          * Returns the new User ID in JSON
          */
-        $lineItems = '';
+        $lineItems = array();
 
         try {
             $members = json_decode($data->members);
 
-            return $members;
+            //return $members;
             //$registrants = json_decode($this->getRegistrants($data->sessionId));
             // $connection is lets you use the same connection for multiple statements.
             $connection = Configuration::openConnection();
@@ -709,6 +771,8 @@ class Membership extends Member implements iRegistration {
             } else {
                 $expirationDate = date('Y-12-31', strtotime($dateCurrent . '+1 year'));
             }
+
+            
 
             foreach($members as $member) {
                 // Update the expiration date
@@ -785,6 +849,9 @@ class Membership extends Member implements iRegistration {
         finally {
             $connection = Configuration::closeConnection();
         }
+
+
+        error_log(__FILE__ . " Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . $lineItems . "\n", 3, "/var/www/html/php-errors.log");
 
         return $lineItems;
 
