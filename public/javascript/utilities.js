@@ -589,37 +589,28 @@ const validateMembershipForm = (form) => {
 }
 
 /**
- * Sets the license type field for the attendee.
+ * Sets the guest name field for the attendee guest.
  * @param {*} sessionId 
  * @param {*} emailAddress
+ * @param {*} guestId
  * @param {*} guestName 
  */
-
- const setGuestName = (sessionId, emailAddress, guestName) => {
-
-    //console.log(sessionId, emailAddress, guestName);
-    
+ const setGuestName = (sessionId, emailAddress, guestId, guestName) => {
     fetch('/setGuestName', {
         method: 'POST', 
-        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "guestName": guestName}), 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "guestId": guestId, "guestName": guestName}), 
         headers: { 'Content-Type': 'application/json' },
     })
     .then(response => response)
     .catch(error => displayError(error));
-    
 }
-
 /**
- * Sets the CEU field if the attendee requires it.
+ * Sets the banquet field for the attendee.
  * @param {*} sessionId 
  * @param {*} emailAddress
  * @param {*} checked 
  */
-
  const setBanquet = (sessionId, emailAddress, checked) => {
-
-    //console.log(sessionId, emailAddress, checked);
-    
     fetch('/setBanquet', {
         method: 'POST', 
         body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "banquet": checked}), 
@@ -627,19 +618,30 @@ const validateMembershipForm = (form) => {
     })
     .then(response => response)
     .catch(error => displayError(error));
-    
 }
 /**
- * Sets the CEU field if the attendee requires it.
+ * Sets the banquet field for the attendee guest.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} guestId
+ * @param {*} checked 
+ */
+ const setBanquetGuest = (sessionId, emailAddress, guestId, checked) => {
+    fetch('/setBanquetGuest', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "guestId": guestId, "banquet": checked}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+}
+/**
+ * Sets the vendor night field for the attendee.
  * @param {*} sessionId 
  * @param {*} emailAddress
  * @param {*} checked 
  */
-
  const setVendorNight = (sessionId, emailAddress, checked) => {
-
-    //console.log(sessionId, emailAddress, checked);
-    
     fetch('/setVendorNight', {
         method: 'POST', 
         body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "vendorNight": checked}), 
@@ -647,9 +649,54 @@ const validateMembershipForm = (form) => {
     })
     .then(response => response)
     .catch(error => displayError(error));
-    
 }
-
+/**
+ * Sets the vendor night field for the attendee guest.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} guestId
+ * @param {*} checked 
+ */
+ const setVendorNightGuest = (sessionId, emailAddress, guestId, checked) => {
+    fetch('/setVendorNightGuest', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "guestId": guestId, "vendorNight": checked}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+}
+/**
+ * Sets the vegetarian meal field for the attendee.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} checked 
+ */
+const setVegetarianMeal = (sessionId, emailAddress, checked) => {
+    fetch('/setVegetarianMeal', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "vegetarianMeal": checked}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+}
+/**
+ * Sets the vegetarian meal field for the attendee guest.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} guestId
+ * @param {*} checked 
+ */
+ const setVegetarianMealGuest = (sessionId, emailAddress, guestId, checked) => {
+    fetch('/setVegetarianMealGuest', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "guestId": guestId, "vegetarianMeal": checked}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+}
 /**
  * Removes a member from the conference attendee registration form.
  * @param {*} id 

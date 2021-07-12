@@ -39,7 +39,7 @@ const controllers = new Controllers();
 /**
  * Sets start and end dates for conference registration.
  */
- const startDateConference = Date.parse('2021-05-10');
+ const startDateConference = Date.parse('2021-05-01');
  const endDateConference = Date.parse('2021-10-30');
 /**
  * EJS templating library.
@@ -209,7 +209,6 @@ app.post('/setAttendingDate', async (request, response) => {
  * 
  */
  app.post('/setGuestName', async (request, response) => {
-    //console.log(request.body);
     let confirm = await controllers.conference.setGuestName(JSON.stringify(request.body));
     response.end();
 });
@@ -217,19 +216,44 @@ app.post('/setAttendingDate', async (request, response) => {
  * 
  */
  app.post('/setBanquet', async (request, response) => {
-    //console.log(request.body);
     let confirm = await controllers.conference.setBanquet(JSON.stringify(request.body));
     response.end();
 });
 /**
  * 
  */
+ app.post('/setBanquetGuest', async (request, response) => {
+    let confirm = await controllers.conference.setBanquetGuest(JSON.stringify(request.body));
+    response.end();
+});
+/**
+ * 
+ */
  app.post('/setVendorNight', async (request, response) => {
-    //console.log(request.body);
     let confirm = await controllers.conference.setVendorNight(JSON.stringify(request.body));
     response.end();
 });
-
+/**
+ * 
+ */
+ app.post('/setVendorNightGuest', async (request, response) => {
+    let confirm = await controllers.conference.setVendorNightGuest(JSON.stringify(request.body));
+    response.end();
+});
+/**
+ * 
+ */
+ app.post('/setVegetarianMeal', async (request, response) => {
+    let confirm = await controllers.conference.setVegetarianMeal(JSON.stringify(request.body));
+    response.end();
+});
+/**
+ * 
+ */
+ app.post('/setVegetarianMealGuest', async (request, response) => {
+    let confirm = await controllers.conference.setVegetarianMealGuest(JSON.stringify(request.body));
+    response.end();
+});
 
 /**
  * Calls the registerMember method to add registrants to the database, calls to the PayPal API to create and send an invoice, then redirect to the confirmation page.
@@ -280,7 +304,7 @@ app.get('/renewal/member', async (request, response) => {
  */
 app.post('/renewal/process', async (request, response) => {
     //console.log(request.session);
-    //console.log(request.body);
+    console.log(request.body);
     request.body.sessionId = request.session.sessionId;
     request.session.registration = await controllers.membership.renewMember(JSON.stringify(request.body));
     response.redirect('/register/confirm');
@@ -465,6 +489,8 @@ app.get('/conference', (request, response) => {
     }
     // Reusing the getRenewals method just to get current members.
     request.session.members = await controllers.membership.getRenewals(JSON.stringify(request.query));
+
+    request.session.businessId = request.query.businessId;
     response.render('./registration/attendeeCurrentMembers.ejs', { session: request.session, message: '' });
 });
 /**
@@ -556,6 +582,14 @@ app.post('/addConferenceRegistrants', async (request, response) => {
  */
  app.get('/conference/speaker', (request, response) => {
     response.render('./registration/speakerInfo.ejs', { session: request.session });
+});
+
+
+app.post('/conference/speaker/register', async (request, response) => {
+    let formData = Object.assign({}, request.body);
+    let result = await controllers.conference.registerSpeaker(JSON.stringify(formData));
+    request.session.message = result;
+    response.redirect('/conference/speaker');
 });
 // SPEAKER END
 // CONFERENCE END

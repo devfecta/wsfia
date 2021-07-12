@@ -49,6 +49,7 @@
                 banquet = '';
                 vendorNight = '';
                 guestName = '';
+                vegetarianMeal = '';
 
                 if (typeof registrant.conference !== 'undefined') {
                     if (typeof registrant.conference.attending !== 'undefined') {
@@ -153,21 +154,59 @@
                                 </tr>
                                 <tr class="bg-transparent">
                                     <td>
-                                        <div>
-                                            <div class="col-md-6 form-check form-check-inline">
-                                                <input class="form-check-input" type="checkbox" onclick="setBanquet('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.checked)" <%= banquet %> name="banquet" id="banquet<%= index %>" />
+                                        <div class="row mb-4">
+                                            <div class="col-md-12 form-inline">
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setBanquet('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.checked)" <%= banquet %> name="banquet" id="banquet<%= index %>" />
                                                 <label class="form-check-label" for="banquet<%= index %>">Attending Banquet?</label>
-                                            </div>
-                                            <div class="col-md-6 form-check form-check-inline">
-                                                <input class="form-check-input" type="checkbox" onclick="setVendorNight('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.checked)" <%= vendorNight %> name="vendorNight" id="vendorNight<%= index %>" />
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setVendorNight('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.checked)" <%= vendorNight %> name="vendorNight" id="vendorNight<%= index %>" />
                                                 <label class="form-check-label" for="vendorNight<%= index %>">Attending Vendor Night?</label>
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setVegetarianMeal('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.checked)" <%= vegetarianMeal %> name="vegetarianMeal" id="vegetarianMeal<%= index %>" />
+                                                <label class="form-check-label" for="vegetarianMeal<%= index %>">Vegetarian Meal?</label>
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col-md-12">
-                                                <input type="text" onblur="setGuestName('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.value)" value="<%= guestName %>" class="form-control" maxlength="32" name="guestName" id="guestName<%= index %>" placeholder="Attendee's Guest" aria-label="Attendee's Guest">
-                                            </div>
+                                            <div class="col-md-12"><strong>Guest Information</strong></div>
                                         </div>
+                                        <div class="row">
+
+
+                                            <div class="col-md-12 form-inline">
+                                                <label class="form-label mr-1" for="guestName0">Guest 1</label>
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setBanquetGuest('<%= session.sessionId %>', '<%= registrant.emailAddress %>', document.querySelector('#guestName1<%= index %>').id, this.checked)" <%= banquet %> name="banquetGuest1" id="banquetGuest1<%= index %>" />
+                                                <label class="form-check-label" for="banquetGuest1<%= index %>">Attending Banquet?</label>
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setVendorNightGuest('<%= session.sessionId %>', '<%= registrant.emailAddress %>', document.querySelector('#guestName1<%= index %>').id, this.checked)" <%= vendorNight %> name="vendorNightGuest1" id="vendorNightGuest1<%= index %>" />
+                                                <label class="form-check-label" for="vendorNightGuest1<%= index %>">Attending Vendor Night?</label>
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setVegetarianMealGuest('<%= session.sessionId %>', '<%= registrant.emailAddress %>', document.querySelector('#guestName1<%= index %>').id, this.checked)" <%= vegetarianMeal %> name="vegetarianMealGuest1" id="vegetarianMealGuest1<%= index %>" />
+                                                <label class="form-check-label" for="vegetarianMealGuest1<%= index %>">Vegetarian Meal?</label>
+                                            </div>
+                                            <div class="col-md-12 form-inline">
+                                                <input class="form-control col-md-6" type="text" onblur="setGuestName('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.id, this.value)" value="<%= guestName %>" maxlength="32" name="guestName1" id="guestName1<%= index %>" placeholder="Guest Name" aria-label="Guest Name">
+                                            </div>
+
+                                            <div class="col-md-12 form-inline">
+                                                <label class="form-label mr-1" for="guestName0">Guest 2</label>
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setBanquetGuest('<%= session.sessionId %>', '<%= registrant.emailAddress %>', document.querySelector('#guestName2<%= index %>').id, this.checked)" <%= banquet %> name="banquetGuest2" id="banquetGuest2<%= index %>" />
+                                                <label class="form-check-label" for="banquetGuest2<%= index %>">Attending Banquet?</label>
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setVendorNightGuest('<%= session.sessionId %>', '<%= registrant.emailAddress %>', document.querySelector('#guestName2<%= index %>').id, this.checked)" <%= vendorNight %> name="vendorNightGuest2" id="vendorNightGuest2<%= index %>" />
+                                                <label class="form-check-label" for="vendorNightGuest2<%= index %>">Attending Vendor Night?</label>
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setVegetarianMealGuest('<%= session.sessionId %>', '<%= registrant.emailAddress %>', document.querySelector('#guestName2<%= index %>').id, this.checked)" <%= vegetarianMeal %> name="vegetarianMealGuest2" id="vegetarianMealGuest2<%= index %>" />
+                                                <label class="form-check-label" for="vegetarianMealGuest2<%= index %>">Vegetarian Meal?</label>
+                                            </div>
+                                            <div class="col-md-12 form-inline">
+                                                <input class="form-control col-md-6" type="text" onblur="setGuestName('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.id, this.value)" value="<%= guestName %>" maxlength="32" name="guestName1" id="guestName2<%= index %>" placeholder="Guest Name" aria-label="Guest Name">
+                                            </div>
+
+
+
+
                                     </td>
                                 </tr>
                             </table>
@@ -230,22 +269,74 @@
         <% emailAddresses.forEach(function(emailAddress, index) { %>
 
         <div class="form-check mb-1">
-            <input type="radio" onclick="validateRegistrationForm(this.form)" class="form-check-input" name="emailAddress" id="emailAddress<%= index %>" value="<%= emailAddress %>">
+            <input type="radio" onclick="validateRegistrationForm(this.form); document.getElementById('otherEmailField').style.display = (this.checked ? 'none' : 'block')" class="form-check-input" name="emailAddress" id="emailAddress<%= index %>" value="<%= emailAddress %>">
             <label class="form-check-label" for="emailAddress<%= index %>"><%= emailAddress %></label>
         </div>
         
         <% }) %>
+
+        <div class="form-check mb-1">
+            <input type="radio" onclick="validateRegistrationForm(this.form); document.getElementById('otherEmailField').style.display = (this.checked ? 'block' : 'none')" class="form-check-input" name="emailAddress" id="otherEmailAddress" value="0">
+            <label class="form-check-label" for="otherEmailAddress">Other</label>
+        </div>
+
+        <div class="col-md-12" id="otherEmailField" style="display: none">
+            <div class="form-group row my-0">
+                <div class="col-md-12">
+                    <label class="col-form-label col-md-12" for="otherBillingEmailAddress">Other e-Mail Address</label>
+                    <input class="form-control col-md-6" type="email" name="otherBillingEmailAddress" id="otherBillingEmailAddress" value="" maxlength="64" placeholder="Other Billing e-Mail Address" aria-label="Other Billing e-Mail Address">
+                </div>
+            </div>
+        </div>
 
         <p class="mt-4 mb-2">Select a billing mailing address:</p>
         
         <% businesses.forEach(function(business, index) { %>
 
             <div class="form-check mb-1">
-                <input type="radio" onclick="validateRegistrationForm(this.form)" class="form-check-input" name="business" id="business<%= index %>" value="<%= business.id %>">
+                <input type="radio" onclick="validateRegistrationForm(this.form); document.getElementById('otherAddressFields').style.display = (this.checked ? 'none' : 'block')" class="form-check-input" name="business" id="business<%= index %>" value="<%= business.id %>">
                 <label class="form-check-label" for="business<%= index %>"><%= business.name %><br/><em style="font-size: 85%;"><%= business.streetAddress %>, <%= business.city %></em></label>
             </div>
 
         <% }) %>
+
+        <div class="form-check mb-1">
+            <input type="radio" onclick="validateRegistrationForm(this.form); document.getElementById('otherAddressFields').style.display = (this.checked ? 'block' : 'none')" class="form-check-input" name="business" id="otherBillingAddress" value="0">
+            <label class="form-check-label" for="otherBillingAddress">Other</label>
+        </div>
+
+        <div class="col-md-12" id="otherAddressFields" style="display: none">
+            <div class="form-group row my-0">
+                <div class="col-md-12">
+                    <label class="col-form-label col-md-12" for="otherBillingName">Other Deparment/Business Name</label><br/>
+                    <input class="form-control col-md-6" onfocus="document.getElementById('otherBillingAddress').checked = true" type="text" name="otherBillingName" id="otherBillingName" value="" maxlength="48" placeholder="Department Company Name" aria-label="Other Billing Company Name">
+                </div>
+            </div>
+
+            <div class="form-group row my-0">
+                <div class="col-md-12">
+                    <label class="col-form-label col-md-12" for="otherBillingStreetAddress">Other Street Address</label><br/>
+                    <input class="form-control col-md-6" onfocus="document.getElementById('otherBillingAddress').checked = true" type="text" name="otherBillingStreetAddress" id="otherBillingStreetAddress" value="" maxlength="64" placeholder="Street Address" aria-label="Other Billing Street Address">
+                </div>
+            </div>
+            <div class="form-group row my-0">
+                <div class="col-md-3">
+                    <label class="col-form-label col-md-12" for="otherBillingCity">Other City</label><br/>
+                    <input class="form-control col-md-12" type="text" name="otherBillingCity" id="otherBillingCity" value="" maxlength="24" placeholder="City" aria-label="Other Billing City">
+                </div>
+                <div class="col-md-3">
+                    <label class="col-form-label col-md-12 for="otherBillingState">Other State</label><br/>
+                    <input class="form-control col-md-12" type="text" name="otherBillingState" id="otherBillingState" value="" maxlength="2" placeholder="State" aria-label="Other Billing State">
+                </div>
+                <div class="col-md-3">
+                    <label class="col-form-label col-md-12" for="otherBillingZipcode">Other Zipcode</label><br/>
+                    <input class="form-control col-md-12" type="text" name="otherBillingZipcode" id="otherBillingZipcode" value="" maxlength="10" placeholder="Zipcode" aria-label="Other Billing Zipcode">
+                </div>
+            </div>
+
+        </div>
+
+        
 
     </fieldset>
             

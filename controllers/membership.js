@@ -172,6 +172,7 @@ class Membership {
 
         let formData = JSON.parse(data);
         //console.log(formData);
+
         let confirmation = false;
         //let registrants = await this.getRegistrants(sessionId);
         
@@ -181,7 +182,17 @@ class Membership {
 
             params.append('sessionId', formData.sessionId);
             params.append('emailAddress', formData.emailAddress);
+            if (formData.emailAddress == '0') {
+                params.append('otherBillingEmailAddress', formData.otherBillingEmailAddress);
+            }
             params.append('businessId', formData.business);
+            if (formData.business == '0') {
+                params.append('otherBillingName', formData.otherBillingName);
+                params.append('otherBillingStreetAddress', formData.otherBillingStreetAddress);
+                params.append('otherBillingCity', formData.otherBillingCity);
+                params.append('otherBillingState', formData.otherBillingState);
+                params.append('otherBillingZipcode', formData.otherBillingZipcode);
+            }
             params.append('class', 'Membership');
             params.append('method', 'register');
             //console.log(params);

@@ -2,10 +2,86 @@
 
 <section id="speakerInfo">
     <h1>Speaker Registration</h1>
-    <p>Please email the following information about yourself, presentation needs, and your presentation to <a href="mailto:treasurer@wsfia.org?subject=Speaker Registration">treasurer@wsfia.org</a> by <strong>October 5th</strong>.</p>
 
+    <%- session.message %>
+
+    <p>In addition to submitting this form, if you would like to send us your presentation please email at <a href="mailto:AsstTraining@wsfia.org?subject=Speaker Registration">AsstTraining@wsfia.org</a> by <strong>October 5th</strong>.</p>
+
+    <form name="speakerForm" id="speakerForm" action="/conference/speaker/register" method="POST" class="needs-validation" novalidate>
         <fieldset>
             <legend>Speaker Information</legend>
+
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="fullName">Full Name</label>
+                <input type="text" class="col-md-9 form-control" name="fullName" id="fullName" size="36" maxlength="48" value="" required />
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="phoneNumber">Phone Number</label>
+                <input type="text" class="col-md-9 form-control" name="phoneNumber" id="phoneNumber" size="18" maxlength="24" value="" required />
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="fullName">e-Mail Address</label>
+                <input type="text" class="col-md-9 form-control" name="emailAddress" id="emailAddress" size="48" maxlength="128" value="" required />
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="streetAddress">Street Address</label>
+                <input type="text" class="col-md-9 form-control" name="streetAddress" id="streetAddress" size="48" maxlength="64" value="" required />
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="city">City</label>
+                <input type="text" class="col-md-9 form-control" name="city" id="city" size="18" maxlength="24" value="" required />
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="state">State Abbreviation</label>
+                <input type="text" class="col-md-9 form-control" name="state" id="state" size="2" maxlength="2" value="" required />
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="zipcode">Zipcode</label>
+                <input type="text" class="col-md-9 form-control" name="zipcode" id="zipcode" size="7" maxlength="10" value="" required />
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="shortBio">Short Bio</label>
+                <textarea class="col-md-9 form-control" name="shortBio" id="shortBio" rows="7" maxlength="2048"></textarea>
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="classTitle">Class Title</label>
+                <input type="text" class="col-md-9 form-control" name="classTitle" id="classTitle" size="36" maxlength="48" value="" required />
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="classDescription">Class Description</label>
+                <textarea class="col-md-9 form-control" name="classDescription" id="classDescription" rows="7" maxlength="1024"></textarea>
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="specialEquipment">Special Equipment needs (speaker will need to provide their own laptop)<br/><em style="font-size: 90%;">Projector, projector pointer, mic and flip chart w/marker provided</em></label>
+                <textarea class="col-md-9 form-control" name="specialEquipment" id="specialEquipment" rows="5" maxlength="512"></textarea>
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="speakerFee">Speaker Fee</label>
+                <input type="number" class="col-md-9 form-control" name="speakerFee" id="speakerFee" min="0" max="1000" value="" required />
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="travelExpenses">Travel Expenses<br/><em>(Airfare, Mileage 0.565/mile, Car Rental)</em></label>
+                <textarea class="col-md-9 form-control" name="travelExpenses" id="travelExpenses" rows="5" maxlength="512"></textarea>
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="hotelNights"># of Hotel Nights</label>
+                <input type="number" class="col-md-9 form-control" name="hotelNights" id="hotelNights" min="0" max="4" value="" required />
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="meals">Meals<br/><em>(meals are provided Tuesday - Lunch; Wednesday - breakfast (if staying night before), lunch, dinner; Thursday - breakfast (if staying night before), lunch, dinner, Friday - breakfast (if staying night before))</em></label>
+                <input type="text" class="col-md-9 form-control" name="meals" id="meals" size="36" maxlength="48" value="" />
+            </div>
+            <div class="form-group row">
+                <label class="col-md-3 col-form-label" for="miscExpenses">Misc Expenses</label>
+                <textarea class="col-md-9 form-control" name="miscExpenses" id="miscExpenses" rows="5" maxlength="512"></textarea>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-md-12 p-5 text-right">
+                    <a href="/conference" id="cancelButton" style="min-width: 150px; width:25%" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" id="registerSpeakerButton" style="min-width: 150px; width:25%" class="btn btn-primary">Register</button>
+                </div>
+            </div>
 
             <div class="row">
                 <ul class="list-group">
@@ -26,7 +102,7 @@
             </div>
 
         </fieldset>
-    
+    </form>
 </section>
 
 <%- include ('../template/footer') -%>
