@@ -172,8 +172,8 @@ class Membership {
 
         let formData = JSON.parse(data);
         //console.log(formData);
-        let confirmation = false;
 
+        let confirmation = false;
         //let registrants = await this.getRegistrants(sessionId);
         
         try {
@@ -182,7 +182,17 @@ class Membership {
 
             params.append('sessionId', formData.sessionId);
             params.append('emailAddress', formData.emailAddress);
+            if (formData.emailAddress == '0') {
+                params.append('otherBillingEmailAddress', formData.otherBillingEmailAddress);
+            }
             params.append('businessId', formData.business);
+            if (formData.business == '0') {
+                params.append('otherBillingName', formData.otherBillingName);
+                params.append('otherBillingStreetAddress', formData.otherBillingStreetAddress);
+                params.append('otherBillingCity', formData.otherBillingCity);
+                params.append('otherBillingState', formData.otherBillingState);
+                params.append('otherBillingZipcode', formData.otherBillingZipcode);
+            }
             params.append('class', 'Membership');
             params.append('method', 'register');
             //console.log(params);
@@ -191,32 +201,33 @@ class Membership {
                 , params
             )
             .then(response => {
-                console.log(response.data);
-                /*
-                response.data.forEach(element => {
-                    console.log(element.firstName);
-                });
-                */
-                /*
+                // returns line items for invoice.
+                console.log("membership.js: ", response.data);
                 const lineItems = response.data;
-                //console.log(lineItems);
                 params = new URLSearchParams();
                 params.append('lineItems', JSON.stringify(response.data));
-                //console.log("Parameters");
-                //console.log(params);
-                */
-                /*
+                
                 return axios.post(process.env.API + '/PayPal-PHP-SDK/SendInvoice.php'
                     , params
                 )
-                .then(response => lineItems)
+                .then(response => {
+                    if(response.data) {
+                        return false;
+                    }
+                    else {
+                        return lineItems
+                    }
+                    //console.log("PayPal Response");
+                    //console.log(response.data);
+                    // NOTE: Response is empty if successful.
+                    
+                })
                 .catch(error => console.log(error));
-                */
-
-                //return false;
-                //confirmation = response.data;
+                
             })
             .catch(error => console.log(error));
+
+            //return confirmation;
             
         }
         catch (e) {
@@ -348,7 +359,7 @@ class Membership {
             })
             .catch(error => console.log(error));
             
-            return confirmation;
+            //return confirmation;
             
         }
         catch (e) {
@@ -413,6 +424,33 @@ class Membership {
         catch (e) {
             console.error(e);
         }
+    }
+
+    getMembershipCard = async (memberId) => {
+        try {
+            let pdf = null;
+
+            await axios.get(process.env.API + '/api.php?class=Membership&method=getMembershipCard&memberId=' + memberId)
+            .then(response => {pdf = response.data})
+            //.then(json => console.log(json))
+            .catch(error => console.log("Controller Error:", error));
+            return pdf;
+        }
+        catch(e) {
+            console.error(e);
+        }
+    }
+
+    getMembers = async () => {
+
+        let parameters = 'class=Membership';
+            parameters += '&method=getMembers';
+
+        return await axios.get(process.env.API + '/api.php?' + parameters)
+        .then(response => response.data)
+        .then(json => json)
+        .catch(error => error);
+
     }
 
 }

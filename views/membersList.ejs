@@ -1,0 +1,14 @@
+<%- include ('template/header') -%>
+
+<section id="membershipInfo">
+    <h1>WSFIA Members</h1>
+
+    <% session.members.forEach( member => { %>
+
+        <p><%- member.firstName %></p>
+
+    <% }); %>
+    
+</section>
+
+<%- include ('template/footer') -%>

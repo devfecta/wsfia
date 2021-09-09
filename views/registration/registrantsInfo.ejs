@@ -8,6 +8,10 @@
 
 <section id="membershipInfo">
     <h1><% if (session.conference) { %> Conference <% } else { %> Membership <% } %> Registration</h1>
+
+    <% if ((session.errorMessage) && session.errorMessage.length > 0) {  %>
+        <div class="alert alert-danger m-1" role="alert"><%- session.errorMessage %></div>
+    <% } %>
     
 <% if ((session.registrants) && session.registrants.length > 0) {  %>
 
@@ -15,7 +19,7 @@
         "Add Another Person" button to fill out the registration for again. Otherwise, click on the "Register" button 
         to finish the registration process.</p>
         
-<form name="membershipForm" id="membershipForm" action="/register/process" method="POST">
+<form class="table-responsive" name="membershipForm" id="membershipForm" action="/register/process" method="POST">
 
     <table class="table table-striped">
         <thead>
@@ -32,6 +36,38 @@
 
 
                 emailAddresses = [...emailAddresses, registrant.emailAddress];
+
+                
+                attendingMonday = '';
+                attendingTuesday = '';
+                attendingWednesday = '';
+                attendingThursday = '';
+                attendingFriday = '';
+                ceu = '';
+                licenseType = '';
+                licenseNumber = '';
+                banquet = '';
+                vendorNight = '';
+                guestName = '';
+                vegetarianMeal = '';
+
+                if (typeof registrant.conference !== 'undefined') {
+                    if (typeof registrant.conference.attending !== 'undefined') {
+                        attendingMonday = ((typeof registrant.conference.attending.Monday !== 'undefined') && registrant.conference.attending.Monday === 'true') ? 'checked=true' : '';
+                        attendingTuesday = ((typeof registrant.conference.attending.Tuesday !== 'undefined') && registrant.conference.attending.Tuesday === 'true') ? 'checked=true' : '';
+                        attendingWednesday = ((typeof registrant.conference.attending.Wednesday !== 'undefined') && registrant.conference.attending.Wednesday === 'true') ? 'checked=true' : '';
+                        attendingThursday = ((typeof registrant.conference.attending.Thursday !== 'undefined') && registrant.conference.attending.Thursday === 'true') ? 'checked=true' : '';
+                        attendingFriday = ((typeof registrant.conference.attending.Friday !== 'undefined') && registrant.conference.attending.Friday === 'true') ? 'checked=true' : '';                         
+                    }
+
+                    ceu = ((typeof registrant.conference.ceu !== 'undefined') && registrant.conference.ceu === 'true') ? 'checked=true' : '';
+                    licenseType = (typeof registrant.conference.licenseType !== 'undefined') ? registrant.conference.licenseType : '';
+                    licenseNumber = (typeof registrant.conference.licenseNumber !== 'undefined') ? registrant.conference.licenseNumber : '';
+                    banquet = ((typeof registrant.conference.banquet !== 'undefined') && registrant.conference.banquet === 'true') ? 'checked=true' : '';
+                    vendorNight = ((typeof registrant.conference.vendorNight !== 'undefined') && registrant.conference.vendorNight === 'true') ? 'checked=true' : '';
+                    guestName = (typeof registrant.conference.guestName !== 'undefined') ? registrant.conference.guestName : '';
+                }
+                
                 
             %>
                 <tr class="userRow<%= index %>">
@@ -61,58 +97,115 @@
                     </td>
                 </tr>
                 <% if (session.conference) { %>
-                <tr class="userRow<%= index %>">
+                <tr class="userRow<%= index %>" style="background-color: rgba(150, 10, 10, 0.1);">
 
                     <td style="border-bottom: solid 1px #aaa"></td>
-                    <td style="border-bottom: solid 1px #aaa" colspan="4">
-                        <div class="table-responsive">
-                            <table class="table">
+                    <td class="p-0" style="border-bottom: solid 1px #aaa" colspan="4">
+                        <div class="table my-2">
+                            <table class="table w-100">
+                                <tr>
+                                    <thead><strong>Conference Registration Information</strong></thead>
+                                </tr>
                                 <tr class="bg-transparent">
                                     <td>
                                         <p class="m-0">Select the day(s) <%= registrant.firstName + ' ' + registrant.lastName %> will be attending the conference:</p>
-
-                                        
+                                       <!--
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Monday', this.checked)" checked=<%= attendingMonday %> name="attendingDates" id="attendingMonday<%= index %>" value="<%= index %>-Monday">
+                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Monday', this.checked)" <%= attendingMonday %> name="attendingDates" id="attendingMonday<%= index %>" value="<%= index %>-Monday">
                                             <label class="form-check-label" for="attendingMonday<%= index %>">Monday</label>
                                         </div>
+                                        -->
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Tuesday', this.checked)" checked=<%= attendingMonday %> name="attendingDates" id="attendingTuesday<%= index %>" value="<%= index %>-Tuesday">
+                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Tuesday', this.checked)" <%= attendingTuesday %> name="attendingDates" id="attendingTuesday<%= index %>" value="<%= index %>-Tuesday">
                                             <label class="form-check-label" for="attendingTuesday<%= index %>">Tuesday</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Wednesday', this.checked)" checked=<%= attendingMonday %> name="attendingDates" id="attendingWednesday<%= index %>" value="<%= index %>-Wednesday">
+                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Wednesday', this.checked)" <%= attendingWednesday %> name="attendingDates" id="attendingWednesday<%= index %>" value="<%= index %>-Wednesday">
                                             <label class="form-check-label" for="attendingWednesday<%= index %>">Wednesday</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Thursday', this.checked)" checked=<%= attendingMonday %> name="attendingDates" id="attendingThursday<%= index %>" value="<%= index %>-Thursday">
+                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Thursday', this.checked)" <%= attendingThursday %> name="attendingDates" id="attendingThursday<%= index %>" value="<%= index %>-Thursday">
                                             <label class="form-check-label" for="attendingThursday<%= index %>">Thursday</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Friday', this.checked)" checked=<%= attendingMonday %> name="attendingDates" id="attendingFriday<%= index %>" value="<%= index %>-Friday">
+                                            <input class="form-check-input" type="checkbox" onclick="setAttendingDate('<%= session.sessionId %>', '<%= registrant.emailAddress %>', 'Friday', this.checked)" <%= attendingFriday %> name="attendingDates" id="attendingFriday<%= index %>" value="<%= index %>-Friday">
                                             <label class="form-check-label" for="attendingFriday<%= index %>">Friday</label>
                                         </div>
                                         
                                     </td>
                                 </tr>
-                                <tr>
+                                <tr class="bg-transparent">
                                     <td>
                                         <div class="row form-check form-check-inline">
-                                            <div class="col">
-                                                <input class="form-check-input" type="checkbox" onclick="setCEU('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.checked)" name="ceu" id="ceu<%= index %>" />
+                                            <div class="col-md-12">
+                                                <input class="form-check-input" type="checkbox" onclick="setCEU('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.checked)" <%= ceu %> name="ceu" id="ceu<%= index %>" />
                                                 <label class="form-check-label" for="ceu<%= index %>">Do you require CEUs?</label>
                                             </div>
                                         </div>
                                         <div class="row">
-                                            <div class="col">
-                                                <input type="text" onblur="setLicenseType('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.value)" class="form-control" maxlength="32" name="licenseType" id="licenseType<%= index %>" placeholder="License Type" aria-label="License Type">
+                                            <div class="col-md-6">
+                                                <input type="text" onblur="setLicenseType('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.value)" value="<%= licenseType %>" class="form-control" maxlength="32" name="licenseType" id="licenseType<%= index %>" placeholder="License Type" aria-label="License Type">
                                             </div>
-                                            <div class="col">
-                                                <input type="text" onblur="setLicenseNumber('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.value)" class="form-control" maxlength="24" name="licenseNumber" id="licenseNumber<%= index %>" placeholder="License Number" aria-label="License Number">
+                                            <div class="col-md-6">
+                                                <input type="text" onblur="setLicenseNumber('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.value)" value="<%= licenseNumber %>" class="form-control" maxlength="24" name="licenseNumber" id="licenseNumber<%= index %>" placeholder="License Number" aria-label="License Number">
                                             </div>
                                         </div>
                                     </td>
+                                </tr>
+                                <tr class="bg-transparent">
                                     <td>
+                                        <div class="row mb-4">
+                                            <div class="col-md-12 form-inline">
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setBanquet('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.checked)" <%= banquet %> name="banquet" id="banquet<%= index %>" />
+                                                <label class="form-check-label" for="banquet<%= index %>">Attending Banquet?</label>
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setVendorNight('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.checked)" <%= vendorNight %> name="vendorNight" id="vendorNight<%= index %>" />
+                                                <label class="form-check-label" for="vendorNight<%= index %>">Attending Vendor Night?</label>
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setVegetarianMeal('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.checked)" <%= vegetarianMeal %> name="vegetarianMeal" id="vegetarianMeal<%= index %>" />
+                                                <label class="form-check-label" for="vegetarianMeal<%= index %>">Vegetarian Meal?</label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-12"><strong>Guest Information</strong></div>
+                                        </div>
+                                        <div class="row">
+
+
+                                            <div class="col-md-12 form-inline">
+                                                <label class="form-label mr-1" for="guestName0">Guest 1</label>
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setBanquetGuest('<%= session.sessionId %>', '<%= registrant.emailAddress %>', document.querySelector('#guestName1<%= index %>').id, this.checked)" <%= banquet %> name="banquetGuest1" id="banquetGuest1<%= index %>" />
+                                                <label class="form-check-label" for="banquetGuest1<%= index %>">Attending Banquet?</label>
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setVendorNightGuest('<%= session.sessionId %>', '<%= registrant.emailAddress %>', document.querySelector('#guestName1<%= index %>').id, this.checked)" <%= vendorNight %> name="vendorNightGuest1" id="vendorNightGuest1<%= index %>" />
+                                                <label class="form-check-label" for="vendorNightGuest1<%= index %>">Attending Vendor Night?</label>
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setVegetarianMealGuest('<%= session.sessionId %>', '<%= registrant.emailAddress %>', document.querySelector('#guestName1<%= index %>').id, this.checked)" <%= vegetarianMeal %> name="vegetarianMealGuest1" id="vegetarianMealGuest1<%= index %>" />
+                                                <label class="form-check-label" for="vegetarianMealGuest1<%= index %>">Vegetarian Meal?</label>
+                                            </div>
+                                            <div class="col-md-12 form-inline">
+                                                <input class="form-control col-md-6" type="text" onblur="setGuestName('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.id, this.value)" value="<%= guestName %>" maxlength="32" name="guestName1" id="guestName1<%= index %>" placeholder="Guest Name" aria-label="Guest Name">
+                                            </div>
+
+                                            <div class="col-md-12 form-inline">
+                                                <label class="form-label mr-1" for="guestName0">Guest 2</label>
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setBanquetGuest('<%= session.sessionId %>', '<%= registrant.emailAddress %>', document.querySelector('#guestName2<%= index %>').id, this.checked)" <%= banquet %> name="banquetGuest2" id="banquetGuest2<%= index %>" />
+                                                <label class="form-check-label" for="banquetGuest2<%= index %>">Attending Banquet?</label>
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setVendorNightGuest('<%= session.sessionId %>', '<%= registrant.emailAddress %>', document.querySelector('#guestName2<%= index %>').id, this.checked)" <%= vendorNight %> name="vendorNightGuest2" id="vendorNightGuest2<%= index %>" />
+                                                <label class="form-check-label" for="vendorNightGuest2<%= index %>">Attending Vendor Night?</label>
+
+                                                <input class="form-check-input ml-2" type="checkbox" onclick="setVegetarianMealGuest('<%= session.sessionId %>', '<%= registrant.emailAddress %>', document.querySelector('#guestName2<%= index %>').id, this.checked)" <%= vegetarianMeal %> name="vegetarianMealGuest2" id="vegetarianMealGuest2<%= index %>" />
+                                                <label class="form-check-label" for="vegetarianMealGuest2<%= index %>">Vegetarian Meal?</label>
+                                            </div>
+                                            <div class="col-md-12 form-inline">
+                                                <input class="form-control col-md-6" type="text" onblur="setGuestName('<%= session.sessionId %>', '<%= registrant.emailAddress %>', this.id, this.value)" value="<%= guestName %>" maxlength="32" name="guestName1" id="guestName2<%= index %>" placeholder="Guest Name" aria-label="Guest Name">
+                                            </div>
+
+
+
 
                                     </td>
                                 </tr>
@@ -120,35 +213,6 @@
                         </div>
                     </td>
                 </tr>
-                
-
-                <%
-                    attendingMonday = false;
-                    attendingTuesday = false;
-                    attendingWednesday = false;
-                    attendingThursday = false;
-                    attendingFriday = false;
-
-                    if (typeof registrant.conference !== 'undefined') {
-                        if (typeof registrant.conference.attending !== 'undefined') {
-                            attendingMonday = (typeof registrant.conference.attending.Monday !== 'undefined') ? registrant.conference.attending.Monday : false;
-                            attendingTuesday = (typeof registrant.conference.attending.Tuesday !== 'undefined') ? registrant.conference.attending.Tuesday : false;
-                            attendingWednesday = (typeof registrant.conference.attending.Wednesday !== 'undefined') ? registrant.conference.attending.Wednesday : false;
-                            attendingThursday = (typeof registrant.conference.attending.Thursday !== 'undefined') ? registrant.conference.attending.Thursday : false;
-                            attendingFriday = (typeof registrant.conference.attending.Friday !== 'undefined') ? registrant.conference.attending.Friday : false;                            
-                        }
-                    }
-                %>
-
-                <script>
-                    document.getElementById('attendingMonday<%= index %>').checked = <%= attendingMonday %>;
-                    document.getElementById('attendingTuesday<%= index %>').checked = <%= attendingTuesday %>;
-                    document.getElementById('attendingWednesday<%= index %>').checked = <%= attendingWednesday %>;
-                    document.getElementById('attendingThursday<%= index %>').checked = <%= attendingThursday %>;
-                    document.getElementById('attendingFriday<%= index %>').checked = <%= attendingFriday %>;
-                </script>
-                
-
                 <% } %>
 
             <% });
@@ -199,27 +263,80 @@
 
     <fieldset class="px-4">
         <legend>Billing Information</legend>
+        <p class="my-2"><strong>To finish your registration select a billing e-mail and mailing address.</strong></p>
         <p class="mb-2">Select a billing e-mail address:</p>
 
         <% emailAddresses.forEach(function(emailAddress, index) { %>
 
         <div class="form-check mb-1">
-            <input type="radio" onclick="validateRegistrationForm(this.form)" class="form-check-input" name="emailAddress" id="emailAddress<%= index %>" value="<%= emailAddress %>">
+            <input type="radio" onclick="validateRegistrationForm(this.form); document.getElementById('otherEmailField').style.display = (this.checked ? 'none' : 'block')" class="form-check-input" name="emailAddress" id="emailAddress<%= index %>" value="<%= emailAddress %>">
             <label class="form-check-label" for="emailAddress<%= index %>"><%= emailAddress %></label>
         </div>
         
         <% }) %>
 
-        <p class="mt-4 mb-2">Select a billing address:</p>
+        <div class="form-check mb-1">
+            <input type="radio" onclick="validateRegistrationForm(this.form); document.getElementById('otherEmailField').style.display = (this.checked ? 'block' : 'none')" class="form-check-input" name="emailAddress" id="otherEmailAddress" value="0">
+            <label class="form-check-label" for="otherEmailAddress">Other</label>
+        </div>
+
+        <div class="col-md-12" id="otherEmailField" style="display: none">
+            <div class="form-group row my-0">
+                <div class="col-md-12">
+                    <label class="col-form-label col-md-12" for="otherBillingEmailAddress">Other e-Mail Address</label>
+                    <input class="form-control col-md-6" type="email" name="otherBillingEmailAddress" id="otherBillingEmailAddress" value="" maxlength="64" placeholder="Other Billing e-Mail Address" aria-label="Other Billing e-Mail Address">
+                </div>
+            </div>
+        </div>
+
+        <p class="mt-4 mb-2">Select a billing mailing address:</p>
         
         <% businesses.forEach(function(business, index) { %>
 
             <div class="form-check mb-1">
-                <input type="radio" onclick="validateRegistrationForm(this.form)" class="form-check-input" name="business" id="business<%= index %>" value="<%= business.id %>">
-                <label class="form-check-label" for="business<%= index %>"><%= business.name %></label>
+                <input type="radio" onclick="validateRegistrationForm(this.form); document.getElementById('otherAddressFields').style.display = (this.checked ? 'none' : 'block')" class="form-check-input" name="business" id="business<%= index %>" value="<%= business.id %>">
+                <label class="form-check-label" for="business<%= index %>"><%= business.name %><br/><em style="font-size: 85%;"><%= business.streetAddress %>, <%= business.city %></em></label>
             </div>
 
         <% }) %>
+
+        <div class="form-check mb-1">
+            <input type="radio" onclick="validateRegistrationForm(this.form); document.getElementById('otherAddressFields').style.display = (this.checked ? 'block' : 'none')" class="form-check-input" name="business" id="otherBillingAddress" value="0">
+            <label class="form-check-label" for="otherBillingAddress">Other</label>
+        </div>
+
+        <div class="col-md-12" id="otherAddressFields" style="display: none">
+            <div class="form-group row my-0">
+                <div class="col-md-12">
+                    <label class="col-form-label col-md-12" for="otherBillingName">Other Deparment/Business Name</label><br/>
+                    <input class="form-control col-md-6" onfocus="document.getElementById('otherBillingAddress').checked = true" type="text" name="otherBillingName" id="otherBillingName" value="" maxlength="48" placeholder="Department Company Name" aria-label="Other Billing Company Name">
+                </div>
+            </div>
+
+            <div class="form-group row my-0">
+                <div class="col-md-12">
+                    <label class="col-form-label col-md-12" for="otherBillingStreetAddress">Other Street Address</label><br/>
+                    <input class="form-control col-md-6" onfocus="document.getElementById('otherBillingAddress').checked = true" type="text" name="otherBillingStreetAddress" id="otherBillingStreetAddress" value="" maxlength="64" placeholder="Street Address" aria-label="Other Billing Street Address">
+                </div>
+            </div>
+            <div class="form-group row my-0">
+                <div class="col-md-3">
+                    <label class="col-form-label col-md-12" for="otherBillingCity">Other City</label><br/>
+                    <input class="form-control col-md-12" type="text" name="otherBillingCity" id="otherBillingCity" value="" maxlength="24" placeholder="City" aria-label="Other Billing City">
+                </div>
+                <div class="col-md-3">
+                    <label class="col-form-label col-md-12 for="otherBillingState">Other State</label><br/>
+                    <input class="form-control col-md-12" type="text" name="otherBillingState" id="otherBillingState" value="" maxlength="2" placeholder="State" aria-label="Other Billing State">
+                </div>
+                <div class="col-md-3">
+                    <label class="col-form-label col-md-12" for="otherBillingZipcode">Other Zipcode</label><br/>
+                    <input class="form-control col-md-12" type="text" name="otherBillingZipcode" id="otherBillingZipcode" value="" maxlength="10" placeholder="Zipcode" aria-label="Other Billing Zipcode">
+                </div>
+            </div>
+
+        </div>
+
+        
 
     </fieldset>
             

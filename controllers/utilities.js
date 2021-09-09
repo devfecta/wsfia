@@ -13,6 +13,10 @@ class Utilities {
         }
     }
 
+    getRegistrantCount = (queryString) => {
+        return this.getApi(queryString);
+    }
+
     /**
      * Searches for departments or businesses in the database, and returns JSON of the search results. 
      * @param {string} queryString The parameters for the API.

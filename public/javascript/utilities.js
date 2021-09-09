@@ -2,6 +2,31 @@
 // wsfia-php
 //const url = 'http://34.71.62.246';
 //const url = 'http://localhost';
+/**
+ * Methods that should be called when every page loads.
+ */
+let init = () => {
+    
+}
+
+const getRegistrantCount = () => {
+
+    let parameters = 'class=Membership';
+    parameters += '&method=getRegistrantCount';
+
+    fetch('/getRegistrantCount?' + parameters, {method: 'GET'})
+    .then(response => response)
+    /*
+    .then(json => {
+        console.log(json);
+    })
+    */
+    .catch(error => displayError(error));
+}
+
+getRegistrantCount();
+
+
 
 /**
  * Searches for departments or businesses in the database, and calls the getBusinesses 
@@ -147,13 +172,13 @@ const getMembers = async (businessId, conference) => {
 
             if (conference) {
                 currentForm.innerHTML = `<p class="text-danger">If you are already a member you will see your account and others 
-                associated with the department/business information listed below. Simply click on the "Conference Registration" button 
-                to continue with the conference registration process. If you don't see a member listed, and need to register them as 
-                a new member click "Add Registrant" to continue.</p>`;
+                associated with the department/business information listed below. Simply click on the "<strong>Conference Registration</strong>" button 
+                to continue with the conference registration process. If you don't see a member listed you will need to register them as 
+                a new member by clicking "<strong>Create New Account</strong>".</p>`;
             }
             else {
                 currentForm.innerHTML = `<p class="text-danger">If you are already a member you will see your account information listed below. 
-                If you don't see your account listed, click on the "Create New Account" button to register.</p>`;
+                If you don't see your account listed, click on the "<strong>Create New Account</strong>" button to register.</p>`;
             }
             
             data.forEach( member => {
@@ -477,6 +502,7 @@ const validateMembershipForm = (form) => {
     }
 
 }
+
 /**
  * Sets the dates an attendee will be attending at the conference.
  * @param {*} sessionId 
@@ -484,6 +510,7 @@ const validateMembershipForm = (form) => {
  * @param {*} attendingDate 
  * @param {*} checked 
  */
+
  const setAttendingDate = (sessionId, emailAddress, attendingDate, checked) => {
 
     console.log(sessionId, emailAddress, attendingDate, checked);
@@ -497,15 +524,17 @@ const validateMembershipForm = (form) => {
     .catch(error => displayError(error));
 
 }
+
 /**
  * Sets the CEU field if the attendee requires it.
  * @param {*} sessionId 
  * @param {*} emailAddress
  * @param {*} checked 
  */
+
  const setCEU = (sessionId, emailAddress, checked) => {
 
-    console.log(sessionId, emailAddress, checked);
+    //console.log(sessionId, emailAddress, checked);
     
     fetch('/setCEU', {
         method: 'POST', 
@@ -516,15 +545,17 @@ const validateMembershipForm = (form) => {
     .catch(error => displayError(error));
     
 }
+
 /**
  * Sets the license type field for the attendee.
  * @param {*} sessionId 
  * @param {*} emailAddress
  * @param {*} licenseType 
  */
+
  const setLicenseType = (sessionId, emailAddress, licenseType) => {
 
-    console.log(sessionId, emailAddress, licenseType);
+    //console.log(sessionId, emailAddress, licenseType);
     
     fetch('/setLicenseType', {
         method: 'POST', 
@@ -535,15 +566,17 @@ const validateMembershipForm = (form) => {
     .catch(error => displayError(error));
     
 }
+
 /**
  * Sets the license type field for the attendee.
  * @param {*} sessionId 
  * @param {*} emailAddress
  * @param {*} licenseNumber 
  */
+
  const setLicenseNumber = (sessionId, emailAddress, licenseNumber) => {
 
-    console.log(sessionId, emailAddress, licenseNumber);
+    //console.log(sessionId, emailAddress, licenseNumber);
     
     fetch('/setLicenseNumber', {
         method: 'POST', 
@@ -555,6 +588,115 @@ const validateMembershipForm = (form) => {
     
 }
 
+/**
+ * Sets the guest name field for the attendee guest.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} guestId
+ * @param {*} guestName 
+ */
+ const setGuestName = (sessionId, emailAddress, guestId, guestName) => {
+    fetch('/setGuestName', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "guestId": guestId, "guestName": guestName}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+}
+/**
+ * Sets the banquet field for the attendee.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} checked 
+ */
+ const setBanquet = (sessionId, emailAddress, checked) => {
+    fetch('/setBanquet', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "banquet": checked}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+}
+/**
+ * Sets the banquet field for the attendee guest.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} guestId
+ * @param {*} checked 
+ */
+ const setBanquetGuest = (sessionId, emailAddress, guestId, checked) => {
+    fetch('/setBanquetGuest', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "guestId": guestId, "banquet": checked}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+}
+/**
+ * Sets the vendor night field for the attendee.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} checked 
+ */
+ const setVendorNight = (sessionId, emailAddress, checked) => {
+    fetch('/setVendorNight', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "vendorNight": checked}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+}
+/**
+ * Sets the vendor night field for the attendee guest.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} guestId
+ * @param {*} checked 
+ */
+ const setVendorNightGuest = (sessionId, emailAddress, guestId, checked) => {
+    fetch('/setVendorNightGuest', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "guestId": guestId, "vendorNight": checked}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+}
+/**
+ * Sets the vegetarian meal field for the attendee.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} checked 
+ */
+const setVegetarianMeal = (sessionId, emailAddress, checked) => {
+    fetch('/setVegetarianMeal', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "vegetarianMeal": checked}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+}
+/**
+ * Sets the vegetarian meal field for the attendee guest.
+ * @param {*} sessionId 
+ * @param {*} emailAddress
+ * @param {*} guestId
+ * @param {*} checked 
+ */
+ const setVegetarianMealGuest = (sessionId, emailAddress, guestId, checked) => {
+    fetch('/setVegetarianMealGuest', {
+        method: 'POST', 
+        body: JSON.stringify({"sessionId": sessionId, "emailAddress": emailAddress, "guestId": guestId, "vegetarianMeal": checked}), 
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(response => response)
+    .catch(error => displayError(error));
+}
 /**
  * Removes a member from the conference attendee registration form.
  * @param {*} id 

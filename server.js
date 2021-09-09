@@ -34,12 +34,13 @@ app.use('/', express.static('public'));
  */
 const Controllers = require('./controllers');
 const { pathToFileURL } = require("url");
+const { request } = require("express");
 const controllers = new Controllers();
 /**
  * Sets start and end dates for conference registration.
  */
- const startDateConference = Date.parse('2021-03-10');
- const endDateConference = Date.parse('2021-03-30');
+ const startDateConference = Date.parse('2021-05-01');
+ const endDateConference = Date.parse('2021-10-30');
 /**
  * EJS templating library.
  */
@@ -58,6 +59,16 @@ app.get('/', (request, response) => {
 /**
  * Utilities START
  */
+app.get('/getRegistrantCount', async (request, response) => {
+    request.session.sessionId = request.sessionID;
+    //console.log(request._parsedOriginalUrl.query + "&sessionId=" + request.session.sessionId);
+    let results = await controllers.utilities.getRegistrantCount(request._parsedOriginalUrl.query + "&sessionId=" + request.session.sessionId);
+    request.session.showRegistrationsButton = (results > 0) ? true : false;
+    //console.log(results);
+    response.end();
+    //response.json(results);
+});
+
 app.get('/businessSearch', async (request, response) => {
     //console.log(request._parsedOriginalUrl.query);
     let results = await controllers.utilities.businessSearch(request._parsedOriginalUrl.query);
@@ -131,10 +142,11 @@ app.post('/addBusiness', async (request, response) => {
  * Renders the page for adding a registrant.
  */
 app.get('/register/member', (request, response) => {
-
+    /*
     if(request.session.sessionId === undefined){
         request.session.sessionId = uuidv4();
     }
+    */
     response.render('./registration/memberInfo.ejs', { session: request.session, message: '' });
 });
 /**
@@ -155,9 +167,10 @@ app.post('/register/addMember', async (request, response) => {
  * Renders the page for listing all of the current registrants.
  */
 app.get('/register/member/registrants', async (request, response) => {
-    console.log("Registrants");
+    //console.log("Registrants");
     request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
     //console.log(request.session.registrants);
+    //console.log(request.session);
     response.render('./registration/registrantsInfo.ejs', { session: request.session, message: '' });
 });
 /**
@@ -192,7 +205,55 @@ app.post('/setAttendingDate', async (request, response) => {
     let confirm = await controllers.conference.setLicenseNumber(JSON.stringify(request.body));
     response.end();
 });
-
+/**
+ * 
+ */
+ app.post('/setGuestName', async (request, response) => {
+    let confirm = await controllers.conference.setGuestName(JSON.stringify(request.body));
+    response.end();
+});
+/**
+ * 
+ */
+ app.post('/setBanquet', async (request, response) => {
+    let confirm = await controllers.conference.setBanquet(JSON.stringify(request.body));
+    response.end();
+});
+/**
+ * 
+ */
+ app.post('/setBanquetGuest', async (request, response) => {
+    let confirm = await controllers.conference.setBanquetGuest(JSON.stringify(request.body));
+    response.end();
+});
+/**
+ * 
+ */
+ app.post('/setVendorNight', async (request, response) => {
+    let confirm = await controllers.conference.setVendorNight(JSON.stringify(request.body));
+    response.end();
+});
+/**
+ * 
+ */
+ app.post('/setVendorNightGuest', async (request, response) => {
+    let confirm = await controllers.conference.setVendorNightGuest(JSON.stringify(request.body));
+    response.end();
+});
+/**
+ * 
+ */
+ app.post('/setVegetarianMeal', async (request, response) => {
+    let confirm = await controllers.conference.setVegetarianMeal(JSON.stringify(request.body));
+    response.end();
+});
+/**
+ * 
+ */
+ app.post('/setVegetarianMealGuest', async (request, response) => {
+    let confirm = await controllers.conference.setVegetarianMealGuest(JSON.stringify(request.body));
+    response.end();
+});
 
 /**
  * Calls the registerMember method to add registrants to the database, calls to the PayPal API to create and send an invoice, then redirect to the confirmation page.
@@ -206,15 +267,27 @@ app.post('/register/process', async (request, response) => {
     delete request.body.ceu;
     delete request.body.licenseType;
     delete request.body.licenseNumber;
-
+    delete request.body.banquet;
+    delete request.body.vendorNight;
+    delete request.body.guestName;
     //console.log(request.body);
+    let result = await controllers.membership.registerMember(JSON.stringify(request.body));
+    //console.log("Registration Session");
+    //console.log(request.session.registration);
+
+    request.session.errorMessage = "";
 
     
-    request.session.registration = await controllers.membership.registerMember(JSON.stringify(request.body));
-    /*
-    response.redirect('/register/confirm');
-    */
-    response.end();
+    if (result) {
+        request.session.registration = result;
+        response.redirect('/register/confirm');
+    }
+    else {
+        //console.log(result);
+        //console.log("PayPal Error");
+        request.session.errorMessage = 'There was an error with PayPal. Please contact us at <a href="mailto:treasurer@wsfia.org">treasurer@wsfia.org</a> to finish your registration.';
+        response.redirect('/register/member/registrants');
+    }
 });
 /**
  * Renders the page for listing all of the members for renewal.
@@ -231,15 +304,11 @@ app.get('/renewal/member', async (request, response) => {
  */
 app.post('/renewal/process', async (request, response) => {
     //console.log(request.session);
-    //console.log(request.body);
-    //request.body.sessionId = request.session.sessionId;
-    
+    console.log(request.body);
+    request.body.sessionId = request.session.sessionId;
     request.session.registration = await controllers.membership.renewMember(JSON.stringify(request.body));
-    
-    //console.log(request.session.registration);
-    
     response.redirect('/register/confirm');
-    
+    //request.end();
 });
 /**
  * Renders the confirmation of registrants, after the registration(s) have been processed.
@@ -301,6 +370,16 @@ app.get('/member-area', authenticateUser, (request, response) => {
     response.render('./memberArea.ejs', { session: request.session, message: '' });
 });
 /**
+ * Gets the member card PDF.
+ */
+ app.get('/member-card', authenticateUser, async (request, response) => {
+    //console.log(request.session.userInfo.wsfiaId);
+    //let resultJSON = await controllers.membership.getMembershipCard(request.session.userInfo.wsfiaId);
+
+    response.redirect(process.env.API + '/api.php?class=Membership&method=getMembershipCard&memberId=' + request.session.userInfo.wsfiaId);
+
+});
+/**
  * Logs out the user by removing the userInfo property from the session, then redirects to the login page.
  */
 app.get('/logout', (request, response) => {
@@ -323,6 +402,14 @@ app.post('/account', authenticateUser, async (request, response) => {
     let resultJSON = await controllers.membership.updateAccountInfo(JSON.stringify(request.body));
     request.session.message = resultJSON.updatedAccount;
     response.redirect('/account');
+});
+/**
+ * If the user is authenticated then renders a listing of all the members.
+ */
+ app.get('/member-list', authenticateUser, async (request, response) => {
+    let members = await controllers.membership.getMembers();
+    request.session.members = members;
+    response.render('./membersList.ejs', { session: request.session, message: '' });
 });
 /**
  * If the user is authenticated then renders the documents page.
@@ -381,41 +468,7 @@ app.get('/scholarships', (request, response) => {
  */
 app.get('/reports/members', async (request, response) => {
 
-    let exportResult = await controllers.membership.exportMemberInfo();
-    //request.session.message = resultJSON.updatedAccount;
-    //console.log(exportResult);
-    //response.send(exportResult);
-
-    response.redirect("/");
-    /*
-    http.get(process.env.API + '/api.php?class=Membership&method=exportMemberInfo', (file) => {
-
-        console.log(file);
-        
-        let fileName = file.headers["content-disposition"].split(";")[1].split("=")[1];
-
-        response.setHeader('Pragma', 'public'); 
-        response.setHeader('Expires', '0'); 
-        response.setHeader('Cache-Control','must-revalidate, post-check=0, pre-check=0');
-        response.setHeader('Content-Type', 'application/vnd.ms-excel'); 
-        response.setHeader('Content-Disposition','attachment; filename=' + fileName);
-        response.setHeader('Content-Transfer-Encoding', 'binary');
-
-        //let file;  
-        
-        
-        file.pipe(response);
-        
-    })
-    .on('end', f => {
-        response.send();
-    })
-    .on('error', (e) => {
-        console.log(e.message);
-    });
-
-    //req.send();
-    */
+    response.redirect("https://api.wsfia.org/api.php?class=Membership&method=exportMemberInfo");
     
 });
 // REPORTS END
@@ -436,22 +489,23 @@ app.get('/conference', (request, response) => {
     }
     // Reusing the getRenewals method just to get current members.
     request.session.members = await controllers.membership.getRenewals(JSON.stringify(request.query));
+
+    request.session.businessId = request.query.businessId;
     response.render('./registration/attendeeCurrentMembers.ejs', { session: request.session, message: '' });
 });
 /**
- * Calls the addMember method to add registrant to the database, then redirects to a page listing the registrants.
+ * Adds selected current member(s) to the registration session data.
  */
  app.post('/conference/currentMembers/process', async (request, response) => {
     request.body.sessionId = request.session.sessionId;
     //console.log(JSON.stringify(request.body));
-    
     let confirm = await controllers.conference.addConferenceCurrentMembers(JSON.stringify(request.body));
 
     let registrationMessage = '';
     if (request.session.conference) {
         registrationMessage = '<div class="alert alert-danger m-1" role="alert">If you have any new member(s), you can register them now. Otherwise, click "Next".</div>';
     }
-    
+
     if (confirm) {
         request.session.registrants = await controllers.membership.getRegistrants(request.session.sessionId);
         response.render('./registration/memberInfo.ejs', { session: request.session, message: registrationMessage });
@@ -469,6 +523,7 @@ app.get('/conference', (request, response) => {
  * Renders the conference register current members page.
  */
 app.get('/conference/register', (request, response) => {
+    request.session.conference = (Date.now() >= startDateConference && Date.now() <= endDateConference) ? true : false;
     response.render('./registration/businessSearch.ejs', { session: request.session });
 });
 
@@ -481,7 +536,62 @@ app.post('/addConferenceRegistrants', async (request, response) => {
     let results = await controllers.conference.addConferenceRegistrants(JSON.stringify(request.body));
     //response.json(results);
 });
+// SPONSOR START
+/**
+ * Renders the conference sponsor registration form.
+ */
+ app.get('/conference/sponsor', async (request, response) => {
+    request.session.inventory = await controllers.conference.getInventory("Sponsor");
+    response.render('./registration/sponsorInfo.ejs', { session: request.session, message: '' });
+});
+/**
+ * Calls the registerSponsor method to add the sponsor to the database, 
+ * calls to the PayPal API to create and send an invoice, 
+ * then redirects back to the registration page with a confirmation message.
+ */
+ app.post('/conference/sponsor/register', async (request, response) => {
+    let formData = Object.assign({}, request.body);
+    let result = await controllers.conference.registerSponsor(JSON.stringify(formData));
+    request.session.message = result;
+    response.redirect('/conference/sponsor');
+});
+// SPONSOR END
+// VENDOR START
+/**
+ * Renders the conference vendor registration form.
+ */
+ app.get('/conference/vendor', async (request, response) => {
+    request.session.inventory = await controllers.conference.getInventory("Vendor");
+    response.render('./registration/vendorInfo.ejs', { session: request.session, message: '' });
+});
+/**
+ * Calls the registerVendor method to add the vendor to the database, 
+ * calls to the PayPal API to create and send an invoice, 
+ * then redirects back to the registration page with a confirmation message.
+ */
+ app.post('/conference/vendor/register', async (request, response) => {
+    let formData = Object.assign({}, request.body);
+    let result = await controllers.conference.registerVendor(JSON.stringify(formData));
+    request.session.message = result;
+    response.redirect('/conference/vendor');
+});
+// VENDOR END
+// SPEAKER START
+/**
+ * Renders the conference speaker registration information.
+ */
+ app.get('/conference/speaker', (request, response) => {
+    response.render('./registration/speakerInfo.ejs', { session: request.session });
+});
 
+
+app.post('/conference/speaker/register', async (request, response) => {
+    let formData = Object.assign({}, request.body);
+    let result = await controllers.conference.registerSpeaker(JSON.stringify(formData));
+    request.session.message = result;
+    response.redirect('/conference/speaker');
+});
+// SPEAKER END
 // CONFERENCE END
 /*
 app.post('/register', async (request, response) => {

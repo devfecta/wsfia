@@ -28,6 +28,11 @@
             <% session.members.forEach(function(member, index) { 
 
                 emailAddresses = [...emailAddresses, member.user.emailAddress];
+
+                let currentDate = new Date();
+                var expirationDate = new Date(member.expirationDate);
+
+                if (currentDate > expirationDate) {
                 
             %>
                 <tr class="text-nowrap" id="userRow<%= index %>">
@@ -55,7 +60,9 @@
                         <input type="hidden" id="member<%= member.id %>" name="members" value="<%= member.id %>" />
                     </td>
                 </tr>
-            <% });
+            <% 
+                }
+               });
 
             let businessesFiltered = [];
             let emailsFiltered = [];
