@@ -658,7 +658,7 @@ class Membership extends Member implements iRegistration {
 
             $connection = Configuration::openConnection();
 
-            $statement = $connection->prepare("SELECT `m`.`userId`, `m`.`jobTitle`, `m`.`departments`, `m`.`areas`, `m`.`expirationDate`, `m`.`status`, `m`.`sinceDate`, `m`.`studentId`, `u`.`firstName`, `u`.`lastName` FROM `members` as `m` INNER JOIN `users` as `u` ON `u`.`id`=`m`.`userId` WHERE `m`.`id`=:wsfiaId");
+            $statement = $connection->prepare("SELECT `m`.`userId`, `m`.`jobTitle`, `m`.`departments`, `m`.`areas`, `m`.`expirationDate`, `m`.`status`, `m`.`sinceDate`, `m`.`studentId`, `m`.`streetAddress`, `m`.`city`, `m`.`state`, `m`.`zipcode`, `u`.`firstName`, `u`.`lastName` FROM `members` as `m` INNER JOIN `users` as `u` ON `u`.`id`=`m`.`userId` WHERE `m`.`id`=:wsfiaId");
             $statement->bindParam(":wsfiaId", $wsfiaId, PDO::PARAM_STR);
             $statement->execute();
 
@@ -720,12 +720,19 @@ class Membership extends Member implements iRegistration {
 
             //return json_encode($areas);
 
-            $statement = $connection->prepare("UPDATE `members` SET `jobTitle`=:jobTitle, `departments`=:departments, `areas`=:areas, `studentId`=:studentId WHERE `userId`=:userId");
+            error_log("Line: " . __LINE__ . " " . date('Y-m-d H:i:s') . " " . json_encode($data, JSON_PRETTY_PRINT) . "\n", 3, "/var/www/html/php-errors.log");
+
+            $statement = $connection->prepare("UPDATE `members` SET `jobTitle`=:jobTitle, `departments`=:departments, `areas`=:areas, `studentId`=:studentId, `streetAddress`=:streetAddress, `city`=:city, `state`=:stateId, `zipcode`=:zipcode WHERE `userId`=:userId");
             $statement->bindParam(":userId", $data->userId);
             $statement->bindParam(":jobTitle", $data->jobTitle);
             $statement->bindParam(":departments", json_encode($businesses));
             $statement->bindParam(":areas", json_encode($areas));
             $statement->bindParam(":studentId", $data->studentId);
+            $statement->bindParam(":streetAddress", $data->streetAddress);
+            $statement->bindParam(":city", $data->city);
+            $statement->bindParam(":stateId", $data->stateId);
+            $statement->bindParam(":zipcode", $data->zipcode);
+
             $statement->execute();
 
             $updatedAccount["updatedAccount"] = true;
