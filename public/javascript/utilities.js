@@ -286,7 +286,7 @@ const addConferenceRegistrants = async (members) => {
 /**
  * Gets a list of HTML options for the states.
  */
-const buildStatesDropdown = async () => {
+const buildStatesDropdown = async (selectedState) => {
 
     let states = document.querySelector("#states");
 
@@ -301,7 +301,8 @@ const buildStatesDropdown = async () => {
             let stateOption = document.createElement("option");
             stateOption.setAttribute('value', state.stateId);
             stateOption.text = state.stateName;
-            if (state.stateId == 49) { stateOption.selected = true }
+
+            if (state.stateId == selectedState) { stateOption.selected = true }
             states.appendChild(stateOption);
         })
     })

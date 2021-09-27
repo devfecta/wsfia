@@ -26,23 +26,45 @@
             <legend>Member Information</legend>
 
             <div class="form-group row">
-                <label class="col-md-2 col-form-label" for="firstName">First Name</label>
+                <label class="col-md-2 col-form-label text-right" for="firstName">First Name</label>
                 <input type="text" class="col-md-10 form-control" name="firstName" id="firstName" size="20" maxlength="24" value="<%= session.accountInfo.firstName %>" required />
             </div>
 
             <div class="form-group row">
-                <label class="col-md-2 col-form-label" for="lastName">Last Name</label>
+                <label class="col-md-2 col-form-label text-right" for="lastName">Last Name</label>
                 <input type="text" class="col-md-10 form-control" name="lastName" id="lastName" size="20" maxlength="24" value="<%= session.accountInfo.lastName %>" required />
             </div>
 
             <div class="form-group row">
-                <label class="col-md-2 col-form-label" for="jobTitle">Job Title</label>
+                <label class="col-md-2 col-form-label text-right" for="jobTitle">Job Title</label>
                 <input type="text" class="col-sm-10 form-control" name="jobTitle" id="jobTitle" size="36" maxlength="48" value="<%= session.accountInfo.jobTitle %>" />
             </div>
 
             <div class="form-group row">
-                <label class="col-md-2 col-form-label" for="studentId">Student ID</label>
+                <label class="col-md-2 col-form-label text-right" for="studentId">Student ID</label>
                 <input type="text" class="col-md-10 form-control" name="studentId" id="studentId" size="12" maxlength="16" value="<%= session.accountInfo.studentId %>" />
+            </div>
+
+            <legend>Mailing Address</legend>
+
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label text-right" for="streetAddress">Street Address</label>
+                <input type="text" class="col-md-10 form-control" name="streetAddress" id="streetAddress" size="12" maxlength="48" value="<%= session.accountInfo.streetAddress %>" />
+            </div>
+
+            <div class="form-group row">
+                <label class="col-md-2 col-form-label text-right" for="city">City</label>
+                <input type="text" class="col-md-4 form-control" name="city" id="city" size="12" maxlength="24" value="<%= session.accountInfo.city %>" />
+
+                <label class="col-md-1 col-form-label text-right" for="state">State</label>
+                <select name="states" id="states" class="col-sm-2 form-control"></select>
+
+                <script>
+                    buildStatesDropdown("<%= session.accountInfo.state %>");
+                </script>
+
+                <label class="col-md-1 col-form-label text-right" for="zipcode">Zipcode</label>
+                <input type="text" class="col-md-2 form-control" name="zipcode" id="zipcode" size="10" maxlength="10" value="<%= session.accountInfo.zipcode %>" />
             </div>
         
         </fieldset>

@@ -392,6 +392,10 @@ class Membership {
             params.append('lastName', formData.lastName);
             params.append('jobTitle', formData.jobTitle);
             params.append('studentId', formData.studentId);
+            params.append('streetAddress', formData.streetAddress);
+            params.append('city', formData.city);
+            params.append('stateId', formData.states);
+            params.append('zipcode', formData.zipcode);
             params.append('areas', formData.areas);
             params.append('businesses', formData.businesses);
             //console.log("Parameters");
